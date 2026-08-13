@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /app.html
+Disallow: /auth.html
+Disallow: /reset.html
+Disallow: /verify.html
+
+Sitemap: https://beatviz.in/sitemap.xml

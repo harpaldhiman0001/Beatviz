@@ -6,7 +6,7 @@
 <title>BeatViz — Business Promo Video Maker | Beat Sync Product Videos Free</title>
 <meta name="description" content="Create beat-synced business promo videos free. Upload product images, add text, choose music — download MP4 for Instagram Reels and WhatsApp Status.">
 <meta name="robots" content="index, follow">
-<link rel="canonical" href="https://beatviz.in/promo.html">
+<link rel="canonical" href="https://beatviz.in/promo-video-maker.html">
 <link rel="icon" type="image/png" href="/favicon.png">
 <meta name="theme-color" content="#7c3aed">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -133,6 +133,27 @@ h1 span{background:linear-gradient(135deg,#ec4899,#7c3aed,#06b6d4);-webkit-backg
 .status-txt{font-size:12px;color:var(--muted);text-align:center;max-width:420px}
 
 @media(max-width:768px){nav{padding:12px 16px}.nav-links{display:none}.studio{padding:0 12px}}
+
+/* PAYWALL */
+.paywall-overlay{position:fixed;inset:0;background:rgba(3,3,13,.92);backdrop-filter:blur(12px);z-index:999;display:none;align-items:center;justify-content:center;padding:20px}
+.paywall-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:36px 32px;max-width:440px;width:100%;text-align:center;box-shadow:0 0 60px rgba(124,58,237,.2)}
+.paywall-icon{font-size:52px;margin-bottom:16px}
+.paywall-title{font-size:22px;font-weight:700;letter-spacing:-.5px;margin-bottom:8px}
+.paywall-sub{font-size:14px;color:var(--soft,#94a3b8);line-height:1.65;margin-bottom:24px}
+.paywall-features{list-style:none;display:flex;flex-direction:column;gap:9px;margin-bottom:24px;text-align:left}
+.paywall-features li{font-size:13px;color:var(--soft,#94a3b8);display:flex;align-items:center;gap:8px}
+.paywall-features li::before{content:'✓';color:#10b981;font-weight:700}
+.paywall-price{background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.25);border-radius:10px;padding:14px;margin-bottom:20px}
+.paywall-price .amount{font-size:32px;font-weight:800;letter-spacing:-1px}
+.paywall-price .period{font-size:13px;color:var(--muted,#64748b)}
+.paywall-price .gst{font-size:11px;color:var(--muted,#64748b);margin-top:2px}
+.paywall-btns{display:flex;flex-direction:column;gap:8px}
+.pw-btn{padding:13px;border-radius:10px;border:none;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s}
+.pw-btn-primary{background:linear-gradient(135deg,#7c3aed,#06b6d4);color:#fff}
+.pw-btn-primary:hover{transform:translateY(-1px);opacity:.9}
+.pw-btn-login{background:none;border:1.5px solid var(--border,#1a1a3e);color:var(--muted,#64748b)}
+.pw-btn-login:hover{border-color:#7c3aed;color:var(--text,#f1f5f9)}
+.paywall-free-note{font-size:11px;color:var(--muted,#64748b);margin-top:12px}
 </style>
 </head>
 <body>
@@ -290,6 +311,33 @@ h1 span{background:linear-gradient(135deg,#ec4899,#7c3aed,#06b6d4);-webkit-backg
   </div>
 
 </div>
+
+<!-- PAYWALL OVERLAY -->
+<div class="paywall-overlay" id="paywallOverlay">
+  <div class="paywall-card">
+    <div class="paywall-icon">🎬</div>
+    <div class="paywall-title">Your Free Video is Ready!</div>
+    <p class="paywall-sub">You've used your 1 free promo video. Upgrade to BeatViz Pro to create unlimited beat-sync promo videos for your business.</p>
+    <ul class="paywall-features">
+      <li>Unlimited promo videos — download anytime</li>
+      <li>Unlimited music videos from your songs</li>
+      <li>All beat effects — Zoom, Glitch, Flash & more</li>
+      <li>All video formats — Reels, YouTube, Square</li>
+      <li>Priority support within 24 hours</li>
+    </ul>
+    <div class="paywall-price">
+      <div class="amount">₹625<span style="font-size:18px;font-weight:500">/mo</span></div>
+      <div class="period">BeatViz Pro — cancel anytime</div>
+      <div class="gst">Inclusive of 18% GST</div>
+    </div>
+    <div class="paywall-btns">
+      <button class="pw-btn pw-btn-primary" onclick="goToPricing()">🚀 Get BeatViz Pro</button>
+      <button class="pw-btn pw-btn-login" onclick="goToLogin()">Already a member? Log in</button>
+    </div>
+    <p class="paywall-free-note">First month free when you sign up today · No card required for trial</p>
+  </div>
+</div>
+
 </main>
 
 <script>
@@ -490,7 +538,7 @@ class Particle {
     ctx.globalAlpha = Math.max(0, this.life * 0.9);
     ctx.fillStyle = this.color;
     ctx.beginPath();
-    ctx.arc(this.x, this.y, this.size * this.life, 0, Math.PI*2);
+    ctx.arc(this.x, this.y, Math.max(0, this.size * this.life), 0, Math.PI*2);
     ctx.fill();
     ctx.globalAlpha = 1;
   }
@@ -536,7 +584,7 @@ function render() {
   }
 
   // Update particles
-  particles = particles.filter(p => p.life > 0);
+  particles = particles.filter(p => p.life > 0.05);
   particles.forEach(p => p.update());
 
   // Glitch timer
@@ -809,7 +857,7 @@ async function startRecord() {
     beatShake.y = beatShake.y*0.8;
     hueShift   += energy*1.5;
     if (textX < fmt.w*0.5) { textX+=(fmt.w*0.5-textX)*0.07; textAlpha=Math.min(1,textAlpha+0.06); }
-    particles = particles.filter(p=>p.life>0);
+    particles = particles.filter(p=>p.life>0.05);
     particles.forEach(p=>p.update());
     if (glitchActive) { glitchTimer--; if(glitchTimer<=0) glitchActive=false; }
 
@@ -896,6 +944,117 @@ window.updateImgText = updateImgText;
 window.loadAudio  = loadAudio;
 window.startRecord = startRecord;
 window.resetAll   = () => { images.length=0; audioBuffer=null; renderGrid(); document.getElementById('audioName').textContent=''; document.getElementById('statusTxt').textContent='Upload images and music to start preview'; checkReady(); };
+
+
+
+// ── PAYWALL GATE ──
+const FREE_LIMIT = 1;
+const STORAGE_KEY = 'bv_promo_count';
+
+function getPromoCount() {
+  try { return parseInt(localStorage.getItem(STORAGE_KEY) || '0'); } 
+  catch(e) { return 0; }
+}
+
+function incrementPromoCount() {
+  try { localStorage.setItem(STORAGE_KEY, getPromoCount() + 1); }
+  catch(e) {}
+}
+
+function checkPaywall() {
+  // Check if user is logged in via BeatViz session
+  try {
+    const session = JSON.parse(localStorage.getItem('bv_session') || '{}');
+    if (session.isPro) return false; // Pro user — no paywall
+    if (session.email) {
+      // Free trial user — check video count from session
+      const used = session.videosUsed || 0;
+      if (used >= FREE_LIMIT) return true;
+    }
+  } catch(e) {}
+  // Not logged in — check local count
+  return getPromoCount() >= FREE_LIMIT;
+}
+
+function showPaywall() {
+  const overlay = document.getElementById('paywallOverlay');
+  overlay.style.display = 'flex';
+  // Prevent background scroll
+  document.body.style.overflow = 'hidden';
+}
+
+function hidePaywall() {
+  document.getElementById('paywallOverlay').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+window.goToPricing = () => { window.location.href = '/auth.html?mode=register&plan=pro'; };
+window.goToLogin   = () => { window.location.href = '/auth.html?mode=login&redirect=promo-video-maker.html'; };
+
+// ── HOOK INTO RECORD BUTTON ──
+// Override startRecord to check paywall first
+const _originalStartRecord = startRecord;
+window.startRecord = async function() {
+  if (checkPaywall()) {
+    showPaywall();
+    return;
+  }
+  await _originalStartRecord();
+};
+
+// ── HOOK INTO DOWNLOAD COMPLETE ──
+// After successful download, increment count and check paywall
+const _origRecorderOnStop = null;
+function onVideoDownloaded() {
+  incrementPromoCount();
+  // Show paywall after short delay so user sees the download first
+  setTimeout(() => {
+    if (checkPaywall()) showPaywall();
+  }, 2500);
+}
+
+// Patch the recorder onstop to also call onVideoDownloaded
+const _origStartRecord = startRecord;
+window.startRecord = async function() {
+  if (checkPaywall()) { showPaywall(); return; }
+  
+  // Run original but intercept the download
+  await _origStartRecord();
+  // Note: download happens inside startRecord's onstop callback
+  // We patch it below
+};
+
+// Simpler approach: patch after download in recorder.onstop
+// We intercept by wrapping the recorder creation
+// Actually simplest: check AFTER record button click
+// The cleanest approach for this architecture:
+const recBtnEl = document.getElementById('recBtn');
+recBtnEl.addEventListener('click', function(e) {
+  if (checkPaywall()) {
+    e.stopImmediatePropagation();
+    showPaywall();
+  }
+}, true); // capture phase — fires before onclick
+
+// After download completes (status text changes), show paywall
+const statusEl = document.getElementById('statusTxt');
+const observer = new MutationObserver(() => {
+  if (statusEl.textContent.includes('Downloaded')) {
+    onVideoDownloaded();
+  }
+});
+observer.observe(statusEl, { childList: true, subtree: true, characterData: true });
+
+// Show free badge on record button
+(function initFreeLabel() {
+  const count = getPromoCount();
+  const btn = document.getElementById('recBtn');
+  if (count < FREE_LIMIT) {
+    const remaining = FREE_LIMIT - count;
+    document.getElementById('statusTxt').textContent = 
+      `✨ You have ${remaining} free promo video. Upload images and music to start!`;
+  }
+})();
 
 // ── INIT ──
 canvas.width=fmt.w; canvas.height=fmt.h;

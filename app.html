@@ -348,6 +348,11 @@ select.cs{background:var(--card);border:1.5px solid var(--border);color:var(--te
 *{border-radius:0!important}
 body{background:var(--bg);color:var(--text);font-family:'Inter','Segoe UI',system-ui,sans-serif;font-size:12px}
 
+  .main{display:grid;grid-template-columns:220px 4px 1fr;height:calc(100vh - var(--topbar-h))}
+.resize-handle{background:#1a1a1a;cursor:col-resize;position:relative;flex-shrink:0;z-index:10;transition:background .15s}
+.resize-handle:hover,.resize-handle.dragging{background:var(--accent)}
+.resize-handle::after{content:'';position:absolute;top:0;bottom:0;left:-3px;right:-3px}
+  
 /* Topbar — thin AE-style header bar */
 .topbar{background:#111;border-bottom:1px solid #333;height:var(--topbar-h)!important;min-height:var(--topbar-h)!important;padding:0 10px!important;gap:8px}
 .topbar .logo{font-size:13px;font-weight:700;letter-spacing:.5px;color:var(--accent)!important}
@@ -359,7 +364,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter','Segoe UI',syste
 /* Sidebar — AE left panel */
 .sidebar{background:#222;border-right:1px solid #333;width:220px;min-width:220px;display:flex;flex-direction:column;overflow:hidden}
 .s-tabs{display:flex;background:#1a1a1a;border-bottom:1px solid #333;padding:0}
-.s-tab{flex:1;padding:6px 4px;font-size:10px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;transition:all .12s;border-right:1px solid #333}
+.s-tab{flex:1;min-width:0;padding:6px 2px;font-size:9px;font-weight:600;letter-spacing:.2px;text-transform:uppercase;color:var(--muted);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;transition:all .12s;border-right:1px solid #333;white-space:normal;line-height:1.15;overflow-wrap:break-word;text-align:center}
 .s-tab:last-child{border-right:none}
 .s-tab.on{color:var(--accent);border-bottom-color:var(--accent);background:#1e1e1e}
 .s-tab:hover:not(.on){color:var(--text);background:#252525}
@@ -1093,6 +1098,7 @@ input[type=color]{width:28px;height:22px;border:1px solid #444;background:#1a1a1
   </div>
 
 </aside>
+<div class="resize-handle" id="resizeHandle"></div>
 
 <!-- ── PREVIEW ── -->
 <div class="preview">
@@ -5233,6 +5239,55 @@ setAspectRatio('16:9',document.querySelector('[data-ar="16:9"]'));
 TL.init();
 window.addEventListener('resize',()=>{TL.resize();if(chars.length)drawIdle();});
 renderPromoSlideList();
+
+  (function initSidebarResize(){
+  const handle = document.getElementById('resizeHandle');
+  const main = document.querySelector('.main');
+  if(!handle || !main) return;
+
+  const saved = localStorage.getItem('bv_sidebar_w');
+  if(saved) main.style.gridTemplateColumns = saved + 'px 4px 1fr';
+
+  let dragging = false;
+  handle.addEventListener('mousedown', e => {
+    dragging = true;
+    handle.classList.add('dragging');
+    document.body.style.userSelect = 'none';
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', e => {
+    if(!dragging) return;
+    const rect = main.getBoundingClientRect();
+    let w = e.clientX - rect.left;
+    w = Math.max(180, Math.min(420, w)); // min/max sidebar width
+    main.style.gridTemplateColumns = w + 'px 4px 1fr';
+  });
+  document.addEventListener('mouseup', () => {
+    if(!dragging) return;
+    dragging = false;
+    handle.classList.remove('dragging');
+    document.body.style.userSelect = '';
+    const w = parseInt(main.style.gridTemplateColumns);
+    localStorage.setItem('bv_sidebar_w', w);
+  });
+
+  // Touch support
+  handle.addEventListener('touchstart', e => { dragging = true; e.preventDefault(); }, {passive:false});
+  document.addEventListener('touchmove', e => {
+    if(!dragging) return;
+    const t = e.touches[0];
+    const rect = main.getBoundingClientRect();
+    let w = t.clientX - rect.left;
+    w = Math.max(180, Math.min(420, w));
+    main.style.gridTemplateColumns = w + 'px 4px 1fr';
+  }, {passive:false});
+  document.addEventListener('touchend', () => {
+    if(!dragging) return;
+    dragging = false;
+    const w = parseInt(main.style.gridTemplateColumns);
+    localStorage.setItem('bv_sidebar_w', w);
+  });
+})();
 
 // Wire lyric save/cancel buttons via addEventListener (more reliable than onclick)
 (function wireLyricBar() {

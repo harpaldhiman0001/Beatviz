@@ -589,6 +589,7 @@ input[type=color]{width:28px;height:22px;border:1px solid #444;background:#1a1a1
 .fx-filter-grid{gap:1px;background:#333}
 .fx-filter{background:#2a2a2a}
 .fx-filter.on{background:#1e1200;outline:1px solid var(--accent) inset}
+#pane-fx>div{margin:0!important;padding-bottom:0!important}
 
 </style>
 </head>
@@ -611,7 +612,6 @@ input[type=color]{width:28px;height:22px;border:1px solid #444;background:#1a1a1
     <button class="logout" onclick="doLogout()">Logout</button>
   </div>
 </div>
-
 <!-- ── DESKTOP: SIDEBAR + PREVIEW ── -->
 <div class="main">
 
@@ -687,7 +687,6 @@ input[type=color]{width:28px;height:22px;border:1px solid #444;background:#1a1a1
         <div style="font-size:9px;color:var(--muted);text-align:center;margin-top:6px">Recording resolution: <span id="qualityDims" style="color:var(--text);font-weight:600">1280×720 px</span></div>
       </div>
     </div>
-
     <!-- STYLE -->
     <div id="pane-style" class="pane">
       <!-- ✨ VIDEO TEMPLATES -->
@@ -758,7 +757,6 @@ input[type=color]{width:28px;height:22px;border:1px solid #444;background:#1a1a1
         </div>
       </div>
     </div>
-
     <!-- LYRICS -->
     <div id="pane-lyrics" class="pane">
       <div>
@@ -817,7 +815,6 @@ input[type=color]{width:28px;height:22px;border:1px solid #444;background:#1a1a1
         </div>
       </div>
     </div>
-
     <!-- TEXT OVERLAY -->
     <div id="pane-text" class="pane">
       <!-- Artist / Song info -->
@@ -874,7 +871,6 @@ input[type=color]{width:28px;height:22px;border:1px solid #444;background:#1a1a1
         <span>🚫</span> None — remove text overlay
       </button>
     </div>
-
     <!-- MOTION -->
     <div id="pane-motion" class="pane">
       <div>
@@ -912,11 +908,8 @@ input[type=color]{width:28px;height:22px;border:1px solid #444;background:#1a1a1
       </div>
       <div class="info">Auto dance mode cycles all 5 moves every 22 seconds. Camera shake triggers on beats above 60% intensity.</div>
     </div>
-  </div>
-
   <!-- ══ FX PANE ══ -->
   <div id="pane-fx" class="pane">
-
     <!-- COLOR FILTERS -->
     <div>
       <div class="sl">Color Filter <span style="color:var(--pink);font-size:9px;background:rgba(244,114,182,.1);padding:1px 6px;border-radius:3px;border:1px solid rgba(244,114,182,.3);margin-left:4px">CapCut style</span></div>
@@ -936,7 +929,6 @@ input[type=color]{width:28px;height:22px;border:1px solid #444;background:#1a1a1
       </div>
       <div class="cr" style="margin-top:8px"><span class="cl">Filter strength</span><input type="range" id="filterStrength" min="0" max="100" step="5" value="70" oninput="document.getElementById('vFilter').textContent=this.value+'%'"><span class="cv" id="vFilter">70%</span></div>
     </div>
-
     <!-- OVERLAY EFFECTS -->
     <div>
       <div class="sl">Overlay Effects <span style="color:var(--cyan);font-size:9px;background:rgba(6,182,212,.1);padding:1px 6px;border-radius:3px;border:1px solid rgba(6,182,212,.3);margin-left:4px">After Effects style</span></div>
@@ -953,7 +945,6 @@ input[type=color]{width:28px;height:22px;border:1px solid #444;background:#1a1a1
       </div>
       <div class="cr" style="margin-top:8px"><span class="cl">FX intensity</span><input type="range" id="fxStrength" min="0" max="100" step="5" value="60" oninput="document.getElementById('vFX').textContent=this.value+'%'"><span class="cv" id="vFX">60%</span></div>
     </div>
-
     <!-- TRANSITIONS -->
     <div>
       <div class="sl">Scene Transition Style</div>
@@ -966,7 +957,6 @@ input[type=color]{width:28px;height:22px;border:1px solid #444;background:#1a1a1
         <button class="so" data-tr="glitch"     onclick="pickTrans('glitch',this)"><span>⚡</span>Glitch</button>
       </div>
     </div>
-
     <!-- SPEED RAMP -->
     <div>
       <div class="sl">Playback Speed</div>
@@ -1000,7 +990,6 @@ input[type=color]{width:28px;height:22px;border:1px solid #444;background:#1a1a1
     </div>
     <div style="font-size:9px;color:var(--muted);text-align:center" id="bpmLine"></div>
   </div>
-
   <!-- ══ PROMO PANES (hidden until promo mode) ══ -->
   <div id="promoPanes" style="display:none;flex:1;overflow-y:auto;padding:14px 14px 0;flex-direction:column;gap:12px">
 
@@ -1025,7 +1014,6 @@ input[type=color]{width:28px;height:22px;border:1px solid #444;background:#1a1a1
         </div>
       </div>
     </div>
-
     <!-- DESIGN pane -->
     <div id="ppane-design" class="pane" style="display:none">
       <div>
@@ -1053,7 +1041,6 @@ input[type=color]{width:28px;height:22px;border:1px solid #444;background:#1a1a1
       </div>
       <div class="info">Beat pulse makes text grow on every beat. Works best with Bounce and Beat animation styles.</div>
     </div>
-
     <!-- AUDIO pane -->
     <div id="ppane-audio" class="pane" style="display:none">
       <div>
@@ -1068,7 +1055,6 @@ input[type=color]{width:28px;height:22px;border:1px solid #444;background:#1a1a1
       <div class="info">Your music plays in the background while slides animate. The text will pulse and grow on every beat.</div>
     </div>
   </div>
-
   <!-- Promo generate bar -->
   <div id="promoActions" style="display:none;padding:11px 14px 14px;border-top:1px solid var(--border);flex-direction:column;gap:6px;flex-shrink:0">
     <button class="pause-btn" id="promoPauseBtn" onclick="togglePause()">⏸ Pause &amp; Edit</button>
@@ -1161,7 +1147,6 @@ input[type=color]{width:28px;height:22px;border:1px solid #444;background:#1a1a1
   </div>
 </div>
 </div>
-
 <!-- ── PAYWALL ── -->
 <div class="paywall" id="paywall">
   <div class="pw" style="position:relative">
@@ -1187,7 +1172,6 @@ input[type=color]{width:28px;height:22px;border:1px solid #444;background:#1a1a1
     </div>
   </div>
 </div>
-
 <!-- ── MOBILE: BOTTOM NAV ── -->
 <div class="mob-nav">
   <button class="mn-btn" id="mn-upload" onclick="openSheet('upload',this)"><span class="ni">🎵</span>Upload</button>
@@ -1198,7 +1182,6 @@ input[type=color]{width:28px;height:22px;border:1px solid #444;background:#1a1a1
 </div>
 
 <div class="ov" id="sheetOv" onclick="closeSheet()"></div>
-
 <!-- MOBILE GENERATE -->
 <div class="mob-gen" id="mobGenBar">
   <button class="mob-pause-btn" id="pauseBtnMob" onclick="togglePause()">⏸ Pause</button>
@@ -1209,7 +1192,6 @@ input[type=color]{width:28px;height:22px;border:1px solid #444;background:#1a1a1
     <button class="exp-btn p" id="dlMp4Mob" onclick="exportMP4()" style="display:none">⬇ MP4</button>
   </div>
 </div>
-
 <!-- ══ MOBILE BOTTOM SHEETS ══ -->
 
 <!-- UPLOAD -->
@@ -1266,7 +1248,6 @@ input[type=color]{width:28px;height:22px;border:1px solid #444;background:#1a1a1
     </div>
   </div>
 </div>
-
 <!-- STYLE -->
 <div class="bs" id="bs-style">
   <div class="bs-drag"></div>
@@ -1306,7 +1287,6 @@ input[type=color]{width:28px;height:22px;border:1px solid #444;background:#1a1a1
     </div>
   </div>
 </div>
-
 <!-- LYRICS -->
 <div class="bs" id="bs-lyrics">
   <div class="bs-drag"></div>
@@ -1362,7 +1342,6 @@ input[type=color]{width:28px;height:22px;border:1px solid #444;background:#1a1a1
     </div>
   </div>
 </div>
-
 <!-- MOTION -->
 <div class="bs" id="bs-motion">
   <div class="bs-drag"></div>
@@ -1401,14 +1380,12 @@ input[type=color]{width:28px;height:22px;border:1px solid #444;background:#1a1a1
     </div>
   </div>
 </div>
-
 <!-- ── FLOATING PASTE BAR (shows after copying a lyric) ── -->
 <div class="paste-bar" id="pasteBar">
   <span class="paste-bar-text">📋 <strong id="pasteBarText">Lyric copied</strong> — paste at playhead</span>
   <button class="paste-bar-btn" onclick="pasteAtPlayhead()">⎙ Paste here</button>
   <button class="paste-bar-close" onclick="hidePasteBar()" title="Dismiss">✕</button>
 </div>
-
 <!-- ── LYRIC RIGHT-CLICK CONTEXT MENU ── -->
 <div id="lyricContextMenu" style="position:fixed;z-index:9999;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:5px;box-shadow:0 8px 32px rgba(0,0,0,.55);display:none;min-width:190px;backdrop-filter:blur(8px)">
   <div id="lcm-title" style="font-size:10px;font-weight:700;color:var(--muted);padding:5px 10px 5px;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);margin-bottom:3px"></div>
@@ -1419,7 +1396,6 @@ input[type=color]{width:28px;height:22px;border:1px solid #444;background:#1a1a1
   <button class="lcm-btn" onclick="lcmMove()">↔ Move to time…</button>
   <button class="lcm-btn danger" onclick="lcmDelete()">✕ Delete</button>
 </div>
-
 <!-- ── MOVE LYRIC POPUP ── -->
 <div class="move-popup" id="moveLyricPopup">
   <div class="move-popup-label">↔ Move lyric to new time</div>
@@ -3283,6 +3259,9 @@ function drawIdlePreview() {
   }
 
   ctx.restore();
+  // Show FX on idle canvas too
+  applyColorFilter(0);
+  drawOverlayFX(0, 0);
   drawEditOverlay();
 }
 
@@ -4537,11 +4516,14 @@ function setFilter(f, btn) {
   activeFilter = f;
   document.querySelectorAll('[data-filter]').forEach(b=>b.classList.remove('on'));
   document.querySelectorAll(`[data-filter="${f}"]`).forEach(b=>b.classList.add('on'));
+  if(!isPlaying && !pvPlaying && (chars.length||aiBackground)) drawIdlePreview();
 }
 
 function toggleFX(fx, btn) {
   if(activeFX.has(fx)) { activeFX.delete(fx); btn.classList.remove('on'); }
   else                  { activeFX.add(fx);    btn.classList.add('on');    }
+  initFXParticles();
+  if(!isPlaying && !pvPlaying && (chars.length||aiBackground)) drawIdlePreview();
 }
 
 function pickTrans(t, btn) {

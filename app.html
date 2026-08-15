@@ -464,6 +464,21 @@ input[type=range]::-webkit-slider-thumb{width:12px;height:12px;background:var(--
 
 /* Timeline */
 .tl-wrap{background:#1a1a1a;border-top:1px solid #333}
+/* Multi-track rows */
+.mt-row{display:flex;align-items:center;height:28px;border-bottom:1px solid #222;position:relative;overflow:hidden}
+.mt-label{width:80px;flex-shrink:0;font-size:9px;font-weight:700;color:var(--muted);padding:0 6px;text-transform:uppercase;letter-spacing:.4px;border-right:1px solid #333;height:100%;display:flex;align-items:center;gap:4px;background:#111;overflow:hidden;white-space:nowrap}
+.mt-label img{width:16px;height:16px;object-fit:cover;border-radius:2px;flex-shrink:0}
+.mt-track{flex:1;height:100%;position:relative;cursor:grab;overflow:hidden}
+.mt-seg{position:absolute;top:2px;bottom:2px;background:rgba(232,104,10,.35);border:1px solid var(--accent);border-radius:2px;cursor:grab;display:flex;align-items:center;padding:0 4px;min-width:8px;box-sizing:border-box;transition:background .1s}
+.mt-seg:hover{background:rgba(232,104,10,.5)}
+.mt-seg.audio-seg{background:rgba(74,158,255,.25);border-color:var(--blue)}
+.mt-seg.audio-seg:hover{background:rgba(74,158,255,.4)}
+.mt-seg-label{font-size:8px;color:var(--text);font-weight:600;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;pointer-events:none}
+.mt-seg-handle{position:absolute;top:0;bottom:0;width:6px;background:rgba(255,255,255,.3);cursor:ew-resize}
+.mt-seg-handle.left{left:0}
+.mt-seg-handle.right{right:0}
+.mt-add-row{display:flex;align-items:center;height:22px;cursor:pointer;opacity:.5;transition:opacity .12s}
+.mt-add-row:hover{opacity:1}
 #tlCanvas{background:#1e1e1e}
 .tl-zoom-bar{background:#111;border-top:1px solid #333;padding:2px 6px}
 .tl-zoom-btn{background:#2a2a2a;border:1px solid #333;color:var(--muted);font-size:11px;width:20px;height:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:monospace}
@@ -1114,6 +1129,15 @@ input[type=color]{width:28px;height:22px;border:1px solid #444;background:#1a1a1
         <button class="tlz-btn fit" onclick="TL.zoomFit()" title="Fit whole song">Fit</button>
       </div>
     </div>
+
+    <!-- MULTI-TRACK ROWS (images + audio) -->
+    <div id="multiTrackArea" style="background:#111;border-bottom:1px solid #333">
+      <!-- Image tracks rendered here by JS -->
+      <div id="imgTrackRows"></div>
+      <!-- Audio tracks rendered here by JS -->
+      <div id="audioTrackRows"></div>
+    </div>
+
     <div class="tl-scroll" id="tlScroll">
       <canvas id="tlCanvas"></canvas>
     </div>
@@ -2439,7 +2463,187 @@ document.addEventListener('keydown', e => {
     e.preventDefault(); pasteAfterCopied();
   }
 });
-// ── MULTI-TRACK AUDIO SYSTEM ──────────────────────────────────────
+// ════════════════════════════════════════
+// MULTI-TRACK TIMELINE SYSTEM
+// Each image + audio gets its own horizontal track row
+// Segments can be dragged left/right to reposition in time
+// ════════════════════════════════════════
+
+// Track segments — each has: start, duration, ref (char index or audio index)
+let imgSegments  = []; // [{charIdx, start, dur}]
+let audioSegments= []; // [{trackIdx, start, dur}]
+
+// When an image is added → create a segment that fills the remaining time
+function addImgSegment(charIdx) {
+  if(!audioDuration) return;
+  // Place segment after the last existing image segment
+  const lastEnd = imgSegments.length > 0
+    ? Math.max(...imgSegments.map(s => s.start + s.dur))
+    : 0;
+  const segDur = imgSegments.length === 0
+    ? audioDuration  // first image = full song
+    : Math.max(1, (audioDuration - lastEnd));
+  const start = Math.min(lastEnd, audioDuration - 0.5);
+  // Re-divide equally if already have segments
+  if(imgSegments.length > 0) {
+    const total = chars.length;
+    const each  = audioDuration / total;
+    imgSegments = chars.map((_, i) => ({ charIdx:i, start:i*each, dur:each }));
+  } else {
+    imgSegments = [{ charIdx:0, start:0, dur:audioDuration }];
+  }
+  renderMultiTracks();
+}
+
+function addAudioSegment(trackIdx) {
+  if(!audioTracks[trackIdx]) return;
+  const lastEnd = audioSegments.length > 0
+    ? Math.max(...audioSegments.map(s => s.start + s.dur))
+    : 0;
+  const dur = audioTracks[trackIdx].buffer.duration;
+  audioSegments.push({ trackIdx, start:lastEnd, dur });
+  renderMultiTracks();
+}
+
+function renderMultiTracks() {
+  const totalDur = audioDuration || 1;
+  const W = document.getElementById('tlScroll')?.clientWidth || 600;
+  function t2pct(t) { return (t / totalDur * 100).toFixed(3) + '%'; }
+  function dur2pct(d){ return (d / totalDur * 100).toFixed(3) + '%'; }
+
+  // ── Image track rows ──
+  const imgArea = document.getElementById('imgTrackRows');
+  if(imgArea && chars.length > 0) {
+    imgArea.innerHTML = imgSegments.map((seg, si) => {
+      const c2 = chars[seg.charIdx];
+      const thumb = c2?.url ? `<img src="${c2.url}">` : '🖼';
+      const name  = `Img ${seg.charIdx+1}`;
+      return `<div class="mt-row" id="mt-img-${si}">
+        <div class="mt-label">${thumb}<span>${name}</span></div>
+        <div class="mt-track" onmousedown="mtDragStart(event,'img',${si})">
+          <div class="mt-seg" style="left:${t2pct(seg.start)};width:${dur2pct(seg.dur)}" id="mts-img-${si}">
+            <div class="mt-seg-handle left"  onmousedown="event.stopPropagation();mtResizeStart(event,'img',${si},'left')"></div>
+            <span class="mt-seg-label">${name} · ${fmt(seg.start)}–${fmt(seg.start+seg.dur)}</span>
+            <div class="mt-seg-handle right" onmousedown="event.stopPropagation();mtResizeStart(event,'img',${si},'right')"></div>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  } else if(imgArea) { imgArea.innerHTML = ''; }
+
+  // ── Audio track rows ──
+  const audArea = document.getElementById('audioTrackRows');
+  if(audArea && audioTracks.length > 0) {
+    audArea.innerHTML = audioSegments.map((seg, si) => {
+      const t    = audioTracks[seg.trackIdx];
+      const name = t ? t.name.slice(0,14) : 'Audio';
+      return `<div class="mt-row" id="mt-aud-${si}">
+        <div class="mt-label" style="border-left:2px solid var(--blue)">🎵 <span>${name}</span></div>
+        <div class="mt-track" onmousedown="mtDragStart(event,'aud',${si})">
+          <div class="mt-seg audio-seg" style="left:${t2pct(seg.start)};width:${dur2pct(seg.dur)}" id="mts-aud-${si}">
+            <div class="mt-seg-handle left"  onmousedown="event.stopPropagation();mtResizeStart(event,'aud',${si},'left')"></div>
+            <span class="mt-seg-label">${name} · ${fmt(seg.start)}</span>
+            <div class="mt-seg-handle right" onmousedown="event.stopPropagation();mtResizeStart(event,'aud',${si},'right')"></div>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  } else if(audArea) { audArea.innerHTML = ''; }
+}
+
+// ── Drag to move segments ──
+let _mtDrag = null;
+
+function mtDragStart(e, type, idx) {
+  e.preventDefault();
+  const totalDur = audioDuration || 1;
+  const track = e.currentTarget;
+  const rect  = track.getBoundingClientRect();
+  const startX = e.clientX;
+  const segs   = type === 'img' ? imgSegments : audioSegments;
+  const origStart = segs[idx].start;
+
+  _mtDrag = { type, idx, startX, origStart, trackW: rect.width, totalDur };
+
+  const onMove = e2 => {
+    if(!_mtDrag) return;
+    const dx    = e2.clientX - _mtDrag.startX;
+    const dtSec = (dx / _mtDrag.trackW) * _mtDrag.totalDur;
+    const seg   = (type === 'img' ? imgSegments : audioSegments)[idx];
+    seg.start   = Math.max(0, Math.min(_mtDrag.totalDur - seg.dur, _mtDrag.origStart + dtSec));
+    renderMultiTracks();
+  };
+  const onUp = () => {
+    _mtDrag = null;
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+  };
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+}
+
+function mtResizeStart(e, type, idx, handle) {
+  e.preventDefault();
+  const totalDur = audioDuration || 1;
+  const track   = e.target.closest('.mt-track') || e.target.parentElement;
+  const rect    = track.getBoundingClientRect();
+  const segs    = type === 'img' ? imgSegments : audioSegments;
+  const seg     = segs[idx];
+  const origStart = seg.start, origDur = seg.dur;
+
+  const onMove = e2 => {
+    const dx    = e2.clientX - e.clientX;
+    const dtSec = (dx / rect.width) * totalDur;
+    if(handle === 'left') {
+      const newStart = Math.max(0, Math.min(origStart + origDur - 0.5, origStart + dtSec));
+      seg.start = newStart;
+      seg.dur   = origDur - (newStart - origStart);
+    } else {
+      seg.dur = Math.max(0.5, Math.min(totalDur - seg.start, origDur + dtSec));
+    }
+    renderMultiTracks();
+  };
+  const onUp = () => {
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+  };
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+}
+
+// ── Hook into image loading to create track segments ──
+const _origLoadChars = loadChars;
+function loadChars(e) {
+  const prevCount = chars.length;
+  _origLoadChars(e);
+  // After loadChars adds images, rebuild segments
+  setTimeout(() => {
+    if(audioDuration && chars.length > prevCount) {
+      const total = chars.length;
+      const each  = audioDuration / total;
+      imgSegments = chars.map((_, i) => ({ charIdx:i, start:i*each, dur:each }));
+      renderMultiTracks();
+    }
+  }, 300);
+}
+
+// ── Hook into audio loading ──
+const _origAddAudioTrack = addAudioTrack;
+async function addAudioTrack(file) {
+  const prevCount = audioTracks.length;
+  await _origAddAudioTrack(file);
+  // After track added, create segment
+  if(audioTracks.length > prevCount) {
+    addAudioSegment(audioTracks.length - 1);
+    // Also rebuild image segments now that we have duration
+    if(chars.length > 0 && imgSegments.length === 0) {
+      const total = chars.length, each = audioDuration / total;
+      imgSegments = chars.map((_, i) => ({ charIdx:i, start:i*each, dur:each }));
+    } else if(chars.length > 0) {
+      renderMultiTracks();
+    }
+  }
+}
 let audioTracks = [];
 
 async function loadAudio(e) {
@@ -3373,9 +3577,21 @@ async function handleGenerate(){
   analyser=audioCtx.createAnalyser();analyser.fftSize=2048;analyser.smoothingTimeConstant=.82;
   freqData=new Uint8Array(analyser.frequencyBinCount);timeData=new Uint8Array(analyser.frequencyBinCount);
   const mDest=audioCtx.createMediaStreamDestination();
-  const buf2=await audioCtx.decodeAudioData(audioArrayBuffer.slice(0));
-  srcNode=audioCtx.createBufferSource();srcNode.buffer=buf2;
-  srcNode.connect(analyser);analyser.connect(audioCtx.destination);analyser.connect(mDest);
+  // Use audioTracks if available, fall back to audioBuffer
+  const mainBuf = (audioTracks.length > 0 ? audioTracks[0].buffer : null) || audioBuffer;
+  if(!mainBuf){ toast('⚠ No audio loaded'); return; }
+  srcNode=audioCtx.createBufferSource(); srcNode.buffer=mainBuf;
+  srcNode.connect(analyser); analyser.connect(audioCtx.destination); analyser.connect(mDest);
+  // Connect additional tracks
+  if(audioTracks.length > 1){
+    audioTracks.slice(1).forEach(t=>{
+      if(t.muted) return;
+      const s=audioCtx.createBufferSource(); s.buffer=t.buffer;
+      const g=audioCtx.createGain(); g.gain.value=t.volume||1;
+      s.connect(g); g.connect(mDest); g.connect(audioCtx.destination);
+      t.gainNode=g; s.start(0, rerecordFrom||0);
+    });
+  }
   initParticles();initFXParticles();bassAvg=0;beatIntensity=0;lastBeat=0;camX=0;camY=0;energyHistory=[];lastTransitionTime=0;beatTimestamps=[];
   // Bump the canvas up to the chosen export resolution (HD/Full HD/Ultra HD) right before capturing.
   applyExportResolution();

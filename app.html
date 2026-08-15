@@ -18,8 +18,7 @@
   /* keep compat names */
   --cyan:#4a9eff;--pink:#e8680a;--surface2:#2a2a2a;
 }
-html{height:100%}
-body{font-family:'Space Grotesk',system-ui,sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden}
+body{font-family:'Space Grotesk',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 /* ── TOPBAR ── */
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:6px 16px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;height:var(--topbar-h);min-height:var(--topbar-h);flex-shrink:0}
 .tb-logo{display:flex;align-items:center;gap:8px;font-size:17px;font-weight:700;letter-spacing:-.5px}
@@ -348,11 +347,6 @@ select.cs{background:var(--card);border:1.5px solid var(--border);color:var(--te
 *{border-radius:0!important}
 body{background:var(--bg);color:var(--text);font-family:'Inter','Segoe UI',system-ui,sans-serif;font-size:12px}
 
-  .main{display:grid;grid-template-columns:220px 4px 1fr;height:calc(100vh - var(--topbar-h))}
-.resize-handle{background:#1a1a1a;cursor:col-resize;position:relative;flex-shrink:0;z-index:10;transition:background .15s}
-.resize-handle:hover,.resize-handle.dragging{background:var(--accent)}
-.resize-handle::after{content:'';position:absolute;top:0;bottom:0;left:-3px;right:-3px}
-  
 /* Topbar — thin AE-style header bar */
 .topbar{background:#111;border-bottom:1px solid #333;height:var(--topbar-h)!important;min-height:var(--topbar-h)!important;padding:0 10px!important;gap:8px}
 .topbar .logo{font-size:13px;font-weight:700;letter-spacing:.5px;color:var(--accent)!important}
@@ -364,7 +358,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter','Segoe UI',syste
 /* Sidebar — AE left panel */
 .sidebar{background:#222;border-right:1px solid #333;width:220px;min-width:220px;display:flex;flex-direction:column;overflow:hidden}
 .s-tabs{display:flex;background:#1a1a1a;border-bottom:1px solid #333;padding:0}
-.s-tab{flex:1;min-width:0;padding:6px 2px;font-size:9px;font-weight:600;letter-spacing:.2px;text-transform:uppercase;color:var(--muted);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;transition:all .12s;border-right:1px solid #333;white-space:normal;line-height:1.15;overflow-wrap:break-word;text-align:center}
+.s-tab{flex:1;padding:6px 4px;font-size:10px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;transition:all .12s;border-right:1px solid #333}
 .s-tab:last-child{border-right:none}
 .s-tab.on{color:var(--accent);border-bottom-color:var(--accent);background:#1e1e1e}
 .s-tab:hover:not(.on){color:var(--text);background:#252525}
@@ -825,6 +819,9 @@ input[type=color]{width:28px;height:22px;border:1px solid #444;background:#1a1a1
           <button class="so" data-ls="splitreveal" onclick="pickLS('splitreveal',this)"><span>↔️</span>Split</button>
           <button class="so" data-ls="glowborder"  onclick="pickLS('glowborder',this)"><span>🔆</span>Glow Box</button>
           <button class="so" data-ls="cinematic"   onclick="pickLS('cinematic',this)"><span>🎬</span>Cinematic</button>
+          <button class="so" data-ls="centerburst"  onclick="pickLS('centerburst',this)"><span>💥</span>Center Burst</button>
+          <button class="so" data-ls="slideleft"    onclick="pickLS('slideleft',this)"><span>←</span>Slide Left</button>
+          <button class="so" data-ls="slideright"   onclick="pickLS('slideright',this)"><span>→</span>Slide Right</button>
         </div>
         <div style="display:flex;flex-direction:column;gap:8px;margin-top:9px">
           <div class="cr"><span class="cl">Color</span><input type="color" id="lyricColor" value="#f472b6"></div>
@@ -1098,7 +1095,6 @@ input[type=color]{width:28px;height:22px;border:1px solid #444;background:#1a1a1
   </div>
 
 </aside>
-<div class="resize-handle" id="resizeHandle"></div>
 
 <!-- ── PREVIEW ── -->
 <div class="preview">
@@ -1113,10 +1109,6 @@ input[type=color]{width:28px;height:22px;border:1px solid #444;background:#1a1a1
       </div>
       <!-- W/H size controls — appears when image selected (like Canva) -->
       <div id="imgCtrl" style="display:none;position:absolute;top:8px;left:50%;transform:translateX(-50%);background:rgba(4,4,14,.94);border:1px solid #1c1c42;border-radius:10px;padding:6px 12px;z-index:20;align-items:center;gap:8px;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.6);backdrop-filter:blur(8px)">
-        <div id="floatCtrl" style="display:none;position:absolute;bottom:10px;left:50%;transform:translateX(-50%);z-index:25;gap:8px;background:rgba(4,4,14,.85);border:1px solid #333;border-radius:10px;padding:6px 10px">
-  <button id="pauseBtnFloat" onclick="togglePause()" style="padding:7px 14px;border-radius:7px;border:1px solid var(--amber);background:rgba(245,158,11,.15);color:#fcd34d;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer">⏸ Pause</button>
-  <button id="rerecordBtnFloat" onclick="reRecordFromPlayhead()" style="display:none;padding:7px 14px;border-radius:7px;border:1px solid #ef4444;background:rgba(239,68,68,.15);color:#ef4444;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer">🔄 Re-record from here</button>
-</div>
         <span style="font-size:10px;font-weight:700;color:#64748b">W</span>
         <input type="number" id="imgCtrlW" min="20" max="1280" step="1" style="width:62px;background:#0f0f28;border:1px solid #1c1c42;color:#e2e8f0;font-size:12px;padding:4px 6px;border-radius:5px;font-family:inherit;outline:none" oninput="applyImgSize('w')">
         <span style="font-size:10px;font-weight:700;color:#64748b">H</span>
@@ -1402,48 +1394,6 @@ input[type=color]{width:28px;height:22px;border:1px solid #444;background:#1a1a1
   </div>
 </div>
 <div class="toast" id="toast"></div>
-
-  <div class="tl-float" id="tlFloat">
-  <div class="tl-float-row1">
-    <span class="tl-fi-badge" id="tlFloatTime">🎤 Add Lyric</span>
-    <div class="tl-time-block">
-      <span class="tl-time-label">Start</span>
-      <input type="number" class="tl-t-min" id="lyricStartMin" min="0" value="0">
-      <span class="tl-t-colon">:</span>
-      <input type="number" class="tl-t-sec" id="lyricStartSec" min="0" max="59.9" step="0.1" value="0">
-    </div>
-    <span class="tl-t-arrow">→</span>
-    <div class="tl-time-block">
-      <span class="tl-time-label">End</span>
-      <input type="number" class="tl-t-min" id="lyricEndMin" min="0" value="0">
-      <span class="tl-t-colon">:</span>
-      <input type="number" class="tl-t-sec" id="lyricEndSec" min="0" max="59.9" step="0.1" value="4">
-    </div>
-  </div>
-  <div class="tl-float-row2">
-    <input type="text" class="tl-fi-inp" id="tlFloatInp" placeholder="Type lyric text here… then press Enter or Save">
-    <button class="tl-fi-save" id="tlSaveBtn">Save</button>
-    <button class="tl-fi-cancel" id="tlCancelBtn">✕</button>
-  </div>
-</div>
-
-<div id="lyricContextMenu" style="position:fixed;z-index:9999;display:none;min-width:170px">
-  <div id="lcm-title"></div>
-  <button class="lcm-btn" onclick="lcmEdit()">✏️ Edit</button>
-  <button class="lcm-btn" onclick="lcmCopy()">⎘ Copy</button>
-  <button class="lcm-btn" onclick="lcmPaste()">⎙ Paste below</button>
-  <button class="lcm-btn" onclick="lcmMove()">↔ Move to time…</button>
-  <button class="lcm-btn danger" onclick="lcmDelete()">🗑 Delete</button>
-</div>
-
-<div class="move-popup" id="moveLyricPopup">
-  <div class="move-popup-label">Move lyric to time (m:ss)</div>
-  <input type="text" class="move-popup-inp" id="moveTimeInput" placeholder="0:00">
-  <div class="move-popup-btns">
-    <button class="move-confirm" onclick="confirmMoveLyric()">Move</button>
-    <button class="move-cancel" onclick="closeMovePopup()">Cancel</button>
-  </div>
-</div>
 
 <script>
 // ════════════════════════════════════════
@@ -2790,8 +2740,8 @@ function copyLyric(i) {
   if(domTxt) lyrics[i].text = domTxt;
   _copiedLyric    = { ...lyrics[i], text: txt };
   _copiedLyricIdx = i;
-  _pasteZoneX     = -1;
-  TL.draw(pvOffset || 0); // redraw to show paste zone immediately
+  _pasteZoneX     = -1; // will be set during next draw
+  if(typeof TL !== 'undefined') TL.draw(pvOffset || 0);
   toast('⎘ "' + txt.slice(0,20) + (txt.length>20?'…':'') + '" copied — click ⎙ on timeline to paste after it');
 }
 
@@ -2927,6 +2877,10 @@ function drawLyricsOverlay(elapsed,beat){
     case'splitreveal': lyrSplitReveal(text,progress,beat,lsz,lcol,alpha,ypos);break;
     case'glowborder':  lyrGlowBorder(text,progress,beat,lsz,lcol,alpha,ypos);break;
     case'cinematic':   lyrCinematic(text,progress,beat,lsz,lcol,alpha,ypos);break;
+    // ── NEW effects ──
+    case'centerburst': lyrCenterBurst(text,progress,beat,lsz,lcol,alpha,ypos);break;
+    case'slideleft':   lyrSlideLeft(text,progress,beat,lsz,lcol,alpha,ypos);break;
+    case'slideright':  lyrSlideRight(text,progress,beat,lsz,lcol,alpha,ypos);break;
   }
 }
 function lyrK(text,progress,beat,lsz,lcol,alpha,ypos){const fs=lsz*(1+beatIntensity*.08);ctx.font=`700 ${fs}px 'Space Grotesk',sans-serif`;ctx.textAlign='center';const tw=ctx.measureText(text).width,x=W/2,y=H*ypos,pad=22;ctx.save();ctx.globalAlpha=alpha;ctx.fillStyle='rgba(0,0,0,.68)';rr(x-tw/2-pad,y-fs-10,tw+pad*2,fs+28,13);ctx.fill();ctx.fillStyle='rgba(255,255,255,.45)';ctx.fillText(text,x,y);ctx.save();ctx.beginPath();ctx.rect(x-tw/2,y-fs-12,tw*progress,fs+24);ctx.clip();ctx.fillStyle=lcol;ctx.shadowBlur=14+beatIntensity*8;ctx.shadowColor=lcol;ctx.fillText(text,x,y);ctx.shadowBlur=0;ctx.restore();ctx.fillStyle='rgba(255,255,255,.1)';ctx.fillRect(x-tw/2-pad,y+14,tw+pad*2,3);ctx.fillStyle=lcol;ctx.fillRect(x-tw/2-pad,y+14,(tw+pad*2)*progress,3);ctx.restore();}
@@ -3746,7 +3700,6 @@ function stopAll(){
 // Lets the user freeze recording at any point, reposition/edit characters on the
 // canvas, then continue — works the same on desktop (mouse) and mobile (touch).
 function showPauseUI(show){
-  const fc=document.getElementById('floatCtrl'); if(fc) fc.style.display = show ? 'flex' : 'none';
   ['pauseBtn','pauseBtnMob','promoPauseBtn'].forEach(id=>{
     const b=document.getElementById(id);
     if(!b)return;
@@ -4901,6 +4854,84 @@ function lyrCinematic(text, progress, beat, lsz, lcol, alpha, ypos) {
 }
 
 // ════════════════════════════════════════
+
+// ════════════════════════════════════════
+// NEW VISUAL EFFECTS — Text animations + Image transitions
+// ════════════════════════════════════════
+
+// ── LYRIC: Colorful burst from center ──
+function lyrCenterBurst(text, progress, beat, lsz, lcol, alpha, ypos) {
+  const scl  = progress < 0.2 ? eO(progress/0.2) : 1;
+  const fade = progress > 0.85 ? (1-progress)/0.15 : 1;
+  ctx.save(); ctx.globalAlpha = alpha * fade;
+  ctx.translate(W/2, H*ypos); ctx.scale(scl, scl);
+  ctx.font = `900 ${lsz*(1+beat*.08)}px Space Grotesk,sans-serif`;
+  ctx.textAlign = 'center';
+  const tw = ctx.measureText(text).width;
+  const now = Date.now()*.002;
+  const rg  = ctx.createLinearGradient(-tw/2,0,tw/2,0);
+  rg.addColorStop(0,`hsl(${(now*60)%360},90%,65%)`);
+  rg.addColorStop(.5,`hsl(${(now*60+180)%360},90%,65%)`);
+  rg.addColorStop(1,`hsl(${(now*60)%360},90%,65%)`);
+  ctx.shadowBlur=30+beat*40; ctx.shadowColor=lcol;
+  ctx.fillStyle=rg; ctx.fillText(text,0,0); ctx.shadowBlur=0;
+  if(beat>.4){ctx.globalAlpha=(beat-.4)*.4;ctx.strokeStyle=lcol;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(0,0,tw/2+30*beat,lsz*.6,0,0,Math.PI*2);ctx.stroke();}
+  ctx.restore();
+}
+
+// ── LYRIC: Slide in from LEFT ──
+function lyrSlideLeft(text, progress, beat, lsz, lcol, alpha, ypos) {
+  const si  = progress < .25 ? eO(progress/.25) : 1;
+  const so  = progress > .8  ? 1-(progress-.8)/.2 : 1;
+  ctx.save(); ctx.globalAlpha = alpha*so;
+  ctx.translate(W*(si-1)+W/2, H*ypos);
+  ctx.font=`800 ${lsz*(1+beat*.05)}px Space Grotesk,sans-serif`; ctx.textAlign='center';
+  const tw=ctx.measureText(text).width;
+  ctx.fillStyle='rgba(0,0,0,.75)';
+  if(ctx.roundRect)ctx.roundRect(-tw/2-20,-lsz-10,tw+40,lsz+20,8);else ctx.rect(-tw/2-20,-lsz-10,tw+40,lsz+20);
+  ctx.fill(); ctx.fillStyle=lcol; ctx.fillRect(-tw/2-20,-lsz-10,4,lsz+20);
+  ctx.fillStyle='#fff'; ctx.shadowBlur=8; ctx.shadowColor=lcol;
+  ctx.fillText(text,0,0); ctx.restore();
+}
+
+// ── LYRIC: Slide in from RIGHT ──
+function lyrSlideRight(text, progress, beat, lsz, lcol, alpha, ypos) {
+  const si  = progress < .25 ? eO(progress/.25) : 1;
+  const so  = progress > .8  ? 1-(progress-.8)/.2 : 1;
+  ctx.save(); ctx.globalAlpha = alpha*so;
+  ctx.translate(W*(2-si)-W/2, H*ypos);
+  ctx.font=`800 ${lsz*(1+beat*.05)}px Space Grotesk,sans-serif`; ctx.textAlign='center';
+  const tw=ctx.measureText(text).width;
+  ctx.fillStyle='rgba(0,0,0,.75)';
+  if(ctx.roundRect)ctx.roundRect(-tw/2-20,-lsz-10,tw+40,lsz+20,8);else ctx.rect(-tw/2-20,-lsz-10,tw+40,lsz+20);
+  ctx.fill(); ctx.fillStyle=lcol; ctx.fillRect(tw/2+16,-lsz-10,4,lsz+20);
+  ctx.fillStyle='#fff'; ctx.shadowBlur=8; ctx.shadowColor=lcol;
+  ctx.fillText(text,0,0); ctx.restore();
+}
+
+// ── IMAGE TRANSITION ──
+let imgTransitionType = 'slideLeft';
+
+function getImageTransition(age, dur) {
+  const prog  = Math.max(0, Math.min(1, age / Math.min(0.7, dur*.25)));
+  const eased = eO(prog);
+  switch(imgTransitionType) {
+    case 'zoomIn':    return { s:0.3+eased*.7, tx:W*(1-(0.3+eased*.7))/2, ty:H*(1-(0.3+eased*.7))/2, a:eased };
+    case 'slideLeft': return { s:1, tx:-W*(1-eased), ty:0, a:1 };
+    case 'slideRight':return { s:1, tx: W*(1-eased), ty:0, a:1 };
+    case 'irisOpen':  return { s:eased, tx:W*(1-eased)/2, ty:H*(1-eased)/2, a:eased };
+    case 'fade':      return { s:1, tx:0, ty:0, a:eased };
+    default:          return { s:1, tx:0, ty:0, a:1 };
+  }
+}
+
+function pickImgTransition(t, btn) {
+  imgTransitionType = t;
+  document.querySelectorAll('[data-imgtrans]').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll(`[data-imgtrans="${t}"]`).forEach(b=>b.classList.add('on'));
+}
+
+
 // FX SYSTEM — Color Filters + Overlays + Transitions
 // ════════════════════════════════════════
 let activeFilter  = 'none';
@@ -5239,55 +5270,6 @@ setAspectRatio('16:9',document.querySelector('[data-ar="16:9"]'));
 TL.init();
 window.addEventListener('resize',()=>{TL.resize();if(chars.length)drawIdle();});
 renderPromoSlideList();
-
-  (function initSidebarResize(){
-  const handle = document.getElementById('resizeHandle');
-  const main = document.querySelector('.main');
-  if(!handle || !main) return;
-
-  const saved = localStorage.getItem('bv_sidebar_w');
-  if(saved) main.style.gridTemplateColumns = saved + 'px 4px 1fr';
-
-  let dragging = false;
-  handle.addEventListener('mousedown', e => {
-    dragging = true;
-    handle.classList.add('dragging');
-    document.body.style.userSelect = 'none';
-    e.preventDefault();
-  });
-  document.addEventListener('mousemove', e => {
-    if(!dragging) return;
-    const rect = main.getBoundingClientRect();
-    let w = e.clientX - rect.left;
-    w = Math.max(180, Math.min(420, w)); // min/max sidebar width
-    main.style.gridTemplateColumns = w + 'px 4px 1fr';
-  });
-  document.addEventListener('mouseup', () => {
-    if(!dragging) return;
-    dragging = false;
-    handle.classList.remove('dragging');
-    document.body.style.userSelect = '';
-    const w = parseInt(main.style.gridTemplateColumns);
-    localStorage.setItem('bv_sidebar_w', w);
-  });
-
-  // Touch support
-  handle.addEventListener('touchstart', e => { dragging = true; e.preventDefault(); }, {passive:false});
-  document.addEventListener('touchmove', e => {
-    if(!dragging) return;
-    const t = e.touches[0];
-    const rect = main.getBoundingClientRect();
-    let w = t.clientX - rect.left;
-    w = Math.max(180, Math.min(420, w));
-    main.style.gridTemplateColumns = w + 'px 4px 1fr';
-  }, {passive:false});
-  document.addEventListener('touchend', () => {
-    if(!dragging) return;
-    dragging = false;
-    const w = parseInt(main.style.gridTemplateColumns);
-    localStorage.setItem('bv_sidebar_w', w);
-  });
-})();
 
 // Wire lyric save/cancel buttons via addEventListener (more reliable than onclick)
 (function wireLyricBar() {

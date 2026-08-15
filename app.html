@@ -49,7 +49,7 @@ body{background:var(--bg);font-family:'Space Grotesk',system-ui,sans-serif;backg
 .logout{font-size:11px;color:var(--muted);background:none;border:none;cursor:pointer;font-family:inherit;padding:4px 7px;border-radius:5px}
 .logout:hover{color:var(--red)}
 /* ── DESKTOP LAYOUT ── */
-.main{display:grid;grid-template-columns:40px 240px 1fr 220px;grid-template-rows:1fr;height:calc(100vh - var(--topbar-h) - var(--menubar-h,22px))}
+.main{display:grid;grid-template-columns:40px 240px 1fr;grid-template-rows:1fr;height:calc(100vh - var(--topbar-h) - var(--menubar-h,22px))}
 .sidebar{background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
 .s-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
 .s-tab{flex:1;padding:6px 2px 5px;font-size:7px;font-weight:700;color:var(--dim);background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;transition:all .1s;display:flex;flex-direction:column;align-items:center;gap:1px;text-transform:uppercase;letter-spacing:.2px;min-width:0;overflow:hidden;white-space:nowrap}
@@ -385,7 +385,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter','Segoe UI',syste
 .s-tab:hover:not(.on){color:var(--text);background:#252525}
 
 /* Pane sections */
-.pane{padding:0;overflow-y:auto;flex:1}
+.pane{padding:0}
 .pane > div{border-bottom:1px solid var(--border)}
 
 /* Section labels — AE-style collapsible headers */
@@ -1129,8 +1129,7 @@ input[type=color]{width:28px;height:22px;border:1px solid var(--border);backgrou
       <div>
         <div class="sl">Slides <span id="promoSlideCount" style="color:var(--muted);font-size:9px;text-transform:none;letter-spacing:0;font-weight:400;margin-left:3px"></span></div>
 <div id="promoSlideList" style="display:flex;flex-direction:column;gap:6px"></div>
-<button onclick="addPromoSlide()" style="...">+ Add Slide</button>
-      </div>
+<button onclick="addPromoSlide()" style="width:100%;margin-top:6px;padding:9px;border-radius:7px;border:1.5px dashed var(--border);background:none;color:var(--muted);font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;transition:all .14s">+ Add Slide</button>      </div>
       <div>
         <div class="sl">Animation Style</div>
         <div class="sg">
@@ -2401,7 +2400,7 @@ function applyExportResolution(){
 function restorePreviewResolution(){
   const base=AR_SIZES[currentAR];
   canvas.width=base.w;canvas.height=base.h;W=base.w;H=base.h;
-  if(chars.length)drawIdle();
+  if(chars.length || aiBackground) drawIdle();
 }
 function pickRecorderMime(){
   const mp4Cands=['video/mp4;codecs=avc1.640028,mp4a.40.2','video/mp4;codecs="avc1.42E01E,mp4a.40.2"','video/mp4;codecs=h264,aac','video/mp4'];
@@ -2517,6 +2516,7 @@ function checkReady(){
   if(pb) pb.disabled = !ok;
   const mb = document.getElementById('aiGenBtn');
   if(mb && aiBackground) mb.textContent = '✨ Generate New';
+  if (typeof checkPromoReady === 'function') checkPromoReady();
 }
 
 // ── PREVIEW PLAYER ──
@@ -2737,7 +2737,7 @@ function showSegmentMenu(e, type, idx) {
   // Update label
   let label = '';
   if(type==='img')   label = `Image ${(imgSegments[idx]?.charIdx||0)+1} clip`;
-  if(type==='audio') label = audioTracks[audioSegments[idx]?.trackIdx]?.name || 'Audio clip';
+if(type==='aud') label = audioTracks[audioSegments[idx]?.trackIdx]?.name || 'Audio clip';
   if(type==='lyric') label = `"${(lyrics[idx]?.text||'').slice(0,22)}"`;
   const t = document.getElementById('segCtxLabel');
   if(t) t.textContent = label;
@@ -2755,7 +2755,7 @@ function hideSegmentMenu() {
 function segCtxCopy() {
   if(!_segCtxType||_segCtxIdx<0){hideSegmentMenu();return;}
   if(_segCtxType==='img')   tlCopy('img',   imgSegments[_segCtxIdx]);
-  if(_segCtxType==='audio') tlCopy('audio', audioSegments[_segCtxIdx]);
+  if(_segCtxType==='aud')   tlCopy('audio', audioSegments[_segCtxIdx]);
   if(_segCtxType==='lyric') tlCopy('lyric', lyrics[_segCtxIdx]);
   hideSegmentMenu();
 }
@@ -2764,7 +2764,7 @@ function segCtxPasteAfter() {
   if(!_segCtxType||_segCtxIdx<0){hideSegmentMenu();return;}
   let atTime = 0;
   if(_segCtxType==='img')   { const s=imgSegments[_segCtxIdx];   atTime=s.start+s.dur+0.2; }
-  if(_segCtxType==='audio') { const s=audioSegments[_segCtxIdx]; atTime=s.start+s.dur+0.2; }
+  if(_segCtxType==='aud')   { const s=audioSegments[_segCtxIdx]; atTime=s.start+s.dur+0.2; }
   if(_segCtxType==='lyric') { const l=lyrics[_segCtxIdx]; atTime=(l.endTime||l.time+4)+0.2; }
   hideSegmentMenu();
   tlPaste(atTime);
@@ -2773,7 +2773,7 @@ function segCtxPasteAfter() {
 function segCtxDelete() {
   if(!_segCtxType||_segCtxIdx<0){hideSegmentMenu();return;}
   if(_segCtxType==='img')   { imgSegments.splice(_segCtxIdx,1);   renderMultiTracks(); }
-  if(_segCtxType==='audio') { audioSegments.splice(_segCtxIdx,1); renderMultiTracks(); }
+  if(_segCtxType==='aud')   { audioSegments.splice(_segCtxIdx,1); renderMultiTracks(); }
   if(_segCtxType==='lyric') { deleteLyric(_segCtxIdx); }
   hideSegmentMenu();
   toast('✕ Deleted');
@@ -4401,12 +4401,46 @@ function renderPromoSlideList() {
   if (!el) { console.error('promoSlideList element missing from DOM'); return; }
   const cnt = document.getElementById('promoSlideCount');
   if (cnt) cnt.textContent = `— ${promoSlides.length} slide${promoSlides.length!==1?'s':''}`;
-  el.innerHTML = promoSlides.map((s,i) => `...`).join('');
+
+  el.innerHTML = promoSlides.map((s, i) => `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:7px">
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-size:9px;font-weight:700;color:var(--accent);min-width:14px">${i+1}</span>
+        <input type="text" value="${(s.emoji||'').replace(/"/g,'&quot;')}" maxlength="4"
+          oninput="promoSlides[${i}].emoji=this.value"
+          style="width:36px;text-align:center;background:var(--bg);border:1px solid var(--border);border-radius:5px;color:var(--text);font-size:15px;padding:5px 2px;outline:none">
+        <button onclick="deletePromoSlide(${i})" title="Delete slide"
+          style="margin-left:auto;width:22px;height:22px;border-radius:5px;border:1px solid var(--border);background:none;color:var(--muted);font-size:11px;cursor:pointer;flex-shrink:0">✕</button>
+      </div>
+      <textarea rows="2" placeholder="Headline (press Enter for a 2nd line)"
+        oninput="promoSlides[${i}].headline=this.value"
+        style="width:100%;resize:vertical;background:var(--bg);border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:inherit;font-size:11px;padding:6px 8px;outline:none;box-sizing:border-box">${(s.headline||'').replace(/</g,'&lt;')}</textarea>
+      <textarea rows="2" placeholder="Sub text"
+        oninput="promoSlides[${i}].sub=this.value"
+        style="width:100%;resize:vertical;background:var(--bg);border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:inherit;font-size:10px;padding:6px 8px;outline:none;box-sizing:border-box">${(s.sub||'').replace(/</g,'&lt;')}</textarea>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-size:9px;color:var(--muted);min-width:44px">Duration</span>
+        <input type="range" min="1.5" max="8" step="0.5" value="${s.dur||3.5}"
+          oninput="promoSlides[${i}].dur=+this.value;this.nextElementSibling.textContent=this.value+'s'"
+          style="flex:1">
+        <span style="font-size:9px;color:var(--text);min-width:26px;text-align:right">${s.dur||3.5}s</span>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px">
+        ${(s.pills||[]).map((p,pi)=>`
+          <span style="display:flex;align-items:center;gap:4px;background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);border-radius:12px;padding:3px 6px 3px 9px;font-size:9px;color:#a78bfa">
+            ${p.replace(/</g,'&lt;')}
+            <button onclick="removePromoPill(${i},${pi})" style="background:none;border:none;color:#a78bfa;font-size:10px;cursor:pointer;padding:0;line-height:1">✕</button>
+          </span>`).join('')}
+        <input type="text" placeholder="+ tag" onkeydown="if(event.key==='Enter'){event.preventDefault();addPromoPill(${i},this);this.value='';}"
+          style="width:60px;background:var(--bg);border:1px dashed var(--border);border-radius:12px;color:var(--text);font-size:9px;padding:3px 8px;outline:none">
+      </div>
+    </div>
+  `).join('');
 }
 
 function checkPromoReady() {
   const btn = document.getElementById('promoGenBtn');
-  if (btn) btn.disabled = promoSlides.length === 0;
+  if (btn) btn.disabled = promoSlides.length === 0 || !audioBuffer;
 }
 
 // ════════════════════════════════════════

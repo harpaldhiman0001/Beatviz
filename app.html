@@ -2442,11 +2442,21 @@ function loadChars(e){
         document.getElementById('cEmpty').style.display='none';
         drawIdlePreview();
         // Rebuild image track segments equally divided across song
-        if(audioDuration > 0){
-          const each = audioDuration / chars.length;
-          imgSegments = chars.map((_,i)=>({charIdx:i, start:i*each, dur:each}));
-          renderMultiTracks();
-        }
+// in loadChars, replace the block above with:
+if (audioDuration > 0) {
+  const newIdx = chars.length - 1;
+  const lastEnd = imgSegments.length
+    ? Math.max(...imgSegments.map(s => s.start + s.dur))
+    : 0;
+  if (lastEnd >= audioDuration) {
+    // no room left — shrink the last segment to make space
+    const remaining = Math.max(1, audioDuration - lastEnd + 2);
+    imgSegments.push({ charIdx: newIdx, start: Math.max(0, audioDuration - remaining), dur: remaining });
+  } else {
+    imgSegments.push({ charIdx: newIdx, start: lastEnd, dur: audioDuration - lastEnd });
+  }
+  renderMultiTracks();
+}
         toast('✓ Image added — click on canvas to move · drag corners to resize');
       };
     };
@@ -2454,6 +2464,17 @@ function loadChars(e){
   });
   if(files.length>room)toast('Max 5 images. Remove one to add more.');
 }
+
+  let currentLTool = 'select';
+function setLTool(tool, btn) {
+  currentLTool = tool;
+  document.querySelectorAll('.ltool').forEach(b => b.classList.remove('on'));
+  if (btn) btn.classList.add('on');
+  document.body.dataset.ltool = tool;
+  canvas.style.cursor = tool === 'select' ? 'default' : 'crosshair';
+}
+
+  let mtTotalDur = 1;
 
 function removeChar(i){
   chars.splice(i,1);
@@ -2636,13 +2657,31 @@ document.addEventListener('click', e => {
   const p = document.getElementById('moveLyricPopup');
   if(p && p.classList.contains('show') && !p.contains(e.target)) closeMovePopup();
 });
+let _selectedSeg = null; // {type:'img'|'audio', idx}
+
 document.addEventListener('keydown', e => {
+  if (e.target.matches('input,textarea,[contenteditable]')) return;
+
   if(e.key==='Escape') hideLyricContextMenu();
-  // Ctrl+V = universal paste at playhead (lyrics, images, audio)
-  if((e.ctrlKey||e.metaKey) && e.key==='v' && (_tlClipboard||_copiedLyric) && !e.target.matches('input,textarea,[contenteditable]')){
+
+  // Ctrl+C — copy whatever is currently selected
+  if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
+    if (selectedLyricIdx >= 0 && lyrics[selectedLyricIdx]) {
+      e.preventDefault();
+      copyLyric(selectedLyricIdx);
+    } else if (_selectedSeg) {
+      e.preventDefault();
+      const data = _selectedSeg.type === 'img'
+        ? imgSegments[_selectedSeg.idx]
+        : audioSegments[_selectedSeg.idx];
+      tlCopy(_selectedSeg.type, data);
+    }
+  }
+
+  // Ctrl+V — paste at current playhead position
+  if ((e.ctrlKey || e.metaKey) && e.key === 'v' && _tlClipboard) {
     e.preventDefault();
-    if(_tlClipboard) tlPaste(pvOffset||0);
-    else pasteAfterCopied();
+    tlPaste(pvOffset || 0);
   }
 });
 
@@ -2796,6 +2835,7 @@ function renderMultiTracks() {
     : 0;
   const totalDur = Math.max(audioDuration || 1, maxAudioEnd, maxImgEnd);
   // Use tlScroll width to match lyric timeline below
+  mtTotalDur = totalDur;
   const trackW = document.getElementById('tlScroll')?.clientWidth || 600;
 
   function pct(t)   { return ((t / totalDur) * 100).toFixed(4) + '%'; }
@@ -2849,18 +2889,35 @@ let _mtDrag = null;
 
 function mtDragStart(e, type, idx) {
   e.preventDefault();
-  const segs   = type === 'img' ? imgSegments : audioSegments;
-  const rect   = e.currentTarget.getBoundingClientRect();
+  const segs = type === 'img' ? imgSegments : audioSegments;
+  const rect = e.currentTarget.getBoundingClientRect();
+  const clickTime = Math.max(0, Math.min(mtTotalDur, ((e.clientX - rect.left) / rect.width) * mtTotalDur));
+
+  if (currentLTool === 'cut') {
+    splitSegment(type, idx, clickTime);
+    return;
+  }
+  if (currentLTool === 'trim') {
+    const seg = segs[idx];
+    const mid = seg.start + seg.dur / 2;
+    trimSegmentEdge(type, idx, clickTime, clickTime < mid ? 'left' : 'right');
+    return;
+  }
+
+  // ── Select tool (default) ──
+  _selectedSeg = { type, idx };
+  document.querySelectorAll('.mt-seg').forEach(el => el.style.outline = 'none');
+  const selEl = document.getElementById(`mts-${type}-${idx}`);
+  if (selEl) selEl.style.outline = '2px solid #06b6d4';
+
   const startX = e.clientX;
   const origStart = segs[idx].start;
 
   // On click (before drag) — seek to segment start + highlight
-  if(type === 'img') {
+  if (type === 'img') {
     seekPreview(segs[idx].start + 0.05);
-    // Highlight active segment
     document.querySelectorAll('.mt-seg').forEach(el => el.style.opacity='0.6');
     document.getElementById(`mts-img-${idx}`)?.style && (document.getElementById(`mts-img-${idx}`).style.opacity='1');
-    // Redraw canvas to show the correct image
     if(!isPlaying && !pvPlaying) drawIdlePreview();
   }
 
@@ -2878,6 +2935,32 @@ function mtDragStart(e, type, idx) {
   };
   document.addEventListener('mousemove', onMove);
   document.addEventListener('mouseup', onUp);
+}
+
+  function splitSegment(type, idx, atTime) {
+  const segs = type === 'img' ? imgSegments : audioSegments;
+  const seg = segs[idx];
+  if (!seg || atTime <= seg.start + 0.15 || atTime >= seg.start + seg.dur - 0.15) return;
+  const newSeg = { ...seg, start: atTime, dur: (seg.start + seg.dur) - atTime };
+  seg.dur = atTime - seg.start;
+  segs.splice(idx + 1, 0, newSeg);
+  renderMultiTracks();
+  toast('✂ Clip split at ' + fmt(atTime));
+}
+
+function trimSegmentEdge(type, idx, atTime, edge) {
+  const segs = type === 'img' ? imgSegments : audioSegments;
+  const seg = segs[idx];
+  if (!seg) return;
+  if (edge === 'left') {
+    const end = seg.start + seg.dur;
+    seg.start = Math.max(0, Math.min(end - 0.3, atTime));
+    seg.dur = end - seg.start;
+  } else {
+    seg.dur = Math.max(0.3, atTime - seg.start);
+  }
+  renderMultiTracks();
+  toast('✂ Trimmed to ' + fmt(atTime));
 }
 
 function mtResizeStart(e, type, idx, handle) {

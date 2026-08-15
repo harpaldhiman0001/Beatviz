@@ -638,15 +638,15 @@ input[type=color]{width:28px;height:22px;border:1px solid #444;background:#1a1a1
     <!-- UPLOAD -->
     <div id="pane-upload" class="pane on">
       <div>
-        <div class="sl">Audio Track</div>
-        <div class="dz" id="audioDz" onclick="document.getElementById('audioIn').click()">
-          <input type="file" id="audioIn" accept=".mp3,.wav,.ogg,.aac,.flac,.m4a,audio/*" onchange="loadAudio(event)">
-          <div style="font-size:24px;margin-bottom:4px">🎵</div>
-          <div style="font-size:12px;font-weight:600;margin-bottom:2px" id="audioName">Drop or click to add track</div>
-          <div style="font-size:10px;color:var(--muted)">MP3 · WAV · AAC · OGG · FLAC</div>
+        <div class="sl">Audio Tracks <span style="color:var(--accent);font-size:9px;font-weight:400;letter-spacing:0;text-transform:none;margin-left:4px">add multiple</span></div>
+        <div id="audioTrackList" style="display:flex;flex-direction:column;gap:1px;margin-bottom:4px"></div>
+        <div class="dz" id="audioDz" onclick="document.getElementById('audioIn').click()" style="padding:10px 12px;display:flex;align-items:center;gap:10px">
+          <input type="file" id="audioIn" accept=".mp3,.wav,.ogg,.aac,.flac,.m4a,audio/*" multiple onchange="loadAudio(event)">
+          <div style="font-size:18px">🎵</div>
+          <div><div style="font-size:11px;font-weight:700;color:var(--text)" id="audioName">Click to add audio track</div>
+          <div style="font-size:9px;color:var(--muted)">MP3 · WAV · AAC · OGG · FLAC</div></div>
         </div>
-        <canvas id="waveCanvas"></canvas>
-      </div>
+        <canvas id="waveCanvas"></canvas>      </div>
       <div>
         <div class="sl">Images on canvas <span style="color:var(--cyan);font-size:9px;font-weight:400;letter-spacing:0;text-transform:none;margin-left:2px">click to select · drag to move · corners to resize</span></div>
         <!-- Two clear upload options -->
@@ -1120,37 +1120,6 @@ input[type=color]{width:28px;height:22px;border:1px solid #444;background:#1a1a1
       <canvas id="tlCanvas"></canvas>
     </div>
     <div class="tl-tip" id="tlTip" style="display:none"></div>
-    <!-- Fixed bottom lyric input bar -->
-    <div class="tl-float" id="tlFloat">
-      <!-- Row 1: time controls -->
-      <div class="tl-float-row1">
-        <span class="tl-fi-badge">🎤 Add Lyric</span>
-        <!-- Start time -->
-        <div class="tl-time-block">
-          <span class="tl-time-label">Start</span>
-          <input type="number" id="lyricStartMin" class="tl-t-min" min="0" max="999" step="1" value="0" title="Start minutes">
-          <span class="tl-t-colon">:</span>
-          <input type="number" id="lyricStartSec" class="tl-t-sec" min="0" max="59.9" step="0.1" value="0.0" title="Start seconds">
-        </div>
-        <span class="tl-t-arrow">→ end</span>
-        <!-- End time -->
-        <div class="tl-time-block">
-          <span class="tl-time-label">End</span>
-          <input type="number" id="lyricEndMin" class="tl-t-min" min="0" max="999" step="1" value="0" title="End minutes">
-          <span class="tl-t-colon">:</span>
-          <input type="number" id="lyricEndSec" class="tl-t-sec" min="0" max="59.9" step="0.1" value="4.0" title="End seconds">
-        </div>
-        <span style="font-size:10px;color:#475569;white-space:nowrap">Edit times above · Enter = save · Esc = cancel</span>
-      </div>
-      <!-- Row 2: text + save/cancel -->
-      <div class="tl-float-row2">
-        <input type="text" class="tl-fi-inp" id="tlFloatInp"
-          placeholder="Type lyric text here… then press Enter or Save"
-          autocomplete="off" autocorrect="off" spellcheck="false">
-        <button class="tl-fi-save" id="tlSaveBtn">✓ Save</button>
-        <button class="tl-fi-cancel" id="tlCancelBtn" title="Cancel (Esc)">✕</button>
-      </div>
-    </div>
   </div>
   <div class="sb">
     <div class="dot" id="dot"></div>
@@ -2259,23 +2228,7 @@ function pickRecorderMime(){
 }
 
 // ── AUDIO ──
-async function loadAudio(e){
-  const file=e.target.files[0];if(!file)return;audioFile=file;toast('Decoding audio…');
-  try{
-    audioArrayBuffer=await file.arrayBuffer();
-    const tmp=new(window.AudioContext||window.webkitAudioContext)();
-    audioBuffer=await tmp.decodeAudioData(audioArrayBuffer.slice(0));audioDuration=audioBuffer.duration;await tmp.close();
-    document.getElementById('audioName').textContent=file.name;
-    document.getElementById('audioNameMob').textContent=file.name;
-    document.getElementById('audioDz').classList.add('ok');
-    drawWaveform(audioBuffer);
-    document.getElementById('pvTime').textContent='0:00 / '+fmt(audioDuration);
-    document.getElementById('pvTimeM').textContent='0:00 / '+fmt(audioDuration);
-    TL.draw(0);toast('✓ '+file.name+' ('+fmt(audioDuration)+')');checkReady();
-    // Show canvas preview status update when audio loads
-    if(chars.length > 0 || aiBackground) drawIdlePreview();
-  }catch(err){toast('Audio error: '+err.message);}
-}
+// loadAudio replaced by multi-track system above
 function drawWaveform(buf){
   const wc=document.getElementById('waveCanvas');wc.style.display='block';
   wc.width=wc.offsetWidth*devicePixelRatio;wc.height=40*devicePixelRatio;wc.style.height='40px';
@@ -2487,6 +2440,69 @@ document.addEventListener('keydown', e => {
     e.preventDefault(); pasteAfterCopied();
   }
 });
+// ── MULTI-TRACK AUDIO SYSTEM ──────────────────────────────────────
+let audioTracks = [];
+
+async function loadAudio(e) {
+  const files = Array.from(e.target.files || []);
+  if(!files.length) return;
+  for(const file of files) await addAudioTrack(file);
+  e.target.value = '';
+}
+
+async function addAudioTrack(file) {
+  if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  const name = file.name.replace(/\.[^.]+$/, '');
+  const ab  = await file.arrayBuffer();
+  let buf;
+  try { buf = await audioCtx.decodeAudioData(ab); }
+  catch(err) { toast('⚠ Could not decode ' + name); return; }
+
+  if(audioTracks.length === 0) {
+    // First track = main track (BPM, duration, waveform)
+    audioBuffer   = buf;
+    audioDuration = buf.duration;
+    if(typeof drawWaveform === 'function') drawWaveform();
+    document.getElementById('audioName').textContent = name;
+    if(typeof TL !== 'undefined') TL.draw(0);
+  }
+  audioTracks.push({ buffer:buf, name, volume:1, muted:false, gainNode:null });
+  renderAudioTrackList();
+  checkReady();
+  toast('✓ ' + name + ' (' + fmt(buf.duration) + ')' + (audioTracks.length > 1 ? ' — track ' + audioTracks.length : ''));
+}
+
+function renderAudioTrackList() {
+  const list = document.getElementById('audioTrackList');
+  if(!list) return;
+  list.innerHTML = audioTracks.map((t,i) => `
+    <div style="display:flex;align-items:center;gap:5px;padding:4px 8px;background:${i===0?'#1e1200':'#1e1e1e'};border-left:2px solid ${i===0?'var(--accent)':'#444'}">
+      <span style="font-size:9px;color:${i===0?'var(--accent)':'var(--dim)'};font-weight:700;min-width:12px">${i+1}</span>
+      <span style="flex:1;font-size:10px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${t.name}">${t.name}</span>
+      <span style="font-size:9px;color:var(--muted);font-family:monospace">${fmt(t.buffer.duration)}</span>
+      <input type="range" min="0" max="1" step="0.05" value="${t.volume}" style="width:40px;height:3px;accent-color:var(--accent)" oninput="setTrackVolume(${i},+this.value)" title="Volume">
+      <button onclick="muteTrack(${i})" style="background:none;border:none;color:${t.muted?'var(--red)':'var(--dim)'};font-size:10px;cursor:pointer;padding:0" title="${t.muted?'Unmute':'Mute'}">${t.muted?'M':'◎'}</button>
+      <button onclick="removeAudioTrack(${i})" style="background:none;border:none;color:var(--dim);font-size:10px;cursor:pointer;padding:0" title="Remove">✕</button>
+    </div>`).join('');
+}
+
+function setTrackVolume(i, v) {
+  if(audioTracks[i]) { audioTracks[i].volume = v; if(audioTracks[i].gainNode) audioTracks[i].gainNode.gain.value = v; }
+}
+function muteTrack(i) {
+  if(!audioTracks[i]) return;
+  audioTracks[i].muted = !audioTracks[i].muted;
+  if(audioTracks[i].gainNode) audioTracks[i].gainNode.gain.value = audioTracks[i].muted ? 0 : audioTracks[i].volume;
+  renderAudioTrackList();
+}
+function removeAudioTrack(i) {
+  audioTracks.splice(i,1);
+  if(audioTracks.length > 0) { audioBuffer = audioTracks[0].buffer; audioDuration = audioBuffer.duration; }
+  else { audioBuffer = null; audioDuration = 0; document.getElementById('audioName').textContent = 'Click to add audio track'; }
+  renderAudioTrackList(); checkReady();
+}
+
+// ── LYRIC COPY / PASTE / MOVE ─────────────────────────────────────
 let _copiedLyric = null;
 let _copiedLyricIdx = -1;
 let _pasteZoneX = -1;

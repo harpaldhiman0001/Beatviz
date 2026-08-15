@@ -339,6 +339,9 @@ select.cs{background:var(--card);border:1.5px solid var(--border);color:var(--te
 /* ══════════════════════════════════════
    AE-STYLE PROFESSIONAL OVERRIDES
 ══════════════════════════════════════ */
+/* Keep pane show/hide logic */
+.pane{display:none!important;flex-direction:column;gap:0}
+.pane.on{display:flex!important}
 
 /* Base */
 *{border-radius:0!important}
@@ -912,9 +915,14 @@ input[type=color]{width:28px;height:22px;border:1px solid #444;background:#1a1a1
   <div id="pane-fx" class="pane">
     <!-- COLOR FILTERS -->
     <div>
-      <div class="sl">Color Filter <span style="color:var(--pink);font-size:9px;background:rgba(244,114,182,.1);padding:1px 6px;border-radius:3px;border:1px solid rgba(244,114,182,.3);margin-left:4px">CapCut style</span></div>
+      <div class="sl">Color Filter</div>
+      <div style="padding:4px 8px 0;border-bottom:1px solid #333">
+        <button class="fx-filter on" data-filter="none" onclick="setFilter('none',this)" style="width:100%;flex-direction:row;gap:8px;padding:6px 10px;background:#1a1a1a;border-bottom:2px solid var(--accent)">
+          <div class="fx-prev" style="background:#111;width:28px;height:18px;flex-shrink:0"></div>
+          <span style="font-size:11px;text-transform:none;letter-spacing:0;color:var(--text)">None — no filter</span>
+        </button>
+      </div>
       <div class="fx-filter-grid">
-        <button class="fx-filter on" data-filter="none"     onclick="setFilter('none',this)">    <div class="fx-prev" style="background:#111"></div><span>Normal</span></button>
         <button class="fx-filter" data-filter="warm"        onclick="setFilter('warm',this)">    <div class="fx-prev" style="background:linear-gradient(135deg,#f97316,#dc2626)"></div><span>Warm</span></button>
         <button class="fx-filter" data-filter="cool"        onclick="setFilter('cool',this)">    <div class="fx-prev" style="background:linear-gradient(135deg,#0ea5e9,#6366f1)"></div><span>Cool</span></button>
         <button class="fx-filter" data-filter="vintage"     onclick="setFilter('vintage',this)"> <div class="fx-prev" style="background:linear-gradient(135deg,#92400e,#a16207)"></div><span>Vintage</span></button>
@@ -931,7 +939,12 @@ input[type=color]{width:28px;height:22px;border:1px solid #444;background:#1a1a1
     </div>
     <!-- OVERLAY EFFECTS -->
     <div>
-      <div class="sl">Overlay Effects <span style="color:var(--cyan);font-size:9px;background:rgba(6,182,212,.1);padding:1px 6px;border-radius:3px;border:1px solid rgba(6,182,212,.3);margin-left:4px">After Effects style</span></div>
+      <div class="sl">Overlay Effects</div>
+      <div style="padding:4px 8px;border-bottom:1px solid #333">
+        <button onclick="clearAllFX()" style="width:100%;padding:6px 10px;background:#1a1a1a;border:1px solid #333;color:var(--muted);font-family:inherit;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;text-align:left;transition:all .1s" onmouseover="this.style.background='#2a2a2a';this.style.color='var(--text)'" onmouseout="this.style.background='#1a1a1a';this.style.color='var(--muted)'">
+          ✕ &nbsp;None — clear all effects
+        </button>
+      </div>
       <div class="sg" style="grid-template-columns:repeat(3,1fr)">
         <button class="so" data-fx="vignette"   onclick="toggleFX('vignette',this)"><span>🔲</span>Vignette</button>
         <button class="so" data-fx="grain"      onclick="toggleFX('grain',this)"><span>📺</span>Film Grain</button>
@@ -2502,13 +2515,16 @@ let _copiedLyric = null;
 
 function copyLyric(i) {
   _copiedLyric = { ...lyrics[i] };
-  // Show floating paste bar
+  const txt = (lyrics[i].text || '');
   const pb = document.getElementById('pasteBar');
   if(pb){
-    document.getElementById('pasteBarText').textContent = '"'+(lyrics[i].text||'').slice(0,26)+(lyrics[i].text.length>26?'…':'')+'" copied';
+    document.getElementById('pasteBarText').textContent = '"'+txt.slice(0,26)+(txt.length>26?'…':'')+'" copied';
     pb.classList.add('show');
   }
-  toast('⎘ Copied — press Ctrl+V or click ⎙ Paste here bar at bottom');
+  // Change cursor to copy mode
+  const tlc = document.getElementById('tlCanvas');
+  if(tlc) tlc.style.cursor = 'copy';
+  toast('⎘ Copied — left-click anywhere on timeline to paste');
 }
 
 function hidePasteBar() {
@@ -2527,7 +2543,10 @@ function pasteAtPlayhead() {
   lyrics.sort((a,b)=>a.time-b.time);
   selectedLyricIdx = lyrics.findIndex(l=>Math.abs(l.time-newStart)<0.1);
   renderLyrics(); TL.draw(pvOffset||0); hidePasteBar();
-  toast('⎙ Pasted at '+fmt(newStart)+' — right-click to edit text');
+  // Reset timeline cursor
+  const tlc = document.getElementById('tlCanvas');
+  if(tlc) tlc.style.cursor = '';
+  toast('⎙ Pasted at '+fmt(newStart)+' — right-click to edit');
 }
 
 // Paste below a specific lyric (from context menu "Paste below")
@@ -2761,9 +2780,18 @@ const TL={
       return;
     }
 
-    // Priority 3: click empty space → open lyric input
+    // Priority 3: click empty space
+    // → if lyric copied: paste there directly
+    // → if nothing copied: open lyric add input
     if(audioDuration > 0){
-      openTlFloat(this.x2t(mx));
+      const t = this.x2t(mx);
+      if(_copiedLyric){
+        // Paste directly at clicked position
+        pvOffset = t; seekPreview(t);
+        pasteAtPlayhead();
+      } else {
+        openTlFloat(t);
+      }
     }
     selectedLyricIdx = -1;
     renderLyrics();
@@ -4514,20 +4542,33 @@ let playbackSpeed = 1;
 
 function setFilter(f, btn) {
   activeFilter = f;
-  document.querySelectorAll('[data-filter]').forEach(b=>b.classList.remove('on'));
-  document.querySelectorAll(`[data-filter="${f}"]`).forEach(b=>b.classList.add('on'));
-  if(!isPlaying && !pvPlaying && (chars.length||aiBackground)) drawIdlePreview();
+  // Sync all filter buttons including the None button
+  document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('on'));
+  document.querySelectorAll(`[data-filter="${f}"]`).forEach(b => b.classList.add('on'));
+  // Sync the None full-width button state
+  const noneBtn = document.querySelector('[data-filter="none"]');
+  if(noneBtn) {
+    noneBtn.style.borderBottomColor = f === 'none' ? 'var(--accent)' : 'transparent';
+    noneBtn.style.background = f === 'none' ? '#1a1a1a' : '#111';
+  }
+  if(!isPlaying && !pvPlaying && (chars.length || aiBackground)) drawIdlePreview();
 }
 
 function toggleFX(fx, btn) {
   if(activeFX.has(fx)) { activeFX.delete(fx); btn.classList.remove('on'); }
   else                  { activeFX.add(fx);    btn.classList.add('on');    }
   initFXParticles();
-  if(!isPlaying && !pvPlaying && (chars.length||aiBackground)) drawIdlePreview();
+  if(!isPlaying && !pvPlaying && (chars.length || aiBackground)) drawIdlePreview();
+}
+
+function clearAllFX() {
+  activeFX.clear();
+  document.querySelectorAll('[data-fx]').forEach(b => b.classList.remove('on'));
+  if(!isPlaying && !pvPlaying && (chars.length || aiBackground)) drawIdlePreview();
+  toast('✕ All overlay effects cleared');
 }
 
 function pickTrans(t, btn) {
-  transitionStyle = t;
   document.querySelectorAll('[data-tr]').forEach(b=>b.classList.remove('on'));
   document.querySelectorAll(`[data-tr="${t}"]`).forEach(b=>b.classList.add('on'));
 }
@@ -4632,7 +4673,7 @@ function initFXParticles() {
   _bokehCircles = Array.from({length:18},()=>({
     x:Math.random()*W, y:Math.random()*H, r:20+Math.random()*60,
     alpha:0.06+Math.random()*0.12, vx:(Math.random()-.5)*0.3, vy:(Math.random()-.5)*0.2,
-    col:`hsl(${Math.random()*360},80%,70%)`
+    hue: Math.random()*360   // store hue number — used as hsla(hue,80%,70%,α)
   }));
   // Stars
   _starField = Array.from({length:200},()=>({
@@ -4707,9 +4748,11 @@ function drawOverlayFX(elapsed, beat) {
     _bokehCircles.forEach(b=>{
       const pulse = (Math.sin(elapsed*0.8+b.r)+1)/2;
       ctx.globalAlpha = b.alpha * str * (0.7+pulse*0.3);
-      ctx.beginPath(); ctx.arc(b.x,b.y,b.r*(0.9+beat*.2),0,Math.PI*2);
-      const bg=ctx.createRadialGradient(b.x,b.y,0,b.x,b.y,b.r);
-      bg.addColorStop(0,b.col+'88'); bg.addColorStop(1,'transparent');
+      const radius = b.r*(0.9+beat*.2);
+      ctx.beginPath(); ctx.arc(b.x,b.y,radius,0,Math.PI*2);
+      const bg=ctx.createRadialGradient(b.x,b.y,0,b.x,b.y,radius);
+      bg.addColorStop(0, `hsla(${b.hue},80%,70%,0.5)`);
+      bg.addColorStop(1, 'transparent');
       ctx.fillStyle=bg; ctx.fill();
       b.x+=b.vx; b.y+=b.vy;
       if(b.x<-b.r)b.x=W+b.r; if(b.x>W+b.r)b.x=-b.r;
@@ -4798,7 +4841,11 @@ function loopFn() {
     if(isPlaying){updateShake(beat);}
     ctx.save();
     if(isPlaying&&camShakeOn)ctx.translate(Math.round(camX),Math.round(camY));
-    drawPromoFrame(elapsed);
+    if(isPlaying||pvPlaying){
+      drawPromoFrame(elapsed);
+    } else {
+      drawPromoIdle();
+    }
     ctx.restore();
   } else {
     if(isPlaying){updateShake(beat);updateEnergy();checkTransition();}
@@ -4807,6 +4854,8 @@ function loopFn() {
     if(lyrics.length&&(isPlaying||pvPlaying))drawLyricsOverlay(elapsed,beat);
     if(isPlaying||pvPlaying)drawTextOverlay(elapsed);
     drawTransitionFlash();
+    applyColorFilter(elapsed);
+    drawOverlayFX(elapsed, beat);
     if(isPlaying||pvPlaying)drawWatermark();
     drawEditOverlay();
   }

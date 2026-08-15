@@ -3065,9 +3065,28 @@ function muteTrack(i) {
 }
 function removeAudioTrack(i) {
   audioTracks.splice(i,1);
-  if(audioTracks.length > 0) { audioBuffer = audioTracks[0].buffer; audioDuration = audioBuffer.duration; }
-  else { audioBuffer = null; audioDuration = 0; document.getElementById('audioName').textContent = 'Click to add audio track'; }
-  renderAudioTrackList(); checkReady();
+
+  // Drop segments that belonged to the removed track, and shift trackIdx
+  // for every segment that pointed at a track after the removed one.
+  audioSegments = audioSegments
+    .filter(s => s.trackIdx !== i)
+    .map(s => ({ ...s, trackIdx: s.trackIdx > i ? s.trackIdx - 1 : s.trackIdx }));
+
+  if(audioTracks.length > 0) {
+    audioBuffer = audioTracks[0].buffer;
+    audioDuration = audioBuffer.duration;
+  } else {
+    audioBuffer = null;
+    audioDuration = 0;
+    audioSegments = [];
+    document.getElementById('audioName').textContent = 'Click to add audio track';
+  }
+
+  renderAudioTrackList();
+  renderMultiTracks();
+  checkReady();
+  if (typeof TL !== 'undefined') TL.draw(pvOffset || 0);
+  toast('✕ Audio track removed');
 }
 
 // ── LYRIC COPY / PASTE / MOVE ─────────────────────────────────────

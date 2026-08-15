@@ -635,6 +635,17 @@ input[type=color]{width:28px;height:22px;border:1px solid var(--border);backgrou
 
 #pane-fx>div{margin:0!important;padding-bottom:0!important}
 
+  /* ── MOBILE FIXES — must stay last in the stylesheet ── */
+@media(max-width:768px){
+  #leftToolbar,#menuBar{display:none!important}
+  .main{display:flex;flex-direction:column;height:auto}
+  .preview{flex:1;min-height:0}
+  .ca{flex:0 0 auto!important;min-height:220px;max-height:46vh;padding:8px}
+  .tl-wrap{flex:0 0 82px!important;height:82px!important}
+  #tlCanvas{height:54px!important}
+  #multiTrackArea{max-height:34%}
+}
+
 </style>
 
 <!-- ── TOPBAR ── -->

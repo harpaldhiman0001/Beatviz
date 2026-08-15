@@ -34,12 +34,12 @@ body{font-family:'Space Grotesk',system-ui,sans-serif;background:var(--bg);color
 .logout{font-size:11px;color:var(--muted);background:none;border:none;cursor:pointer;font-family:inherit;padding:4px 7px;border-radius:5px}
 .logout:hover{color:var(--red)}
 /* ── DESKTOP LAYOUT ── */
-.main{display:grid;grid-template-columns:330px 1fr;height:calc(100vh - var(--topbar-h))}
+.main{display:grid;grid-template-columns:220px 1fr;height:calc(100vh - var(--topbar-h))}
 .sidebar{background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
 .s-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
 .s-tab{flex:1;padding:9px 4px;background:none;border:none;color:var(--muted);font-family:inherit;font-size:10px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent;letter-spacing:.4px;transition:all .14s}
 .s-tab.on{color:var(--cyan);border-bottom-color:var(--cyan)}
-.panes{flex:1;overflow-y:auto;padding:14px 14px 0}
+.panes{flex:1;overflow-y:auto;padding:0}
 .pane{display:none;flex-direction:column;gap:13px}
 .pane.on{display:flex}
 /* ── CONTROLS ── */
@@ -356,7 +356,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter','Segoe UI',syste
 .sub-pill.expired{background:#2a1010!important;color:var(--red)!important;border:1px solid #5a2020!important;font-size:9px;padding:2px 7px}
 
 /* Sidebar — AE left panel */
-.sidebar{background:#222;border-right:1px solid #333;width:260px}
+.sidebar{background:#222;border-right:1px solid #333;width:220px;display:flex;flex-direction:column;overflow:hidden}
 .s-tabs{display:flex;background:#1a1a1a;border-bottom:1px solid #333;padding:0}
 .s-tab{flex:1;padding:6px 4px;font-size:10px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;transition:all .12s;border-right:1px solid #333}
 .s-tab:last-child{border-right:none}
@@ -364,7 +364,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter','Segoe UI',syste
 .s-tab:hover:not(.on){color:var(--text);background:#252525}
 
 /* Pane sections */
-.pane{padding:0;overflow-y:auto;flex:1}
+.pane{padding:0;overflow-y:auto;flex:1;max-height:calc(100vh - 200px)}
 .pane > div{border-bottom:1px solid #333}
 
 /* Section labels — AE-style collapsible headers */
@@ -463,13 +463,13 @@ input[type=range]::-webkit-slider-thumb{width:12px;height:12px;background:var(--
 .paste-bar-close{color:var(--dim)}
 
 /* Timeline */
-.tl-wrap{background:#1a1a1a;border-top:1px solid #333}
+.tl-wrap{background:#1a1a1a;border-top:1px solid #333;flex-shrink:0;display:flex;flex-direction:column}
 /* Multi-track rows */
-.mt-row{display:flex;align-items:center;height:22px;border-bottom:1px solid #222;position:relative;overflow:hidden}
-.mt-label{width:76px;flex-shrink:0;font-size:9px;font-weight:700;color:var(--muted);padding:0 5px;text-transform:uppercase;letter-spacing:.3px;border-right:1px solid #333;height:100%;display:flex;align-items:center;gap:3px;background:#111;overflow:hidden;white-space:nowrap}
+.mt-row{display:flex;align-items:center;height:20px;border-bottom:1px solid #1e1e1e;position:relative;overflow:hidden}
+.mt-label{width:72px;flex-shrink:0;font-size:8px;font-weight:700;color:var(--muted);padding:0 4px;text-transform:uppercase;letter-spacing:.2px;border-right:1px solid #2a2a2a;height:100%;display:flex;align-items:center;gap:2px;background:#0d0d0d;overflow:hidden;white-space:nowrap}
 .mt-label img{width:16px;height:16px;object-fit:cover;border-radius:2px;flex-shrink:0}
 .mt-track{flex:1;height:100%;position:relative;cursor:grab;overflow:hidden}
-.mt-seg{position:absolute;top:2px;bottom:2px;background:rgba(232,104,10,.35);border:1px solid var(--accent);border-radius:2px;cursor:grab;display:flex;align-items:center;padding:0 4px;min-width:8px;box-sizing:border-box;transition:background .1s}
+.mt-seg{position:absolute;top:1px;bottom:1px;background:rgba(232,104,10,.4);border:1px solid var(--accent);cursor:grab;display:flex;align-items:center;padding:0 3px;min-width:6px;box-sizing:border-box}
 .mt-seg:hover{background:rgba(232,104,10,.5)}
 .mt-seg.audio-seg{background:rgba(74,158,255,.25);border-color:var(--blue)}
 .mt-seg.audio-seg:hover{background:rgba(74,158,255,.4)}
@@ -533,7 +533,7 @@ input[type=color]{width:28px;height:22px;border:1px solid #444;background:#1a1a1
 .ci-del{position:absolute;top:1px;right:1px;width:14px;height:14px;background:rgba(0,0,0,.7);border:none;color:#c05050;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 
 /* Canvas area */
-.ca{background:#111;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ca{background:#111;display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;min-height:0;overflow:hidden}
 .cw{border:1px solid #333}
 #cEmpty{background:#1a1a1a;color:var(--dim);font-size:11px}
 
@@ -1136,11 +1136,11 @@ input[type=color]{width:28px;height:22px;border:1px solid #444;background:#1a1a1
       <div id="imgTrackRows"></div>
       <!-- Audio tracks -->
       <div id="audioTrackRows"></div>
-      <!-- Lyrics section label -->
-      <div style="display:flex;align-items:center;height:18px;background:#0d0d0d;border-top:1px solid #333;padding:0 5px;gap:6px">
+      <!-- Lyrics section label — taller so it's easier to target -->
+      <div style="display:flex;align-items:center;height:20px;background:#0a0a14;border-top:2px solid var(--accent);padding:0 5px;gap:6px">
         <span style="font-size:9px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.5px;min-width:66px">🎤 Lyrics</span>
-        <span style="flex:1;height:1px;background:#222"></span>
-        <span style="font-size:9px;color:var(--dim)">click timeline to add</span>
+        <span style="flex:1;height:1px;background:#1a1a2a"></span>
+        <span style="font-size:9px;color:var(--dim)">↓ click in timeline below to add</span>
       </div>
     </div>
 
@@ -2663,7 +2663,13 @@ async function addAudioTrack(file) {
   const lastEnd = audioSegments.length > 0
     ? audioSegments[audioSegments.length-1].start + audioSegments[audioSegments.length-1].dur
     : 0;
+  // If this track is shorter, just show its actual duration
+  // Segments CAN go past audioDuration (will be trimmed on playback)
   audioSegments.push({ trackIdx: audioTracks.length-1, start: lastEnd, dur: buf.duration });
+  // Update totalDur reference if this track extends beyond current
+  if(lastEnd + buf.duration > audioDuration && audioTracks.length === 1){
+    audioDuration = buf.duration;
+  }
   // Rebuild image segments now that we have duration
   if(chars.length > 0 && audioDuration > 0){
     const each = audioDuration / chars.length;

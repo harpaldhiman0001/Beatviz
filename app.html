@@ -104,6 +104,15 @@ select.cs{background:var(--card);border:1.5px solid var(--border);color:var(--te
 .lyr-act-btn:hover{background:rgba(124,58,237,.18);border-color:var(--accent);color:var(--text)}
 .lyr-act-btn.paste-btn{border-color:rgba(6,182,212,.35);color:var(--cyan)}
 .lyr-act-btn.paste-btn:hover{background:rgba(6,182,212,.15)}
+/* Floating paste bar — appears after copying a lyric */
+.paste-bar{position:fixed;bottom:calc(var(--gen-h,78px) + 12px);left:50%;transform:translateX(-50%);background:var(--card);border:1.5px solid var(--cyan);border-radius:30px;padding:8px 18px;display:none;align-items:center;gap:10px;z-index:500;box-shadow:0 4px 24px rgba(6,182,212,.25);animation:slideUp .18s ease}
+.paste-bar.show{display:flex}
+@keyframes slideUp{from{transform:translateX(-50%) translateY(12px);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}
+.paste-bar-text{font-size:12px;color:var(--muted);white-space:nowrap}
+.paste-bar-text strong{color:var(--cyan)}
+.paste-bar-btn{padding:5px 14px;border-radius:20px;border:none;background:var(--cyan);color:#03030d;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;transition:opacity .12s;white-space:nowrap}
+.paste-bar-btn:hover{opacity:.85}
+.paste-bar-close{background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;line-height:1;padding:0 2px}
 .move-popup{position:fixed;z-index:9999;background:var(--card);border:1px solid var(--accent);border-radius:12px;padding:14px 16px;box-shadow:0 8px 40px rgba(0,0,0,.6);display:none;min-width:230px}
 .move-popup.show{display:block}
 .move-popup-label{font-size:11px;color:var(--muted);margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
@@ -1054,6 +1063,13 @@ select.cs{background:var(--card);border:1.5px solid var(--border);color:var(--te
       </div>
     </div>
   </div>
+</div>
+
+<!-- ── FLOATING PASTE BAR (shows after copying a lyric) ── -->
+<div class="paste-bar" id="pasteBar">
+  <span class="paste-bar-text">📋 <strong id="pasteBarText">Lyric copied</strong> — paste at playhead</span>
+  <button class="paste-bar-btn" onclick="pasteAtPlayhead()">⎙ Paste here</button>
+  <button class="paste-bar-close" onclick="hidePasteBar()" title="Dismiss">✕</button>
 </div>
 
 <!-- ── LYRIC RIGHT-CLICK CONTEXT MENU ── -->
@@ -2150,39 +2166,59 @@ document.addEventListener('click', e => {
     hideLyricContextMenu();
   }
 });
-document.addEventListener('keydown', e => { if(e.key==='Escape') hideLyricContextMenu(); });
+document.addEventListener('keydown', e => {
+  if(e.key==='Escape') hideLyricContextMenu();
+  // Ctrl+V = paste lyric at playhead
+  if((e.ctrlKey||e.metaKey) && e.key==='v' && _copiedLyric && !e.target.matches('input,textarea,[contenteditable]')){
+    e.preventDefault(); pasteAtPlayhead();
+  }
+});
 let _copiedLyric = null;
-let _movingIdx   = -1;
+let _moveTargetIdx2 = -1;
 
 function copyLyric(i) {
   _copiedLyric = { ...lyrics[i] };
-  toast(`⎘ Copied: "${lyrics[i].text.slice(0,30)}${lyrics[i].text.length>30?'…':''}"`);
-  // Highlight paste buttons
-  document.querySelectorAll('.paste-btn').forEach(b => {
-    b.style.background = 'rgba(6,182,212,.2)';
-    b.style.borderColor = 'var(--cyan)';
-    b.textContent = '⎙ Paste';
-  });
+  // Show floating paste bar
+  const pb = document.getElementById('pasteBar');
+  if(pb){
+    document.getElementById('pasteBarText').textContent = '"'+lyrics[i].text.slice(0,26)+(lyrics[i].text.length>26?'…':'')+'" copied';
+    pb.classList.add('show');
+  }
+  toast('⎘ Copied — press Ctrl+V or click ⎙ Paste here bar at bottom');
 }
 
+function hidePasteBar() {
+  document.getElementById('pasteBar')?.classList.remove('show');
+}
+
+// Paste at current playhead position — used by Ctrl+V and paste bar button
+function pasteAtPlayhead() {
+  if (!_copiedLyric) { toast('⚠ Nothing copied — right-click a lyric → Copy first'); return; }
+  const t   = pvOffset || 0;
+  const dur = (_copiedLyric.endTime || _copiedLyric.time + 4) - _copiedLyric.time;
+  const newStart = Math.max(0, Math.min(audioDuration - dur, t));
+  const newEnd   = +(newStart + dur).toFixed(2);
+  lyrics.push({ text:_copiedLyric.text, time:+newStart.toFixed(2), endTime:newEnd,
+    ds:{beatCount:0,jumpAmt:0,spinAng:0,spinDir:1,phase:Math.random()*Math.PI*2} });
+  lyrics.sort((a,b)=>a.time-b.time);
+  selectedLyricIdx = lyrics.findIndex(l=>Math.abs(l.time-newStart)<0.1);
+  renderLyrics(); TL.draw(pvOffset||0); hidePasteBar();
+  toast('⎙ Pasted at '+fmt(newStart)+' — right-click to edit text');
+}
+
+// Paste below a specific lyric (from context menu "Paste below")
 function pasteAfterLyric(afterIdx) {
-  if (!_copiedLyric) { toast('⚠ Copy a lyric first — click ⎘ Copy on any lyric'); return; }
-  // Place it 1 second after the current lyric ends
+  if (!_copiedLyric) { toast('⚠ Nothing copied — right-click a lyric → Copy first'); return; }
   const refEnd = lyrics[afterIdx].endTime || lyrics[afterIdx].time + 4;
   const dur    = (_copiedLyric.endTime || _copiedLyric.time + 4) - _copiedLyric.time;
   const newStart = Math.min(audioDuration - dur, refEnd + 0.5);
-  const newEnd   = newStart + dur;
-  lyrics.splice(afterIdx + 1, 0, {
-    text:    _copiedLyric.text,
-    time:    +newStart.toFixed(2),
-    endTime: +newEnd.toFixed(2),
-    ds:      { beatCount:0, jumpAmt:0, spinAng:0, spinDir:1, phase:Math.random()*Math.PI*2 }
-  });
-  lyrics.sort((a,b) => a.time - b.time);
-  selectedLyricIdx = lyrics.findIndex(l => Math.abs(l.time - newStart) < 0.1);
-  renderLyrics();
-  TL.draw(pvOffset || 0);
-  toast(`⎙ Pasted "${_copiedLyric.text.slice(0,20)}…" at ${fmt(newStart)}`);
+  const newEnd   = +(newStart + dur).toFixed(2);
+  lyrics.splice(afterIdx+1, 0, { text:_copiedLyric.text, time:+newStart.toFixed(2), endTime:newEnd,
+    ds:{beatCount:0,jumpAmt:0,spinAng:0,spinDir:1,phase:Math.random()*Math.PI*2} });
+  lyrics.sort((a,b)=>a.time-b.time);
+  selectedLyricIdx = lyrics.findIndex(l=>Math.abs(l.time-newStart)<0.1);
+  renderLyrics(); TL.draw(pvOffset||0); hidePasteBar();
+  toast('⎙ Pasted below at '+fmt(newStart));
 }
 
 let _moveTargetIdx = -1;
@@ -2277,7 +2313,7 @@ const TL={
     this.c.addEventListener('mousemove',e=>this.onMove(e));
     this.c.addEventListener('mouseup',e=>this.onUp());
     this.c.addEventListener('mouseleave',()=>{this.onUp();this.onLeave();});
-    // Right-click on lyric bar → open edit
+    // Right-click on lyric bar → edit; right-click on empty → paste if copied
     this.c.addEventListener('contextmenu', e => {
       e.preventDefault();
       const r=this.c.getBoundingClientRect(), mx=e.clientX-r.left, my=e.clientY-r.top;
@@ -2286,6 +2322,12 @@ const TL={
         selectedLyricIdx=h.idx;
         renderLyrics();
         showLyricContextMenu(e.clientX, e.clientY, h.idx);
+      } else if(_copiedLyric && audioDuration>0){
+        // Right-click on empty space → seek playhead there and paste
+        const t = Math.max(0,Math.min(audioDuration,this.x2t(mx)));
+        pvOffset = t;
+        seekPreview(t);
+        pasteAtPlayhead();
       }
     });
     this._ghostX=-1;this._ghostT=0;

@@ -828,18 +828,22 @@ input[type=color]{width:28px;height:22px;border:1px solid #444;background:#1a1a1
           <button class="so" data-ls="typewriter"     onclick="pickLS('typewriter',this)"><span>⌨️</span>Typer</button>
           <button class="so on" data-ls="none"           onclick="pickLS('none',this)"><span>🚫</span>None</button>
         </div>
-        <!-- NEW animated styles -->
-        <div class="sl" style="margin-top:10px">Animated Text <span style="color:var(--pink);font-size:9px;background:rgba(244,114,182,.1);padding:1px 6px;border-radius:3px;border:1px solid rgba(244,114,182,.3);margin-left:4px">NEW</span></div>
+        <!-- TEXT ENTRY EFFECTS -->
+        <div class="sl" style="margin-top:0;background:#1a0a00;border-top:2px solid var(--accent)">
+          Text Entry Effects
+          <span style="color:var(--accent);font-size:9px;background:rgba(232,104,10,.15);padding:1px 6px;border-radius:3px;border:1px solid rgba(232,104,10,.3);margin-left:4px">MOTION</span>
+        </div>
+        <div style="font-size:9px;color:#555;padding:4px 8px;background:#111;border-bottom:1px solid #222">Select → add a lyric → play to see it animate</div>
         <div class="sg">
-          <button class="so" data-ls="instacard"   onclick="pickLS('instacard',this)"><span>📱</span>Insta Card</button>
-          <button class="so" data-ls="bouncebox"   onclick="pickLS('bouncebox',this)"><span>🎯</span>Bounce Box</button>
-          <button class="so" data-ls="waveletters" onclick="pickLS('waveletters',this)"><span>〰️</span>Wave</button>
-          <button class="so" data-ls="splitreveal" onclick="pickLS('splitreveal',this)"><span>↔️</span>Split</button>
-          <button class="so" data-ls="glowborder"  onclick="pickLS('glowborder',this)"><span>🔆</span>Glow Box</button>
-          <button class="so" data-ls="cinematic"   onclick="pickLS('cinematic',this)"><span>🎬</span>Cinematic</button>
-          <button class="so" data-ls="centerburst"  onclick="pickLS('centerburst',this)"><span>💥</span>Center Burst</button>
-          <button class="so" data-ls="slideleft"    onclick="pickLS('slideleft',this)"><span>←</span>Slide Left</button>
-          <button class="so" data-ls="slideright"   onclick="pickLS('slideright',this)"><span>→</span>Slide Right</button>
+          <button class="so" data-ls="centerburst"  onclick="pickLS('centerburst',this)"><span>💥</span>Burst</button>
+          <button class="so" data-ls="slideleft"    onclick="pickLS('slideleft',this)"><span>⬅</span>← Slide</button>
+          <button class="so" data-ls="slideright"   onclick="pickLS('slideright',this)"><span>➡</span>→ Slide</button>
+          <button class="so" data-ls="instacard"    onclick="pickLS('instacard',this)"><span>📱</span>Insta</button>
+          <button class="so" data-ls="bouncebox"    onclick="pickLS('bouncebox',this)"><span>🎯</span>Bounce</button>
+          <button class="so" data-ls="waveletters"  onclick="pickLS('waveletters',this)"><span>〰</span>Wave</button>
+          <button class="so" data-ls="splitreveal"  onclick="pickLS('splitreveal',this)"><span>↔</span>Split</button>
+          <button class="so" data-ls="glowborder"   onclick="pickLS('glowborder',this)"><span>🔆</span>Glow</button>
+          <button class="so" data-ls="cinematic"    onclick="pickLS('cinematic',this)"><span>🎬</span>Cinema</button>
         </div>
         <div style="display:flex;flex-direction:column;gap:8px;margin-top:9px">
           <div class="cr"><span class="cl">Color</span><input type="color" id="lyricColor" value="#f472b6"></div>
@@ -1411,6 +1415,15 @@ input[type=color]{width:28px;height:22px;border:1px solid #444;background:#1a1a1
     </div>
   </div>
 </div>
+<!-- ── UNIVERSAL SEGMENT CONTEXT MENU ── -->
+<div id="segContextMenu" style="position:fixed;z-index:9999;background:#2a2a2a;border:1px solid #444;border-radius:8px;padding:3px 0;box-shadow:0 8px 24px rgba(0,0,0,.8);display:none;min-width:170px">
+  <div id="segCtxLabel" style="font-size:9px;font-weight:700;color:#555;padding:4px 10px;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #333;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:165px"></div>
+  <button class="lcm-btn" onclick="segCtxCopy()">⎘ Copy clip</button>
+  <button class="lcm-btn" onclick="segCtxPasteAfter()">⎙ Paste after</button>
+  <div style="border-top:1px solid #333;margin:2px 0"></div>
+  <button class="lcm-btn danger" onclick="segCtxDelete()">✕ Delete clip</button>
+</div>
+
 <!-- ── LYRIC RIGHT-CLICK CONTEXT MENU ── -->
 <div id="lyricContextMenu" style="position:fixed;z-index:9999;background:#2a2a2a;border:1px solid #444;border-radius:8px;padding:3px 0;box-shadow:0 8px 24px rgba(0,0,0,.8);display:none;min-width:180px">
   <div id="lcm-title" style="font-size:9px;font-weight:700;color:#555;padding:4px 10px;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #333;margin-bottom:2px"></div>
@@ -1666,7 +1679,8 @@ function openTlFloat(time) {
   const badge2 = document.getElementById('tlFloatTime');
   if(badge2) badge2.textContent = '🎤 Add Lyric';
   if (inp) { inp.value = ''; }
-  document.getElementById('tlFloat')?.classList.add('show');
+  const fl3 = document.getElementById('tlFloat');
+  if(fl3) fl3.style.display = 'flex';
   seekPreview(time);
   setTimeout(() => inp?.focus(), 80);
 }
@@ -1723,7 +1737,7 @@ function saveTlLyric() {
   // Close bar
   tlPendingTime = null;
   inp.value = '';
-  if (fl) fl.classList.remove('show');
+  if (fl) fl.style.display = 'none';
 }
 
 function cancelTlLyric() {
@@ -2544,11 +2558,112 @@ document.addEventListener('click', e => {
 });
 document.addEventListener('keydown', e => {
   if(e.key==='Escape') hideLyricContextMenu();
-  // Ctrl+V = paste after copied lyric
-  if((e.ctrlKey||e.metaKey) && e.key==='v' && _copiedLyric && !e.target.matches('input,textarea,[contenteditable]')){
-    e.preventDefault(); pasteAfterCopied();
+  // Ctrl+V = universal paste at playhead (lyrics, images, audio)
+  if((e.ctrlKey||e.metaKey) && e.key==='v' && (_tlClipboard||_copiedLyric) && !e.target.matches('input,textarea,[contenteditable]')){
+    e.preventDefault();
+    if(_tlClipboard) tlPaste(pvOffset||0);
+    else pasteAfterCopied();
   }
 });
+
+// ════════════════════════════════════════
+// UNIVERSAL TIMELINE CLIPBOARD
+// Works for lyrics, image clips, audio clips
+// ════════════════════════════════════════
+let _tlClipboard = null; // { type:'lyric'|'img'|'audio', data:{...} }
+
+function tlCopy(type, data) {
+  _tlClipboard = { type, data: { ...data } };
+  const labels = { lyric: `"${(data.text||'').slice(0,20)}"`, img: `Image ${(data.charIdx||0)+1}`, audio: audioTracks[data.trackIdx]?.name||'Audio' };
+  toast('⎘ Copied ' + (labels[type]||type) + ' — Ctrl+V to paste');
+}
+
+function tlPaste(atTime) {
+  if(!_tlClipboard) { toast('⚠ Nothing copied — right-click a clip to copy'); return; }
+  const t = atTime !== undefined ? atTime : (pvOffset || 0);
+  const { type, data } = _tlClipboard;
+
+  if(type === 'lyric') {
+    const dur = (data.endTime || data.time + 4) - data.time;
+    const newT = Math.max(0, Math.min(audioDuration - dur, t));
+    lyrics.push({ text: data.text||'', time: +newT.toFixed(2), endTime: +(newT+dur).toFixed(2),
+      ds:{beatCount:0,jumpAmt:0,spinAng:0,spinDir:1,phase:Math.random()*Math.PI*2} });
+    lyrics.sort((a,b)=>a.time-b.time);
+    selectedLyricIdx = lyrics.findIndex(l=>Math.abs(l.time-newT)<0.1);
+    renderLyrics(); TL.draw(pvOffset||0);
+    toast('⎙ Lyric pasted at '+fmt(newT));
+  }
+  else if(type === 'img') {
+    const dur = data.dur || 3;
+    imgSegments.push({ charIdx: data.charIdx, start: +t.toFixed(2), dur });
+    imgSegments.sort((a,b)=>a.start-b.start);
+    renderMultiTracks();
+    toast('⎙ Image clip pasted at '+fmt(t));
+  }
+  else if(type === 'audio') {
+    const dur = data.dur || (audioTracks[data.trackIdx]?.buffer?.duration || 3);
+    audioSegments.push({ trackIdx: data.trackIdx, start: +t.toFixed(2), dur });
+    audioSegments.sort((a,b)=>a.start-b.start);
+    renderMultiTracks();
+    toast('⎙ Audio clip pasted at '+fmt(t));
+  }
+}
+
+// ── Segment context menu ──
+let _segCtxType = null, _segCtxIdx = -1;
+
+function showSegmentMenu(e, type, idx) {
+  e.preventDefault(); e.stopPropagation();
+  _segCtxType = type; _segCtxIdx = idx;
+  const menu = document.getElementById('segContextMenu');
+  if(!menu) return;
+  // Update label
+  let label = '';
+  if(type==='img')   label = `Image ${(imgSegments[idx]?.charIdx||0)+1} clip`;
+  if(type==='audio') label = audioTracks[audioSegments[idx]?.trackIdx]?.name || 'Audio clip';
+  if(type==='lyric') label = `"${(lyrics[idx]?.text||'').slice(0,22)}"`;
+  const t = document.getElementById('segCtxLabel');
+  if(t) t.textContent = label;
+  menu.style.display = 'block';
+  menu.style.left = Math.min(e.clientX, window.innerWidth-200)+'px';
+  menu.style.top  = Math.min(e.clientY, window.innerHeight-160)+'px';
+}
+
+function hideSegmentMenu() {
+  const m = document.getElementById('segContextMenu');
+  if(m) m.style.display='none';
+  _segCtxType=null; _segCtxIdx=-1;
+}
+
+function segCtxCopy() {
+  if(!_segCtxType||_segCtxIdx<0){hideSegmentMenu();return;}
+  if(_segCtxType==='img')   tlCopy('img',   imgSegments[_segCtxIdx]);
+  if(_segCtxType==='audio') tlCopy('audio', audioSegments[_segCtxIdx]);
+  if(_segCtxType==='lyric') tlCopy('lyric', lyrics[_segCtxIdx]);
+  hideSegmentMenu();
+}
+
+function segCtxPasteAfter() {
+  if(!_segCtxType||_segCtxIdx<0){hideSegmentMenu();return;}
+  let atTime = 0;
+  if(_segCtxType==='img')   { const s=imgSegments[_segCtxIdx];   atTime=s.start+s.dur+0.2; }
+  if(_segCtxType==='audio') { const s=audioSegments[_segCtxIdx]; atTime=s.start+s.dur+0.2; }
+  if(_segCtxType==='lyric') { const l=lyrics[_segCtxIdx]; atTime=(l.endTime||l.time+4)+0.2; }
+  hideSegmentMenu();
+  tlPaste(atTime);
+}
+
+function segCtxDelete() {
+  if(!_segCtxType||_segCtxIdx<0){hideSegmentMenu();return;}
+  if(_segCtxType==='img')   { imgSegments.splice(_segCtxIdx,1);   renderMultiTracks(); }
+  if(_segCtxType==='audio') { audioSegments.splice(_segCtxIdx,1); renderMultiTracks(); }
+  if(_segCtxType==='lyric') { deleteLyric(_segCtxIdx); }
+  hideSegmentMenu();
+  toast('✕ Deleted');
+}
+
+document.addEventListener('click', () => hideSegmentMenu());
+
 // ════════════════════════════════════════
 // MULTI-TRACK TIMELINE SYSTEM
 // Each image + audio gets its own horizontal track row
@@ -2616,7 +2731,7 @@ function renderMultiTracks() {
         return `<div class="mt-row">
           <div class="mt-label">${thumb} <span style="overflow:hidden;text-overflow:ellipsis">Img ${seg.charIdx+1}</span></div>
           <div class="mt-track" style="position:relative" onmousedown="mtDragStart(event,'img',${si})">
-            <div class="mt-seg" id="mts-img-${si}" style="left:${pct(seg.start)};width:${durPct(seg.dur)}">
+            <div class="mt-seg" id="mts-img-${si}" style="left:${pct(seg.start)};width:${durPct(seg.dur)}" oncontextmenu="showSegmentMenu(event,'img',${si})">
               <div class="mt-seg-handle left"  onmousedown="event.stopPropagation();mtResizeStart(event,'img',${si},'left')"></div>
               <span class="mt-seg-label">${fmt(seg.start)}–${fmt(seg.start+seg.dur)}</span>
               <div class="mt-seg-handle right" onmousedown="event.stopPropagation();mtResizeStart(event,'img',${si},'right')"></div>
@@ -2637,7 +2752,7 @@ function renderMultiTracks() {
         return `<div class="mt-row">
           <div class="mt-label" style="border-left:2px solid var(--blue)">🎵 <span style="overflow:hidden;text-overflow:ellipsis">${name}</span></div>
           <div class="mt-track" style="position:relative" onmousedown="mtDragStart(event,'aud',${si})">
-            <div class="mt-seg audio-seg" id="mts-aud-${si}" style="left:${pct(seg.start)};width:${durPct(seg.dur)}">
+            <div class="mt-seg audio-seg" id="mts-aud-${si}" style="left:${pct(seg.start)};width:${durPct(seg.dur)}" oncontextmenu="showSegmentMenu(event,'aud',${si})">
               <div class="mt-seg-handle left"  onmousedown="event.stopPropagation();mtResizeStart(event,'aud',${si},'left')"></div>
               <span class="mt-seg-label">${fmt(seg.start)}</span>
               <div class="mt-seg-handle right" onmousedown="event.stopPropagation();mtResizeStart(event,'aud',${si},'right')"></div>
@@ -2801,18 +2916,16 @@ let _pasteZoneX = -1;
 
 function copyLyric(i) {
   if(i < 0 || i >= lyrics.length) return;
-  // Always grab latest text from DOM in case user edited inline
   const domEl  = document.getElementById('lr'+i)?.querySelector('.ltxt');
   const domTxt = domEl ? domEl.textContent.trim() : '';
-  const lyric  = lyrics[i];
-  const txt    = domTxt || lyric.text || '';
-  // Update the lyrics array with current DOM text before copying
+  const txt    = domTxt || lyrics[i].text || '';
   if(domTxt) lyrics[i].text = domTxt;
   _copiedLyric    = { ...lyrics[i], text: txt };
   _copiedLyricIdx = i;
-  _pasteZoneX     = -1; // will be set during next draw
+  _pasteZoneX     = -1;
+  // Also store in universal clipboard
+  tlCopy('lyric', _copiedLyric);
   if(typeof TL !== 'undefined') TL.draw(pvOffset || 0);
-  toast('⎘ "' + txt.slice(0,20) + (txt.length>20?'…':'') + '" copied — click ⎙ on timeline to paste after it');
 }
 
 function pasteAfterCopied() {

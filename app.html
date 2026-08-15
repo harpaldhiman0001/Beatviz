@@ -5736,14 +5736,6 @@ canvas.addEventListener('mousemove', e => {
   }
 });
 
-  let currentLTool = 'select';
-function setLTool(tool, btn) {
-  currentLTool = tool;
-  document.querySelectorAll('.ltool').forEach(b => b.classList.remove('on'));
-  if (btn) btn.classList.add('on');
-  // optional: change cursor to hint at the active tool
-  canvas.style.cursor = tool === 'select' ? 'default' : 'crosshair';
-}
 
 canvas.addEventListener('mouseup',    () => { editDrag = null; canvas.style.cursor = editHoverIdx >= 0 ? 'grab' : 'default'; updateImgCtrl(); });
 canvas.addEventListener('mouseleave', () => { editDrag = null; editHoverIdx = -1; });

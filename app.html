@@ -3508,24 +3508,42 @@ function drawCharacters(beat, elapsed) {
   if(imgSegments.length > 0) {
     const activeIdx = getActiveCharIdx(elapsed);
     if(activeIdx < 0 || activeIdx >= chars.length) return;
+
+    // Find which segment is active to get its start time for transition
+    const activeSeg = imgSegments.find(s => elapsed >= s.start && elapsed < s.start + s.dur)
+                   || imgSegments[imgSegments.length - 1];
+    const segAge  = activeSeg ? elapsed - activeSeg.start : 0;
+    const segDur  = activeSeg ? activeSeg.dur : 4;
+    const trans   = getImageTransition(segAge, segDur);
+
     const savedChars = chars;
-    // Temporarily act as if only the active char exists
     chars = [chars[activeIdx]];
     const wasPlaced = chars[0].userPlaced;
-    // Solo mode if not manually placed
-    if(!wasPlaced) { drawSoloCharacter(beat, elapsed); chars = savedChars; return; }
+
+    // Apply transition transform around the draw call
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, Math.min(1, trans.a));
+    ctx.translate(trans.tx || 0, trans.ty || 0);
+    if(trans.s && trans.s !== 1) ctx.scale(trans.s, trans.s);
+
+    if(!wasPlaced) {
+      drawSoloCharacter(beat, elapsed);
+      ctx.restore();
+      chars = savedChars;
+      return;
+    }
     // Positioned — draw at its location
     const c2 = chars[0];
     const { dx, dy, rot, scx, scy } = getDance(c2, beat, elapsed, 0);
     const floatY = danceMode === 'none' ? 0 : Math.sin(Date.now() * 0.002) * 8;
     const bs = danceMode === 'none' ? 1 : 1 + beatIntensity * 0.17;
     const glow = +document.getElementById('sGlow').value;
-    ctx.save();
     ctx.translate(c2.px + dx, c2.py + c2.ph/2 - c2.ph/2 + dy + floatY);
     ctx.rotate(rot); ctx.scale(scx*bs, scy*bs);
     if(beatIntensity > 0.08 && glow > 0) { ctx.shadowBlur=32*beatIntensity*glow; ctx.shadowColor=STYLE_COLORS[style]||'#8b5cf6'; }
     ctx.drawImage(c2.img, -c2.pw/2, -c2.ph/2, c2.pw, c2.ph);
-    ctx.shadowBlur=0; ctx.restore();
+    ctx.shadowBlur=0;
+    ctx.restore();
     chars = savedChars;
     return;
   }

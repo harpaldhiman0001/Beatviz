@@ -4,12 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>BeatViz Pro — Create</title>
-<link rel="icon" type="image/png" href="/favicon.png">
-<link rel="apple-touch-icon" href="/favicon.png">
-<meta name="theme-color" content="#7c3aed">
-<meta name="robots" content="noindex, nofollow">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <!-- Razorpay loaded in head to avoid COEP blocking -->
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
@@ -91,7 +85,7 @@ select.cs{background:var(--card);border:1.5px solid var(--border);color:var(--te
 .lc{padding:7px 11px;border-radius:6px;border:1px solid var(--border);background:none;color:var(--muted);font-family:inherit;font-size:12px;cursor:pointer}
 /* Lyric list */
 .ll{display:flex;flex-direction:column;gap:3px}
-.lr{display:flex;align-items:center;gap:6px;padding:6px 7px;background:var(--card);border-radius:7px;border:1px solid var(--border);transition:all .13s;cursor:pointer}
+.lr{display:flex;align-items:flex-start;flex-wrap:wrap;gap:6px;padding:8px 7px;background:var(--card);border-radius:7px;border:1px solid var(--border);transition:all .13s;cursor:pointer}
 .lr:hover{border-color:rgba(124,58,237,.35)}
 .lr.sel{border-color:var(--accent);background:rgba(124,58,237,.1)}
 .lr.pl{border-color:var(--green);background:rgba(16,185,129,.07)}
@@ -103,6 +97,19 @@ select.cs{background:var(--card);border:1.5px solid var(--border);color:var(--te
 .ltxt{flex:1;font-size:12px;outline:none;cursor:text;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-radius:3px;padding:1px 3px}
 .ltxt:focus{white-space:normal;background:rgba(255,255,255,.04)}
 .ldel{width:19px;height:19px;border-radius:4px;border:1px solid var(--border);background:none;color:var(--muted);font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .13s}
+.lyr-actions{display:flex;gap:4px;flex-wrap:wrap;width:100%;padding-top:2px}
+.lyr-act-btn{padding:3px 8px;border-radius:5px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--muted);font-family:inherit;font-size:10px;font-weight:600;cursor:pointer;transition:all .12s}
+.lyr-act-btn:hover{background:rgba(124,58,237,.18);border-color:var(--accent);color:var(--text)}
+.lyr-act-btn.paste-btn{border-color:rgba(6,182,212,.35);color:var(--cyan)}
+.lyr-act-btn.paste-btn:hover{background:rgba(6,182,212,.15)}
+.move-popup{position:fixed;z-index:9999;background:var(--card);border:1px solid var(--accent);border-radius:12px;padding:14px 16px;box-shadow:0 8px 40px rgba(0,0,0,.6);display:none;min-width:230px}
+.move-popup.show{display:block}
+.move-popup-label{font-size:11px;color:var(--muted);margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.move-popup-inp{width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:7px;color:var(--text);font-family:inherit;font-size:15px;font-weight:700;padding:8px 11px;outline:none;margin-bottom:10px;text-align:center}
+.move-popup-inp:focus{border-color:var(--accent)}
+.move-popup-btns{display:flex;gap:7px}
+.move-confirm{flex:1;padding:8px;border-radius:7px;border:none;background:var(--accent);color:#fff;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer}
+.move-cancel{flex:1;padding:8px;border-radius:7px;border:1px solid var(--border);background:none;color:var(--muted);font-family:inherit;font-size:12px;cursor:pointer}
 .ldel:hover{border-color:var(--red);color:var(--red)}
 .le{text-align:center;padding:16px;color:var(--muted);font-size:12px;line-height:1.7}
 /* Toggles */
@@ -1040,6 +1047,17 @@ select.cs{background:var(--card);border:1.5px solid var(--border);color:var(--te
         <div class="cr"><span class="cl">Shake intensity</span><input type="range" min="2" max="20" step="1" value="10" oninput="document.getElementById('sShake').value=this.value"><span class="cv">10</span></div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- ── MOVE LYRIC POPUP ── -->
+<div class="move-popup" id="moveLyricPopup">
+  <div class="move-popup-label">↔ Move lyric to new time</div>
+  <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Enter start time (M:SS format)</div>
+  <input class="move-popup-inp" type="text" id="moveTimeInput" placeholder="0:11" maxlength="6">
+  <div class="move-popup-btns">
+    <button class="move-confirm" onclick="confirmMoveLyric()">✓ Move</button>
+    <button class="move-cancel" onclick="closeMovePopup()">Cancel</button>
   </div>
 </div>
 
@@ -2058,14 +2076,112 @@ function renderLyrics(){
   const lc=lyrics.length?'— '+lyrics.length+' line'+(lyrics.length!==1?'s':''):'';
   document.getElementById('lyricCount').textContent=lc;
   document.getElementById('lyricCountM').textContent=lc;
-  const empty='<div class="le">Play audio then tap "+ Add lyric".<br>The <strong>timeline below video</strong> shows bars — drag to adjust.</div>';
-  const html=lyrics.length?lyrics.map((l,i)=>`<div class="lr${i===selectedLyricIdx?' sel':''}" id="lr${i}" onclick="selectLyric(${i})"><div class="lt-badge"><span class="lt" onclick="event.stopPropagation();seekPreview(${l.time})">${fmt(l.time)}</span><span class="lt-arrow">→</span><span class="lt end" onclick="event.stopPropagation();seekPreview(${l.endTime||l.time+4})">${fmt(l.endTime||l.time+4)}</span></div><div class="ltxt" contenteditable="true" spellcheck="false" onclick="event.stopPropagation()" onblur="saveLyricText(${i},this)">${l.text.replace(/</g,'&lt;')}</div><button class="ldel" onclick="event.stopPropagation();deleteLyric(${i})">✕</button></div>`).join(''):empty;
+  const empty='<div class="le">Click on the timeline below the video to add lyrics at that time.</div>';
+  const html=lyrics.length?lyrics.map((l,i)=>{
+    const isSel=i===selectedLyricIdx;
+    const endT=l.endTime||l.time+4;
+    return `<div class="lr${isSel?' sel':''}" id="lr${i}" onclick="selectLyric(${i})">
+      <div class="lt-badge">
+        <span class="lt" onclick="event.stopPropagation();seekPreview(${l.time})">${fmt(l.time)}</span>
+        <span class="lt-arrow">→</span>
+        <span class="lt end" onclick="event.stopPropagation();seekPreview(${endT})">${fmt(endT)}</span>
+      </div>
+      <div class="ltxt" contenteditable="true" spellcheck="false"
+        onclick="event.stopPropagation()"
+        onblur="saveLyricText(${i},this)">${l.text.replace(/</g,'&lt;')}</div>
+      <div class="lyr-actions" onclick="event.stopPropagation()">
+        <button class="lyr-act-btn" title="Copy this lyric" onclick="copyLyric(${i})">⎘ Copy</button>
+        <button class="lyr-act-btn paste-btn" title="Paste copied lyric right after this one" onclick="pasteAfterLyric(${i})">⎙ Paste</button>
+        <button class="lyr-act-btn" title="Move to a new time" onclick="moveLyric(${i})">↔ Move</button>
+        <button class="ldel" title="Delete lyric" onclick="event.stopPropagation();deleteLyric(${i})">✕</button>
+      </div>
+    </div>`;
+  }).join(''):empty;
   document.getElementById('lyricsList').innerHTML=html;
   document.getElementById('lyricsListM').innerHTML=html;
   document.getElementById('lr'+selectedLyricIdx)?.scrollIntoView({block:'nearest',behavior:'smooth'});
 }
 
-// ── LYRIC CANVAS RENDERING ──
+// ── LYRIC COPY / PASTE / MOVE ─────────────────────────────────────
+let _copiedLyric = null;
+let _movingIdx   = -1;
+
+function copyLyric(i) {
+  _copiedLyric = { ...lyrics[i] };
+  toast(`⎘ Copied: "${lyrics[i].text.slice(0,30)}${lyrics[i].text.length>30?'…':''}"`);
+  // Highlight paste buttons
+  document.querySelectorAll('.paste-btn').forEach(b => {
+    b.style.background = 'rgba(6,182,212,.2)';
+    b.style.borderColor = 'var(--cyan)';
+    b.textContent = '⎙ Paste';
+  });
+}
+
+function pasteAfterLyric(afterIdx) {
+  if (!_copiedLyric) { toast('⚠ Copy a lyric first — click ⎘ Copy on any lyric'); return; }
+  // Place it 1 second after the current lyric ends
+  const refEnd = lyrics[afterIdx].endTime || lyrics[afterIdx].time + 4;
+  const dur    = (_copiedLyric.endTime || _copiedLyric.time + 4) - _copiedLyric.time;
+  const newStart = Math.min(audioDuration - dur, refEnd + 0.5);
+  const newEnd   = newStart + dur;
+  lyrics.splice(afterIdx + 1, 0, {
+    text:    _copiedLyric.text,
+    time:    +newStart.toFixed(2),
+    endTime: +newEnd.toFixed(2),
+    ds:      { beatCount:0, jumpAmt:0, spinAng:0, spinDir:1, phase:Math.random()*Math.PI*2 }
+  });
+  lyrics.sort((a,b) => a.time - b.time);
+  selectedLyricIdx = lyrics.findIndex(l => Math.abs(l.time - newStart) < 0.1);
+  renderLyrics();
+  TL.draw(pvOffset || 0);
+  toast(`⎙ Pasted "${_copiedLyric.text.slice(0,20)}…" at ${fmt(newStart)}`);
+}
+
+let _moveTargetIdx = -1;
+function moveLyric(i) {
+  _moveTargetIdx = i;
+  const popup = document.getElementById('moveLyricPopup');
+  const inp   = document.getElementById('moveTimeInput');
+  // Position popup near the clicked row
+  const row = document.getElementById('lr'+i);
+  const rect = row ? row.getBoundingClientRect() : { left:200, top:200 };
+  popup.style.left = Math.min(rect.left, window.innerWidth - 250) + 'px';
+  popup.style.top  = (rect.bottom + 6) + 'px';
+  popup.classList.add('show');
+  inp.value = fmt(lyrics[i].time);
+  inp.focus(); inp.select();
+  inp.onkeydown = e => { if(e.key==='Enter') confirmMoveLyric(); if(e.key==='Escape') closeMovePopup(); };
+}
+
+function confirmMoveLyric() {
+  if (_moveTargetIdx < 0) return;
+  const inp = document.getElementById('moveTimeInput');
+  const raw = inp.value.trim();
+  // Parse M:SS or plain seconds
+  let newTime = 0;
+  if (raw.includes(':')) {
+    const [m,s] = raw.split(':');
+    newTime = (parseInt(m)||0)*60 + (parseFloat(s)||0);
+  } else {
+    newTime = parseFloat(raw) || 0;
+  }
+  newTime = Math.max(0, Math.min(audioDuration - 0.5, newTime));
+  const dur = (lyrics[_moveTargetIdx].endTime || lyrics[_moveTargetIdx].time + 4) - lyrics[_moveTargetIdx].time;
+  lyrics[_moveTargetIdx].time    = +newTime.toFixed(2);
+  lyrics[_moveTargetIdx].endTime = +(newTime + dur).toFixed(2);
+  lyrics.sort((a,b) => a.time - b.time);
+  selectedLyricIdx = lyrics.findIndex(l => Math.abs(l.time - newTime) < 0.1);
+  closeMovePopup();
+  renderLyrics();
+  TL.draw(pvOffset || 0);
+  seekPreview(newTime);
+  toast(`↔ Moved to ${fmt(newTime)}`);
+}
+
+function closeMovePopup() {
+  _moveTargetIdx = -1;
+  document.getElementById('moveLyricPopup')?.classList.remove('show');
+}
 function getCurrentLyric(t){for(let i=0;i<lyrics.length;i++){const l=lyrics[i];const end=l.endTime||l.time+4;if(t>=l.time&&t<end)return{lyric:l,idx:i};}return null;}
 function drawLyricsOverlay(elapsed,beat){
   if(lyricsStyle==='none')return; // None = no lyrics shown

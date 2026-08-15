@@ -395,7 +395,7 @@ input[type=range]::-webkit-slider-thumb{width:12px;height:12px;background:var(--
 .sw.on::after{left:15px;background:#fff}
 
 /* Generate / action buttons */
-.gen-btn{background:var(--accent);color:#fff;border:none;font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;padding:8px 12px;cursor:pointer;width:100%;transition:background .12s}
+.gen-btn{background:var(--accent);color:#fff;border:none;font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;padding:7px 12px;cursor:pointer;width:100%;transition:background .12s}
 .gen-btn:hover:not(:disabled){background:var(--accent2)}
 .gen-btn:disabled{background:#333;color:#555;cursor:not-allowed}
 .gen-btn.stop{background:#8b1c1c}
@@ -409,7 +409,7 @@ input[type=range]::-webkit-slider-thumb{width:12px;height:12px;background:var(--
 .prev-dur button{flex:1;padding:4px;font-size:10px;background:#222;border:none;color:var(--muted);cursor:pointer;border-top:1px solid #333;border-bottom:1px solid #333;font-weight:600}
 .prev-dur button.on{background:#2a1800;color:var(--accent)}
 .prev-dur button:hover:not(.on){background:#2a2a2a;color:var(--text)}
-.actions{display:flex;flex-direction:column;gap:1px;padding:0;background:#1a1a1a;border-top:1px solid #444}
+.actions{display:flex;flex-direction:column;gap:0;padding:0;background:#111;border-top:1px solid #444;flex-shrink:0}
 
 /* Lyric list */
 .ll{display:flex;flex-direction:column;gap:1px;background:#1e1e1e;padding:2px}
@@ -463,9 +463,9 @@ input[type=range]::-webkit-slider-thumb{width:12px;height:12px;background:var(--
 .paste-bar-close{color:var(--dim)}
 
 /* Timeline */
-.tl-wrap{background:#1a1a1a;border-top:1px solid #333;flex-shrink:0;display:flex;flex-direction:column}
+.tl-wrap{background:#1a1a1a;border-top:1px solid #333;flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden}
 /* Multi-track rows */
-.mt-row{display:flex;align-items:center;height:20px;border-bottom:1px solid #1e1e1e;position:relative;overflow:hidden}
+.mt-row{display:flex;align-items:center;height:24px;border-bottom:1px solid #222;position:relative;overflow:hidden}
 .mt-label{width:72px;flex-shrink:0;font-size:8px;font-weight:700;color:var(--muted);padding:0 4px;text-transform:uppercase;letter-spacing:.2px;border-right:1px solid #2a2a2a;height:100%;display:flex;align-items:center;gap:2px;background:#0d0d0d;overflow:hidden;white-space:nowrap}
 .mt-label img{width:16px;height:16px;object-fit:cover;border-radius:2px;flex-shrink:0}
 .mt-track{flex:1;height:100%;position:relative;cursor:grab;overflow:hidden}
@@ -473,7 +473,7 @@ input[type=range]::-webkit-slider-thumb{width:12px;height:12px;background:var(--
 .mt-seg:hover{background:rgba(232,104,10,.5)}
 .mt-seg.audio-seg{background:rgba(74,158,255,.25);border-color:var(--blue)}
 .mt-seg.audio-seg:hover{background:rgba(74,158,255,.4)}
-.mt-seg-label{font-size:8px;color:var(--text);font-weight:600;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;pointer-events:none}
+.mt-seg-label{font-size:9px;color:var(--text);font-weight:600;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;pointer-events:none}
 .mt-seg-handle{position:absolute;top:0;bottom:0;width:6px;background:rgba(255,255,255,.3);cursor:ew-resize}
 .mt-seg-handle.left{left:0}
 .mt-seg-handle.right{right:0}
@@ -485,7 +485,7 @@ input[type=range]::-webkit-slider-thumb{width:12px;height:12px;background:var(--
 .tl-zoom-btn:hover{background:#333;color:var(--text)}
 
 /* Status bar */
-.sb{background:#111;border-top:1px solid #2a2a2a;font-size:10px;color:var(--dim);padding:3px 10px;font-family:'Courier New',monospace}
+.sb{background:#0d0d0d;border-top:1px solid #2a2a2a;font-size:9px;color:var(--dim);padding:2px 8px;font-family:'Courier New',monospace;flex-shrink:0}
 .dot{width:7px;height:7px;background:#555;display:inline-block;vertical-align:middle;margin-right:5px}
 .dot.rec{background:var(--red);box-shadow:0 0 6px var(--red);animation:pulse .8s infinite}
 .dot.paused{background:var(--amber)}
@@ -510,7 +510,7 @@ input[type=range]::-webkit-slider-thumb{width:12px;height:12px;background:var(--
 #progFill{height:100%;background:var(--accent);transition:width .2s;width:0%}
 
 /* Preview player controls */
-.plr{background:#1a1a1a;border-bottom:1px solid #333;padding:6px 8px}
+.plr{background:#1a1a1a;border-bottom:1px solid #333;padding:4px 8px;flex-shrink:0}
 .plr-top{display:flex;align-items:center;gap:6px}
 .pv-btn{width:28px;height:28px;border:1px solid #444;background:#2a2a2a;color:var(--text);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .1s}
 .pv-btn:hover{background:#333}
@@ -533,7 +533,7 @@ input[type=color]{width:28px;height:22px;border:1px solid #444;background:#1a1a1
 .ci-del{position:absolute;top:1px;right:1px;width:14px;height:14px;background:rgba(0,0,0,.7);border:none;color:#c05050;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 
 /* Canvas area */
-.ca{background:#111;display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;min-height:0;overflow:hidden}
+.ca{background:#111;display:flex;flex-direction:column;align-items:center;justify-content:center;flex:0 0 54%;min-height:0;overflow:hidden;border-bottom:2px solid #333}
 .cw{border:1px solid #333}
 #cEmpty{background:#1a1a1a;color:var(--dim);font-size:11px}
 
@@ -544,7 +544,7 @@ input[type=color]{width:28px;height:22px;border:1px solid #444;background:#1a1a1
 #imgCtrl button:hover{background:#333;color:var(--text)}
 
 /* Lyric float input */
-.tl-float{background:#1e1e1e;border-top:2px solid var(--accent);padding:6px 8px}
+.tl-float{background:#1e1e1e;border-top:2px solid var(--accent);padding:4px 6px;flex-shrink:0}
 .tl-fi-inp{background:#1a1a1a;border:1px solid #333;color:var(--text);font-family:inherit;font-size:12px;padding:6px 8px;outline:none;flex:1}
 .tl-fi-inp:focus{border-color:var(--accent)}
 .tl-fi-save{background:var(--accent);border:none;color:#fff;font-family:inherit;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:6px 14px;cursor:pointer}
@@ -1131,7 +1131,7 @@ input[type=color]{width:28px;height:22px;border:1px solid #444;background:#1a1a1
     </div>
 
     <!-- MULTI-TRACK ROWS (images + audio above lyrics) -->
-    <div id="multiTrackArea" style="background:#111;border-bottom:1px solid #444">
+    <div id="multiTrackArea" style="background:#111;border-bottom:1px solid #444;overflow-y:auto;max-height:40%">
       <!-- Image tracks -->
       <div id="imgTrackRows"></div>
       <!-- Audio tracks -->

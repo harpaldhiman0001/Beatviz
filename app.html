@@ -2273,9 +2273,14 @@ function loadChars(e){
         chars.push({img,url:ev.target.result,ds:{beatCount:0,jumpAmt:0,spinAng:0,spinDir:1,phase:Math.random()*Math.PI*2}});
         renderCG();
         checkReady();
-        // ── Always show image on canvas immediately — even without audio ──
         document.getElementById('cEmpty').style.display='none';
         drawIdlePreview();
+        // Rebuild image track segments equally divided across song
+        if(audioDuration > 0){
+          const each = audioDuration / chars.length;
+          imgSegments = chars.map((_,i)=>({charIdx:i, start:i*each, dur:each}));
+          renderMultiTracks();
+        }
         toast('✓ Image added — click on canvas to move · drag corners to resize');
       };
     };
@@ -2336,7 +2341,9 @@ async function playPreview(){
   if(!pvCtx||pvCtx.state==='closed'){pvCtx=new(window.AudioContext||window.webkitAudioContext)();pvAnalyser=pvCtx.createAnalyser();pvAnalyser.fftSize=2048;pvFreqData=new Uint8Array(pvAnalyser.frequencyBinCount);}
   if(pvCtx.state==='suspended')await pvCtx.resume();
   try{if(pvSrc)pvSrc.stop();}catch(e){}
-  const buf=await pvCtx.decodeAudioData(audioArrayBuffer.slice(0));
+  // Use already-decoded buffer — no need to re-decode
+  const buf = audioBuffer;
+  if(!buf){ toast('⚠ No audio loaded'); return; }
   pvSrc=pvCtx.createBufferSource();pvSrc.buffer=buf;
   pvSrc.connect(pvAnalyser);pvAnalyser.connect(pvCtx.destination);
   pvOffset=Math.min(pvOffset,audioDuration-.1);
@@ -2611,39 +2618,7 @@ function mtResizeStart(e, type, idx, handle) {
   document.addEventListener('mouseup', onUp);
 }
 
-// ── Hook into image loading to create track segments ──
-const _origLoadChars = loadChars;
-function loadChars(e) {
-  const prevCount = chars.length;
-  _origLoadChars(e);
-  // After loadChars adds images, rebuild segments
-  setTimeout(() => {
-    if(audioDuration && chars.length > prevCount) {
-      const total = chars.length;
-      const each  = audioDuration / total;
-      imgSegments = chars.map((_, i) => ({ charIdx:i, start:i*each, dur:each }));
-      renderMultiTracks();
-    }
-  }, 300);
-}
-
-// ── Hook into audio loading ──
-const _origAddAudioTrack = addAudioTrack;
-async function addAudioTrack(file) {
-  const prevCount = audioTracks.length;
-  await _origAddAudioTrack(file);
-  // After track added, create segment
-  if(audioTracks.length > prevCount) {
-    addAudioSegment(audioTracks.length - 1);
-    // Also rebuild image segments now that we have duration
-    if(chars.length > 0 && imgSegments.length === 0) {
-      const total = chars.length, each = audioDuration / total;
-      imgSegments = chars.map((_, i) => ({ charIdx:i, start:i*each, dur:each }));
-    } else if(chars.length > 0) {
-      renderMultiTracks();
-    }
-  }
-}
+// Track hooks moved into loadChars and addAudioTrack directly
 let audioTracks = [];
 
 async function loadAudio(e) {
@@ -2662,9 +2637,10 @@ async function addAudioTrack(file) {
   catch(err) { toast('⚠ Could not decode ' + name); return; }
 
   if(audioTracks.length === 0) {
-    // First track = main track (BPM, duration, waveform)
-    audioBuffer   = buf;
-    audioDuration = buf.duration;
+    // First track = main track
+    audioBuffer      = buf;
+    audioArrayBuffer = await file.arrayBuffer().catch(()=>null); // keep for compat
+    audioDuration    = buf.duration;
     if(typeof drawWaveform === 'function') drawWaveform();
     document.getElementById('audioName').textContent = name;
     if(typeof TL !== 'undefined') TL.draw(0);
@@ -2672,6 +2648,17 @@ async function addAudioTrack(file) {
   audioTracks.push({ buffer:buf, name, volume:1, muted:false, gainNode:null });
   renderAudioTrackList();
   checkReady();
+  // Add audio segment right after the previous one
+  const lastEnd = audioSegments.length > 0
+    ? audioSegments[audioSegments.length-1].start + audioSegments[audioSegments.length-1].dur
+    : 0;
+  audioSegments.push({ trackIdx: audioTracks.length-1, start: lastEnd, dur: buf.duration });
+  // Rebuild image segments now that we have duration
+  if(chars.length > 0 && audioDuration > 0){
+    const each = audioDuration / chars.length;
+    imgSegments = chars.map((_,i)=>({charIdx:i, start:i*each, dur:each}));
+  }
+  renderMultiTracks();
   toast('✓ ' + name + ' (' + fmt(buf.duration) + ')' + (audioTracks.length > 1 ? ' — track ' + audioTracks.length : ''));
 }
 
@@ -4394,9 +4381,21 @@ async function handlePromoGenerate() {
   timeData = new Uint8Array(analyser.frequencyBinCount);
 
   const mDest = audioCtx.createMediaStreamDestination();
-  const buf2  = await audioCtx.decodeAudioData(audioArrayBuffer.slice(0));
-  srcNode = audioCtx.createBufferSource(); srcNode.buffer = buf2;
+  // Use decoded audioBuffer — no re-decoding needed
+  const mainBuf2 = (audioTracks.length > 0 ? audioTracks[0].buffer : null) || audioBuffer;
+  if(!mainBuf2){ toast('⚠ No audio loaded'); return; }
+  srcNode = audioCtx.createBufferSource(); srcNode.buffer = mainBuf2;
   srcNode.connect(analyser); analyser.connect(audioCtx.destination); analyser.connect(mDest);
+  // Start additional tracks
+  if(audioTracks.length > 1){
+    audioTracks.slice(1).forEach(t=>{
+      if(t.muted) return;
+      const s=audioCtx.createBufferSource(); s.buffer=t.buffer;
+      const g=audioCtx.createGain(); g.gain.value=t.volume||1;
+      s.connect(g); g.connect(mDest); g.connect(audioCtx.destination);
+      t.gainNode=g; s.start(0,0);
+    });
+  }
 
   bassAvg = 0; beatIntensity = 0; lastBeat = 0;
 

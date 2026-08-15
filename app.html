@@ -145,6 +145,12 @@ select.cs{background:var(--card);border:1.5px solid var(--border);color:var(--te
 .move-confirm{flex:1;padding:8px;border-radius:7px;border:none;background:var(--accent);color:#fff;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer}
 .move-cancel{flex:1;padding:8px;border-radius:7px;border:1px solid var(--border);background:none;color:var(--muted);font-family:inherit;font-size:12px;cursor:pointer}
 /* FX Panel */
+  .sidebar { display:flex; flex-direction:column; overflow:hidden; }
+.panes   { flex:1; overflow-y:auto; }   /* scrollable content area */
+.actions { flex-shrink:0; }             /* Generate button, pinned at bottom */
+  .sidebar { min-height: 0; }
+.panes   { min-height: 0; }
+#promoPanes { min-height: 0; }
 .fx-filter-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:6px}
 .fx-filter{background:var(--card);border:1.5px solid var(--border);border-radius:8px;padding:6px 4px 5px;cursor:pointer;transition:all .13s;display:flex;flex-direction:column;align-items:center;gap:4px}
 .fx-filter:hover{border-color:var(--accent)}
@@ -5646,6 +5652,15 @@ canvas.addEventListener('mousemove', e => {
     ec.userPlaced = true;
   }
 });
+
+  let currentLTool = 'select';
+function setLTool(tool, btn) {
+  currentLTool = tool;
+  document.querySelectorAll('.ltool').forEach(b => b.classList.remove('on'));
+  if (btn) btn.classList.add('on');
+  // optional: change cursor to hint at the active tool
+  canvas.style.cursor = tool === 'select' ? 'default' : 'crosshair';
+}
 
 canvas.addEventListener('mouseup',    () => { editDrag = null; canvas.style.cursor = editHoverIdx >= 0 ? 'grab' : 'default'; updateImgCtrl(); });
 canvas.addEventListener('mouseleave', () => { editDrag = null; editHoverIdx = -1; });

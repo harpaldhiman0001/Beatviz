@@ -1128,10 +1128,8 @@ input[type=color]{width:28px;height:22px;border:1px solid var(--border);backgrou
     <div id="ppane-slides" class="pane on" style="display:flex">
       <div>
         <div class="sl">Slides <span id="promoSlideCount" style="color:var(--muted);font-size:9px;text-transform:none;letter-spacing:0;font-weight:400;margin-left:3px"></span></div>
-        <div id="promoSlideList" style="display:flex;flex-direction:column;gap:6px"></div>
-        <button onclick="addPromoSlide()" style="width:100%;margin-top:8px;padding:9px;border-radius:8px;border:2px dashed var(--border);background:none;color:var(--muted);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:all .14s" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
-          + Add Slide
-        </button>
+<div id="promoSlideList" style="display:flex;flex-direction:column;gap:6px"></div>
+<button onclick="addPromoSlide()" style="...">+ Add Slide</button>
       </div>
       <div>
         <div class="sl">Animation Style</div>
@@ -3777,37 +3775,55 @@ function getActiveCharIdx(elapsed) {
   return last ? last.charIdx : 0;
 }
 
+  function getActiveSegmentsAtTime(elapsed) {
+  const activeByChar = {};
+  imgSegments.forEach(seg => {
+    if (elapsed >= seg.start && elapsed < seg.start + seg.dur) {
+      activeByChar[seg.charIdx] = seg;
+    }
+  });
+  return Object.entries(activeByChar).map(([charIdx, seg]) => ({ charIdx: +charIdx, seg }));
+}
+
 function drawCharacters(beat, elapsed) {
   if (!chars.length) return;
 
   // ── Canva-style clip: if imgSegments defined, show only the active image ──
-  if(imgSegments.length > 0) {
-    const activeIdx = getActiveCharIdx(elapsed);
-    if(activeIdx < 0 || activeIdx >= chars.length) return;
+if (imgSegments.length > 0) {
+    const activeList = getActiveSegmentsAtTime(elapsed);
+    if (activeList.length === 0) return;
 
-    // Find which segment is active to get its start time for transition
-    const activeSeg = imgSegments.find(s => elapsed >= s.start && elapsed < s.start + s.dur)
-                   || imgSegments[imgSegments.length - 1];
-    const segAge  = activeSeg ? elapsed - activeSeg.start : 0;
-    const segDur  = activeSeg ? activeSeg.dur : 4;
-    const trans   = getImageTransition(segAge, segDur);
+    activeList.forEach(({ charIdx, seg }) => {
+      if (charIdx < 0 || charIdx >= chars.length) return;
+      const c = chars[charIdx];
+      const segAge = elapsed - seg.start;
+      const trans  = getImageTransition(segAge, seg.dur);
 
-    const savedChars = chars;
-    chars = [chars[activeIdx]];
-    const wasPlaced = chars[0].userPlaced;
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, Math.min(1, trans.a));
+      ctx.translate(trans.tx || 0, trans.ty || 0);
+      if (trans.s && trans.s !== 1) ctx.scale(trans.s, trans.s);
 
-    // Apply transition transform around the draw call
-    ctx.save();
-    ctx.globalAlpha = Math.max(0, Math.min(1, trans.a));
-    ctx.translate(trans.tx || 0, trans.ty || 0);
-    if(trans.s && trans.s !== 1) ctx.scale(trans.s, trans.s);
-
-    if(!wasPlaced) {
-      drawSoloCharacter(beat, elapsed);
+      if (!c.userPlaced) {
+        const savedChars = chars;
+        chars = [c];
+        drawSoloCharacter(beat, elapsed);
+        chars = savedChars;
+      } else {
+        const { dx, dy, rot, scx, scy } = getDance(c, beat, elapsed, charIdx);
+        const floatY = danceMode === 'none' ? 0 : Math.sin(Date.now() * 0.002) * 8;
+        const bs = danceMode === 'none' ? 1 : 1 + beatIntensity * 0.17;
+        const glow = +document.getElementById('sGlow').value;
+        ctx.translate(c.px + dx, c.py + dy + floatY);
+        ctx.rotate(rot); ctx.scale(scx * bs, scy * bs);
+        if (beatIntensity > 0.08 && glow > 0) { ctx.shadowBlur = 32 * beatIntensity * glow; ctx.shadowColor = STYLE_COLORS[style] || '#8b5cf6'; }
+        ctx.drawImage(c.img, -c.pw/2, -c.ph/2, c.pw, c.ph);
+        ctx.shadowBlur = 0;
+      }
       ctx.restore();
-      chars = savedChars;
-      return;
-    }
+    });
+    return;
+  }
     // Positioned — draw at its location
     const c2 = chars[0];
     const { dx, dy, rot, scx, scy } = getDance(c2, beat, elapsed, 0);
@@ -4399,29 +4415,10 @@ function deletePromoSlide(i) {
 
 function renderPromoSlideList() {
   const el = document.getElementById('promoSlideList');
+  if (!el) { console.error('promoSlideList element missing from DOM'); return; }
   const cnt = document.getElementById('promoSlideCount');
   if (cnt) cnt.textContent = `— ${promoSlides.length} slide${promoSlides.length!==1?'s':''}`;
-  el.innerHTML = promoSlides.map((s,i) => `
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:9px;padding:10px;display:flex;flex-direction:column;gap:6px">
-      <div style="display:flex;align-items:center;gap:6px">
-        <input value="${s.emoji}" onchange="promoSlides[${i}].emoji=this.value" style="width:44px;background:var(--bg);border:1px solid var(--border);border-radius:5px;color:var(--text);font-size:18px;padding:3px;text-align:center;outline:none;font-family:inherit">
-        <div style="flex:1;display:flex;flex-direction:column;gap:4px">
-          <input value="${s.headline}" placeholder="Main heading" onchange="promoSlides[${i}].headline=this.value" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:5px;color:var(--text);font-size:12px;font-weight:700;padding:4px 7px;outline:none;font-family:inherit">
-          <input value="${s.sub}" placeholder="Sub text" onchange="promoSlides[${i}].sub=this.value" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:5px;color:var(--muted);font-size:11px;padding:4px 7px;outline:none;font-family:inherit">
-        </div>
-        <button onclick="deletePromoSlide(${i})" style="width:22px;height:22px;border-radius:4px;border:1px solid var(--border);background:none;color:var(--muted);font-size:11px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center" onmouseover="this.style.color='var(--red)';this.style.borderColor='var(--red)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'">✕</button>
-      </div>
-      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:5px;padding-top:2px;border-top:1px dashed var(--border);margin-top:2px">
-        ${(s.pills||[]).map((p,pi) => `
-          <span style="display:flex;align-items:center;gap:4px;padding:3px 5px 3px 9px;border-radius:100px;background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.35);color:#c4b5fd;font-size:10px;font-weight:600;white-space:nowrap">
-            ${p.replace(/</g,'&lt;')}
-            <button onclick="removePromoPill(${i},${pi})" title="Remove tag" style="width:14px;height:14px;border-radius:50%;border:none;background:rgba(255,255,255,.12);color:#c4b5fd;font-size:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;line-height:1;flex-shrink:0">✕</button>
-          </span>
-        `).join('')}
-        <input placeholder="+ add tag" onkeydown="if(event.key==='Enter'){event.preventDefault();addPromoPill(${i},this);this.value='';}" style="width:76px;background:var(--bg);border:1px dashed var(--border);border-radius:100px;color:var(--text);font-size:10px;padding:3px 9px;outline:none;font-family:inherit" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
-      </div>
-    </div>
-  `).join('');
+  el.innerHTML = promoSlides.map((s,i) => `...`).join('');
 }
 
 function checkPromoReady() {

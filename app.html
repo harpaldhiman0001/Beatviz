@@ -3788,8 +3788,8 @@ function getActiveCharIdx(elapsed) {
 function drawCharacters(beat, elapsed) {
   if (!chars.length) return;
 
-  // ── Canva-style clip: if imgSegments defined, show only the active image ──
-if (imgSegments.length > 0) {
+  // ── Canva-style clip: if imgSegments defined, show each active image on its own track ──
+  if (imgSegments.length > 0) {
     const activeList = getActiveSegmentsAtTime(elapsed);
     if (activeList.length === 0) return;
 
@@ -3824,25 +3824,9 @@ if (imgSegments.length > 0) {
     });
     return;
   }
-    // Positioned — draw at its location
-    const c2 = chars[0];
-    const { dx, dy, rot, scx, scy } = getDance(c2, beat, elapsed, 0);
-    const floatY = danceMode === 'none' ? 0 : Math.sin(Date.now() * 0.002) * 8;
-    const bs = danceMode === 'none' ? 1 : 1 + beatIntensity * 0.17;
-    const glow = +document.getElementById('sGlow').value;
-    ctx.translate(c2.px + dx, c2.py + c2.ph/2 - c2.ph/2 + dy + floatY);
-    ctx.rotate(rot); ctx.scale(scx*bs, scy*bs);
-    if(beatIntensity > 0.08 && glow > 0) { ctx.shadowBlur=32*beatIntensity*glow; ctx.shadowColor=STYLE_COLORS[style]||'#8b5cf6'; }
-    ctx.drawImage(c2.img, -c2.pw/2, -c2.ph/2, c2.pw, c2.ph);
-    ctx.shadowBlur=0;
-    ctx.restore();
-    chars = savedChars;
-    return;
-  }
 
   // ── Original multi-char behaviour (no segments) ──
   // Solo spotlight mode ONLY when single char and NOT manually positioned by user
-  // If user placed it (Fill Video / drag / resize), draw at their exact position
   if (chars.length === 1 && !chars[0].userPlaced) { drawSoloCharacter(beat, elapsed); return; }
 
   const glow  = +document.getElementById('sGlow').value;
@@ -3850,7 +3834,6 @@ if (imgSegments.length > 0) {
   const n = chars.length, margin = W * 0.08, avail = W - margin * 2;
 
   chars.forEach((c, i) => {
-    // Use manual position if set, otherwise auto
     let cx, baseY, cw2, ch;
     if (c.userPlaced) {
       cx = c.px; baseY = c.py + c.ph/2; cw2 = c.pw; ch = c.ph;

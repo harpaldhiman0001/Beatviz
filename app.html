@@ -121,6 +121,14 @@ select.cs{background:var(--card);border:1.5px solid var(--border);color:var(--te
 .move-popup-btns{display:flex;gap:7px}
 .move-confirm{flex:1;padding:8px;border-radius:7px;border:none;background:var(--accent);color:#fff;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer}
 .move-cancel{flex:1;padding:8px;border-radius:7px;border:1px solid var(--border);background:none;color:var(--muted);font-family:inherit;font-size:12px;cursor:pointer}
+/* FX Panel */
+.fx-filter-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:6px}
+.fx-filter{background:var(--card);border:1.5px solid var(--border);border-radius:8px;padding:6px 4px 5px;cursor:pointer;transition:all .13s;display:flex;flex-direction:column;align-items:center;gap:4px}
+.fx-filter:hover{border-color:var(--accent)}
+.fx-filter.on{border-color:var(--pink);box-shadow:0 0 10px rgba(244,114,182,.3)}
+.fx-filter .fx-prev{width:100%;height:28px;border-radius:5px;margin-bottom:2px}
+.fx-filter span{font-size:9px;font-weight:700;color:var(--muted);text-align:center}
+.fx-filter.on span{color:var(--pink)}
 .lcm-btn{display:block;width:100%;padding:8px 12px;border-radius:7px;border:none;background:none;color:var(--text);font-family:inherit;font-size:13px;font-weight:500;text-align:left;cursor:pointer;transition:background .1s}
 .lcm-btn:hover{background:rgba(124,58,237,.18)}
 .lcm-btn.danger{color:#ef4444}
@@ -350,6 +358,7 @@ select.cs{background:var(--card);border:1.5px solid var(--border);color:var(--te
     <button class="s-tab" onclick="showTab('style',this)">STYLE</button>
     <button class="s-tab" onclick="showTab('lyrics',this)">LYRICS</button>
     <button class="s-tab" onclick="showTab('motion',this)">MOTION</button>
+    <button class="s-tab" onclick="showTab('fx',this)" style="color:var(--pink)">FX</button>
     <button class="s-tab" onclick="showTab('text',this)" style="color:var(--amber)">TEXT</button>
   </div>
   <!-- Promo mode tabs -->
@@ -639,6 +648,71 @@ select.cs{background:var(--card);border:1.5px solid var(--border);color:var(--te
         </div>
       </div>
       <div class="info">Auto dance mode cycles all 5 moves every 22 seconds. Camera shake triggers on beats above 60% intensity.</div>
+    </div>
+  </div>
+
+  <!-- ══ FX PANE ══ -->
+  <div id="pane-fx" class="pane">
+
+    <!-- COLOR FILTERS -->
+    <div>
+      <div class="sl">Color Filter <span style="color:var(--pink);font-size:9px;background:rgba(244,114,182,.1);padding:1px 6px;border-radius:3px;border:1px solid rgba(244,114,182,.3);margin-left:4px">CapCut style</span></div>
+      <div class="fx-filter-grid">
+        <button class="fx-filter on" data-filter="none"     onclick="setFilter('none',this)">    <div class="fx-prev" style="background:#111"></div><span>Normal</span></button>
+        <button class="fx-filter" data-filter="warm"        onclick="setFilter('warm',this)">    <div class="fx-prev" style="background:linear-gradient(135deg,#f97316,#dc2626)"></div><span>Warm</span></button>
+        <button class="fx-filter" data-filter="cool"        onclick="setFilter('cool',this)">    <div class="fx-prev" style="background:linear-gradient(135deg,#0ea5e9,#6366f1)"></div><span>Cool</span></button>
+        <button class="fx-filter" data-filter="vintage"     onclick="setFilter('vintage',this)"> <div class="fx-prev" style="background:linear-gradient(135deg,#92400e,#a16207)"></div><span>Vintage</span></button>
+        <button class="fx-filter" data-filter="cinematic"   onclick="setFilter('cinematic',this)"><div class="fx-prev" style="background:linear-gradient(135deg,#0f0f2d,#1e3a5f)"></div><span>Cinema</span></button>
+        <button class="fx-filter" data-filter="bw"          onclick="setFilter('bw',this)">      <div class="fx-prev" style="background:linear-gradient(135deg,#111,#777)"></div><span>B&amp;W</span></button>
+        <button class="fx-filter" data-filter="vivid"       onclick="setFilter('vivid',this)">   <div class="fx-prev" style="background:linear-gradient(135deg,#ec4899,#f59e0b)"></div><span>Vivid</span></button>
+        <button class="fx-filter" data-filter="dreamy"      onclick="setFilter('dreamy',this)">  <div class="fx-prev" style="background:linear-gradient(135deg,#e879f9,#a78bfa)"></div><span>Dreamy</span></button>
+        <button class="fx-filter" data-filter="fade"        onclick="setFilter('fade',this)">    <div class="fx-prev" style="background:linear-gradient(135deg,#d4d4d4,#737373)"></div><span>Fade</span></button>
+        <button class="fx-filter" data-filter="drama"       onclick="setFilter('drama',this)">   <div class="fx-prev" style="background:linear-gradient(135deg,#1c1c1c,#450a0a)"></div><span>Drama</span></button>
+        <button class="fx-filter" data-filter="golden"      onclick="setFilter('golden',this)">  <div class="fx-prev" style="background:linear-gradient(135deg,#f59e0b,#b45309)"></div><span>Golden</span></button>
+        <button class="fx-filter" data-filter="cyberpunk"   onclick="setFilter('cyberpunk',this)"><div class="fx-prev" style="background:linear-gradient(135deg,#f0abfc,#818cf8)"></div><span>Cyber</span></button>
+      </div>
+      <div class="cr" style="margin-top:8px"><span class="cl">Filter strength</span><input type="range" id="filterStrength" min="0" max="100" step="5" value="70" oninput="document.getElementById('vFilter').textContent=this.value+'%'"><span class="cv" id="vFilter">70%</span></div>
+    </div>
+
+    <!-- OVERLAY EFFECTS -->
+    <div>
+      <div class="sl">Overlay Effects <span style="color:var(--cyan);font-size:9px;background:rgba(6,182,212,.1);padding:1px 6px;border-radius:3px;border:1px solid rgba(6,182,212,.3);margin-left:4px">After Effects style</span></div>
+      <div class="sg" style="grid-template-columns:repeat(3,1fr)">
+        <button class="so" data-fx="vignette"   onclick="toggleFX('vignette',this)"><span>🔲</span>Vignette</button>
+        <button class="so" data-fx="grain"      onclick="toggleFX('grain',this)"><span>📺</span>Film Grain</button>
+        <button class="so" data-fx="lightleak"  onclick="toggleFX('lightleak',this)"><span>✨</span>Light Leak</button>
+        <button class="so" data-fx="glitch"     onclick="toggleFX('glitch',this)"><span>⚡</span>Glitch</button>
+        <button class="so" data-fx="rain"       onclick="toggleFX('rain',this)"><span>🌧</span>Rain</button>
+        <button class="so" data-fx="bokeh"      onclick="toggleFX('bokeh',this)"><span>🌸</span>Bokeh</button>
+        <button class="so" data-fx="scanlines"  onclick="toggleFX('scanlines',this)"><span>📡</span>Scan Lines</button>
+        <button class="so" data-fx="chromab"    onclick="toggleFX('chromab',this)"><span>🎨</span>Chroma</button>
+        <button class="so" data-fx="stars"      onclick="toggleFX('stars',this)"><span>⭐</span>Stars</button>
+      </div>
+      <div class="cr" style="margin-top:8px"><span class="cl">FX intensity</span><input type="range" id="fxStrength" min="0" max="100" step="5" value="60" oninput="document.getElementById('vFX').textContent=this.value+'%'"><span class="cv" id="vFX">60%</span></div>
+    </div>
+
+    <!-- TRANSITIONS -->
+    <div>
+      <div class="sl">Scene Transition Style</div>
+      <div class="sg" style="grid-template-columns:repeat(3,1fr)">
+        <button class="so on" data-tr="cut"     onclick="pickTrans('cut',this)"><span>✂</span>Cut</button>
+        <button class="so" data-tr="fade"       onclick="pickTrans('fade',this)"><span>🌫</span>Fade</button>
+        <button class="so" data-tr="zoom"       onclick="pickTrans('zoom',this)"><span>🔍</span>Zoom</button>
+        <button class="so" data-tr="slide"      onclick="pickTrans('slide',this)"><span>➡</span>Slide</button>
+        <button class="so" data-tr="spin"       onclick="pickTrans('spin',this)"><span>🌀</span>Spin</button>
+        <button class="so" data-tr="glitch"     onclick="pickTrans('glitch',this)"><span>⚡</span>Glitch</button>
+      </div>
+    </div>
+
+    <!-- SPEED RAMP -->
+    <div>
+      <div class="sl">Playback Speed</div>
+      <div class="sg" style="grid-template-columns:repeat(4,1fr)">
+        <button class="so" data-spd="0.5"  onclick="pickSpeed(0.5,this)"><span>🐌</span>0.5×</button>
+        <button class="so" data-spd="0.75" onclick="pickSpeed(0.75,this)"><span>🎭</span>0.75×</button>
+        <button class="so on" data-spd="1" onclick="pickSpeed(1,this)"><span>▶</span>1×</button>
+        <button class="so" data-spd="1.5"  onclick="pickSpeed(1.5,this)"><span>🚀</span>1.5×</button>
+      </div>
     </div>
   </div>
 
@@ -2930,6 +3004,9 @@ function loopFn(){
   if(lyrics.length&&(isPlaying||pvPlaying))drawLyricsOverlay(elapsed,beat);
   if(isPlaying||pvPlaying)drawTextOverlay(elapsed);
   drawTransitionFlash();
+  // ── FX LAYER ──
+  applyColorFilter(elapsed);
+  drawOverlayFX(elapsed, beat);
   if(isPlaying||pvPlaying)drawWatermark();
   // Draw edit overlay on top of everything
   drawEditOverlay(); // always on
@@ -2963,7 +3040,7 @@ async function handleGenerate(){
   const buf2=await audioCtx.decodeAudioData(audioArrayBuffer.slice(0));
   srcNode=audioCtx.createBufferSource();srcNode.buffer=buf2;
   srcNode.connect(analyser);analyser.connect(audioCtx.destination);analyser.connect(mDest);
-  initParticles();bassAvg=0;beatIntensity=0;lastBeat=0;camX=0;camY=0;energyHistory=[];lastTransitionTime=0;beatTimestamps=[];
+  initParticles();initFXParticles();bassAvg=0;beatIntensity=0;lastBeat=0;camX=0;camY=0;energyHistory=[];lastTransitionTime=0;beatTimestamps=[];
   // Bump the canvas up to the chosen export resolution (HD/Full HD/Ultra HD) right before capturing.
   applyExportResolution();
   const cvStr=canvas.captureStream(30),audTr=mDest.stream.getAudioTracks();
@@ -4147,9 +4224,283 @@ function lyrCinematic(text, progress, beat, lsz, lcol, alpha, ypos) {
   ctx.restore();
 }
 
-// ── HOOK INTO MAIN LOOP ──
-// Override loopFn to render promo frame when in promo mode
-// ── PROMO-AWARE RENDER LOOP ──
+// ════════════════════════════════════════
+// FX SYSTEM — Color Filters + Overlays + Transitions
+// ════════════════════════════════════════
+let activeFilter  = 'none';
+let activeFX      = new Set();
+let transitionStyle = 'cut';
+let playbackSpeed = 1;
+
+function setFilter(f, btn) {
+  activeFilter = f;
+  document.querySelectorAll('[data-filter]').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll(`[data-filter="${f}"]`).forEach(b=>b.classList.add('on'));
+}
+
+function toggleFX(fx, btn) {
+  if(activeFX.has(fx)) { activeFX.delete(fx); btn.classList.remove('on'); }
+  else                  { activeFX.add(fx);    btn.classList.add('on');    }
+}
+
+function pickTrans(t, btn) {
+  transitionStyle = t;
+  document.querySelectorAll('[data-tr]').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll(`[data-tr="${t}"]`).forEach(b=>b.classList.add('on'));
+}
+
+function pickSpeed(s, btn) {
+  playbackSpeed = s;
+  document.querySelectorAll('[data-spd]').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll(`[data-spd="${s}"]`).forEach(b=>b.classList.add('on'));
+  if(srcNode) try{ srcNode.playbackRate.value = s; }catch(e){}
+}
+
+// ── APPLY COLOR FILTER ──
+function applyColorFilter(elapsed) {
+  if(activeFilter==='none') return;
+  const strength = (document.getElementById('filterStrength')?.value || 70) / 100;
+  ctx.save();
+  ctx.globalAlpha = strength;
+
+  switch(activeFilter) {
+    case 'warm':
+      ctx.globalCompositeOperation = 'multiply';
+      ctx.fillStyle = 'rgba(255,200,100,0.35)'; ctx.fillRect(0,0,W,H);
+      break;
+    case 'cool':
+      ctx.globalCompositeOperation = 'multiply';
+      ctx.fillStyle = 'rgba(100,160,255,0.3)'; ctx.fillRect(0,0,W,H);
+      break;
+    case 'vintage': {
+      // Sepia-like warm overlay + fade
+      ctx.globalCompositeOperation = 'overlay';
+      ctx.fillStyle = 'rgba(180,130,60,0.4)'; ctx.fillRect(0,0,W,H);
+      ctx.globalCompositeOperation = 'lighten';
+      ctx.fillStyle = 'rgba(100,80,40,0.15)'; ctx.fillRect(0,0,W,H);
+      break;
+    }
+    case 'cinematic': {
+      // Dark teal + letterbox
+      ctx.globalCompositeOperation = 'multiply';
+      ctx.fillStyle = 'rgba(20,40,80,0.4)'; ctx.fillRect(0,0,W,H);
+      // Letterbox bars
+      ctx.globalAlpha = strength * 0.9;
+      ctx.globalCompositeOperation = 'source-over';
+      const barH = H * 0.09;
+      ctx.fillStyle = '#000'; ctx.fillRect(0,0,W,barH); ctx.fillRect(0,H-barH,W,barH);
+      break;
+    }
+    case 'bw': {
+      // Grayscale via desaturate — draw grey overlay in luminosity
+      ctx.globalCompositeOperation = 'saturation';
+      ctx.fillStyle = 'rgba(128,128,128,1)'; ctx.fillRect(0,0,W,H);
+      break;
+    }
+    case 'vivid': {
+      ctx.globalCompositeOperation = 'overlay';
+      ctx.fillStyle = 'rgba(255,100,200,0.15)'; ctx.fillRect(0,0,W,H);
+      break;
+    }
+    case 'dreamy': {
+      ctx.globalCompositeOperation = 'screen';
+      ctx.fillStyle = 'rgba(200,150,255,0.2)'; ctx.fillRect(0,0,W,H);
+      break;
+    }
+    case 'fade': {
+      ctx.globalCompositeOperation = 'lighten';
+      ctx.fillStyle = 'rgba(200,200,200,0.25)'; ctx.fillRect(0,0,W,H);
+      break;
+    }
+    case 'drama': {
+      ctx.globalCompositeOperation = 'multiply';
+      ctx.fillStyle = 'rgba(30,10,10,0.5)'; ctx.fillRect(0,0,W,H);
+      break;
+    }
+    case 'golden': {
+      ctx.globalCompositeOperation = 'overlay';
+      ctx.fillStyle = 'rgba(255,180,0,0.3)'; ctx.fillRect(0,0,W,H);
+      break;
+    }
+    case 'cyberpunk': {
+      ctx.globalCompositeOperation = 'screen';
+      const cg = ctx.createLinearGradient(0,0,W,H);
+      cg.addColorStop(0,'rgba(240,171,252,0.15)');
+      cg.addColorStop(1,'rgba(99,102,241,0.15)');
+      ctx.fillStyle = cg; ctx.fillRect(0,0,W,H);
+      break;
+    }
+  }
+  ctx.restore();
+}
+
+// ── OVERLAY EFFECTS ──
+let _rainDrops   = [];
+let _bokehCircles = [];
+let _starField   = [];
+
+function initFXParticles() {
+  // Rain
+  _rainDrops = Array.from({length:120},()=>({
+    x: Math.random()*W, y: Math.random()*H*2-H,
+    speed: 6+Math.random()*10, len: 15+Math.random()*25, alpha: 0.2+Math.random()*0.4
+  }));
+  // Bokeh
+  _bokehCircles = Array.from({length:18},()=>({
+    x:Math.random()*W, y:Math.random()*H, r:20+Math.random()*60,
+    alpha:0.06+Math.random()*0.12, vx:(Math.random()-.5)*0.3, vy:(Math.random()-.5)*0.2,
+    col:`hsl(${Math.random()*360},80%,70%)`
+  }));
+  // Stars
+  _starField = Array.from({length:200},()=>({
+    x:Math.random()*W, y:Math.random()*H,
+    r:0.5+Math.random()*2, twinkle:Math.random()*Math.PI*2
+  }));
+}
+
+function drawOverlayFX(elapsed, beat) {
+  if(activeFX.size===0) return;
+  const str = (document.getElementById('fxStrength')?.value||60)/100;
+
+  // ── Vignette ──
+  if(activeFX.has('vignette')) {
+    const vg = ctx.createRadialGradient(W/2,H/2,H*.2,W/2,H/2,H*.85);
+    vg.addColorStop(0,'rgba(0,0,0,0)');
+    vg.addColorStop(1,`rgba(0,0,0,${0.6*str})`);
+    ctx.save(); ctx.fillStyle=vg; ctx.fillRect(0,0,W,H); ctx.restore();
+  }
+
+  // ── Film Grain ──
+  if(activeFX.has('grain')) {
+    ctx.save(); ctx.globalAlpha=0.06*str;
+    const id=ctx.getImageData(0,0,W,H);const d=id.data;
+    for(let i=0;i<d.length;i+=4){const n=(Math.random()-.5)*80;d[i]+=n;d[i+1]+=n;d[i+2]+=n;}
+    ctx.putImageData(id,0,0); ctx.restore();
+  }
+
+  // ── Light Leak ──
+  if(activeFX.has('lightleak')) {
+    const pulse = (Math.sin(elapsed*1.3)+1)/2;
+    const lg = ctx.createLinearGradient(0,0,W*.6,H*.4);
+    lg.addColorStop(0,`rgba(255,200,100,${0.18*str*pulse})`);
+    lg.addColorStop(0.5,`rgba(255,100,80,${0.08*str})`);
+    lg.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.save(); ctx.globalCompositeOperation='screen';
+    ctx.fillStyle=lg; ctx.fillRect(0,0,W,H); ctx.restore();
+  }
+
+  // ── Glitch ──
+  if(activeFX.has('glitch') && (beat>0.6 || Math.random()<0.04*str)) {
+    ctx.save();
+    const glitchH = 4+Math.floor(Math.random()*H*.12);
+    const glitchY = Math.floor(Math.random()*(H-glitchH));
+    const shift   = (Math.random()-.5)*W*0.04*str;
+    const chunk   = ctx.getImageData(0,glitchY,W,glitchH);
+    ctx.putImageData(chunk,shift,glitchY);
+    // RGB split flash
+    ctx.globalCompositeOperation='screen';
+    ctx.fillStyle=`rgba(255,0,0,${0.06*str})`; ctx.fillRect(shift+2,glitchY,W,glitchH);
+    ctx.fillStyle=`rgba(0,0,255,${0.06*str})`; ctx.fillRect(shift-2,glitchY,W,glitchH);
+    ctx.restore();
+  }
+
+  // ── Rain ──
+  if(activeFX.has('rain')) {
+    if(!_rainDrops.length) initFXParticles();
+    ctx.save(); ctx.strokeStyle=`rgba(180,220,255,${0.45*str})`; ctx.lineWidth=1.2;
+    _rainDrops.forEach(d=>{
+      ctx.globalAlpha=d.alpha*str;
+      ctx.beginPath(); ctx.moveTo(d.x,d.y); ctx.lineTo(d.x-3,d.y+d.len); ctx.stroke();
+      d.y += d.speed; d.x -= 2;
+      if(d.y>H){ d.y=-d.len; d.x=Math.random()*W; }
+    });
+    ctx.restore();
+  }
+
+  // ── Bokeh ──
+  if(activeFX.has('bokeh')) {
+    if(!_bokehCircles.length) initFXParticles();
+    ctx.save();
+    _bokehCircles.forEach(b=>{
+      const pulse = (Math.sin(elapsed*0.8+b.r)+1)/2;
+      ctx.globalAlpha = b.alpha * str * (0.7+pulse*0.3);
+      ctx.beginPath(); ctx.arc(b.x,b.y,b.r*(0.9+beat*.2),0,Math.PI*2);
+      const bg=ctx.createRadialGradient(b.x,b.y,0,b.x,b.y,b.r);
+      bg.addColorStop(0,b.col+'88'); bg.addColorStop(1,'transparent');
+      ctx.fillStyle=bg; ctx.fill();
+      b.x+=b.vx; b.y+=b.vy;
+      if(b.x<-b.r)b.x=W+b.r; if(b.x>W+b.r)b.x=-b.r;
+      if(b.y<-b.r)b.y=H+b.r; if(b.y>H+b.r)b.y=-b.r;
+    });
+    ctx.restore();
+  }
+
+  // ── Scan Lines ──
+  if(activeFX.has('scanlines')) {
+    ctx.save(); ctx.globalAlpha=0.18*str;
+    ctx.fillStyle='rgba(0,0,0,1)';
+    for(let y=0;y<H;y+=4){ ctx.fillRect(0,y,W,2); }
+    ctx.restore();
+  }
+
+  // ── Chromatic Aberration ──
+  if(activeFX.has('chromab')) {
+    const shift = 3 + beat*5*str;
+    ctx.save(); ctx.globalCompositeOperation='screen'; ctx.globalAlpha=0.12*str;
+    const id=ctx.getImageData(0,0,W,H);
+    ctx.putImageData(id,shift,0);  // R channel
+    ctx.globalAlpha=0.06*str;
+    ctx.putImageData(id,-shift,0); // B channel
+    ctx.restore();
+  }
+
+  // ── Stars ──
+  if(activeFX.has('stars')) {
+    if(!_starField.length) initFXParticles();
+    ctx.save();
+    _starField.forEach(s=>{
+      s.twinkle+=0.04;
+      const a=(0.5+0.5*Math.sin(s.twinkle))*str;
+      ctx.globalAlpha=a; ctx.fillStyle='#fff';
+      ctx.beginPath(); ctx.arc(s.x,s.y,s.r*(1+beat*.5),0,Math.PI*2); ctx.fill();
+    });
+    ctx.restore();
+  }
+}
+
+// ── TRANSITION ENGINE ──
+let transProgress = 0;
+let transActive   = false;
+
+function drawTransition(elapsed, beat) {
+  if(!transActive || transitionStyle==='cut') return;
+  const tp = Math.min(1, transProgress);
+  ctx.save();
+  switch(transitionStyle) {
+    case 'fade':
+      ctx.globalAlpha = tp<0.5 ? tp*2 : (1-tp)*2;
+      ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H); break;
+    case 'zoom': {
+      const s = 1+tp*.4;
+      ctx.translate(W/2,H/2); ctx.scale(s,s); ctx.translate(-W/2,-H/2);
+      break;
+    }
+    case 'slide':
+      ctx.translate(W*tp,0); break;
+    case 'spin': {
+      const ang = tp*Math.PI/6;
+      ctx.translate(W/2,H/2); ctx.rotate(ang); ctx.translate(-W/2,-H/2); break;
+    }
+    case 'glitch':
+      if(tp<0.5){
+        ctx.globalAlpha=tp*2*0.8;
+        ctx.fillStyle=`rgba(${Math.random()*255|0},0,${Math.random()*255|0},1)`;
+        ctx.fillRect(0,0,W,H);
+      }
+      break;
+  }
+  ctx.restore();
+}
 function loopFn() {
   rafId = requestAnimationFrame(loopFn);
   if (analyser&&isPlaying){analyser.getByteFrequencyData(freqData);analyser.getByteTimeDomainData(timeData);}

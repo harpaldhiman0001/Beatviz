@@ -465,8 +465,8 @@ input[type=range]::-webkit-slider-thumb{width:12px;height:12px;background:var(--
 /* Timeline */
 .tl-wrap{background:#1a1a1a;border-top:1px solid #333}
 /* Multi-track rows */
-.mt-row{display:flex;align-items:center;height:28px;border-bottom:1px solid #222;position:relative;overflow:hidden}
-.mt-label{width:80px;flex-shrink:0;font-size:9px;font-weight:700;color:var(--muted);padding:0 6px;text-transform:uppercase;letter-spacing:.4px;border-right:1px solid #333;height:100%;display:flex;align-items:center;gap:4px;background:#111;overflow:hidden;white-space:nowrap}
+.mt-row{display:flex;align-items:center;height:22px;border-bottom:1px solid #222;position:relative;overflow:hidden}
+.mt-label{width:76px;flex-shrink:0;font-size:9px;font-weight:700;color:var(--muted);padding:0 5px;text-transform:uppercase;letter-spacing:.3px;border-right:1px solid #333;height:100%;display:flex;align-items:center;gap:3px;background:#111;overflow:hidden;white-space:nowrap}
 .mt-label img{width:16px;height:16px;object-fit:cover;border-radius:2px;flex-shrink:0}
 .mt-track{flex:1;height:100%;position:relative;cursor:grab;overflow:hidden}
 .mt-seg{position:absolute;top:2px;bottom:2px;background:rgba(232,104,10,.35);border:1px solid var(--accent);border-radius:2px;cursor:grab;display:flex;align-items:center;padding:0 4px;min-width:8px;box-sizing:border-box;transition:background .1s}
@@ -1130,12 +1130,18 @@ input[type=color]{width:28px;height:22px;border:1px solid #444;background:#1a1a1
       </div>
     </div>
 
-    <!-- MULTI-TRACK ROWS (images + audio) -->
-    <div id="multiTrackArea" style="background:#111;border-bottom:1px solid #333">
-      <!-- Image tracks rendered here by JS -->
+    <!-- MULTI-TRACK ROWS (images + audio above lyrics) -->
+    <div id="multiTrackArea" style="background:#111;border-bottom:1px solid #444">
+      <!-- Image tracks -->
       <div id="imgTrackRows"></div>
-      <!-- Audio tracks rendered here by JS -->
+      <!-- Audio tracks -->
       <div id="audioTrackRows"></div>
+      <!-- Lyrics section label -->
+      <div style="display:flex;align-items:center;height:18px;background:#0d0d0d;border-top:1px solid #333;padding:0 5px;gap:6px">
+        <span style="font-size:9px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.5px;min-width:66px">🎤 Lyrics</span>
+        <span style="flex:1;height:1px;background:#222"></span>
+        <span style="font-size:9px;color:var(--dim)">click timeline to add</span>
+      </div>
     </div>
 
     <div class="tl-scroll" id="tlScroll">
@@ -2514,48 +2520,53 @@ function addAudioSegment(trackIdx) {
 
 function renderMultiTracks() {
   const totalDur = audioDuration || 1;
-  const W = document.getElementById('tlScroll')?.clientWidth || 600;
-  function t2pct(t) { return (t / totalDur * 100).toFixed(3) + '%'; }
-  function dur2pct(d){ return (d / totalDur * 100).toFixed(3) + '%'; }
+  // Use tlScroll width to match lyric timeline below
+  const trackW = document.getElementById('tlScroll')?.clientWidth || 600;
+
+  function pct(t)   { return ((t / totalDur) * 100).toFixed(4) + '%'; }
+  function durPct(d){ return ((d / totalDur) * 100).toFixed(4) + '%'; }
 
   // ── Image track rows ──
   const imgArea = document.getElementById('imgTrackRows');
-  if(imgArea && chars.length > 0) {
-    imgArea.innerHTML = imgSegments.map((seg, si) => {
-      const c2 = chars[seg.charIdx];
-      const thumb = c2?.url ? `<img src="${c2.url}">` : '🖼';
-      const name  = `Img ${seg.charIdx+1}`;
-      return `<div class="mt-row" id="mt-img-${si}">
-        <div class="mt-label">${thumb}<span>${name}</span></div>
-        <div class="mt-track" onmousedown="mtDragStart(event,'img',${si})">
-          <div class="mt-seg" style="left:${t2pct(seg.start)};width:${dur2pct(seg.dur)}" id="mts-img-${si}">
-            <div class="mt-seg-handle left"  onmousedown="event.stopPropagation();mtResizeStart(event,'img',${si},'left')"></div>
-            <span class="mt-seg-label">${name} · ${fmt(seg.start)}–${fmt(seg.start+seg.dur)}</span>
-            <div class="mt-seg-handle right" onmousedown="event.stopPropagation();mtResizeStart(event,'img',${si},'right')"></div>
+  if(imgArea) {
+    if(chars.length > 0 && imgSegments.length > 0){
+      imgArea.innerHTML = imgSegments.map((seg,si)=>{
+        const ch   = chars[seg.charIdx];
+        const thumb= ch?.url ? `<img src="${ch.url}" style="width:14px;height:14px;object-fit:cover;border-radius:2px;flex-shrink:0">` : '🖼';
+        return `<div class="mt-row">
+          <div class="mt-label">${thumb} <span style="overflow:hidden;text-overflow:ellipsis">Img ${seg.charIdx+1}</span></div>
+          <div class="mt-track" style="position:relative" onmousedown="mtDragStart(event,'img',${si})">
+            <div class="mt-seg" id="mts-img-${si}" style="left:${pct(seg.start)};width:${durPct(seg.dur)}">
+              <div class="mt-seg-handle left"  onmousedown="event.stopPropagation();mtResizeStart(event,'img',${si},'left')"></div>
+              <span class="mt-seg-label">${fmt(seg.start)}–${fmt(seg.start+seg.dur)}</span>
+              <div class="mt-seg-handle right" onmousedown="event.stopPropagation();mtResizeStart(event,'img',${si},'right')"></div>
+            </div>
           </div>
-        </div>
-      </div>`;
-    }).join('');
-  } else if(imgArea) { imgArea.innerHTML = ''; }
+        </div>`;
+      }).join('');
+    } else { imgArea.innerHTML = ''; }
+  }
 
   // ── Audio track rows ──
   const audArea = document.getElementById('audioTrackRows');
-  if(audArea && audioTracks.length > 0) {
-    audArea.innerHTML = audioSegments.map((seg, si) => {
-      const t    = audioTracks[seg.trackIdx];
-      const name = t ? t.name.slice(0,14) : 'Audio';
-      return `<div class="mt-row" id="mt-aud-${si}">
-        <div class="mt-label" style="border-left:2px solid var(--blue)">🎵 <span>${name}</span></div>
-        <div class="mt-track" onmousedown="mtDragStart(event,'aud',${si})">
-          <div class="mt-seg audio-seg" style="left:${t2pct(seg.start)};width:${dur2pct(seg.dur)}" id="mts-aud-${si}">
-            <div class="mt-seg-handle left"  onmousedown="event.stopPropagation();mtResizeStart(event,'aud',${si},'left')"></div>
-            <span class="mt-seg-label">${name} · ${fmt(seg.start)}</span>
-            <div class="mt-seg-handle right" onmousedown="event.stopPropagation();mtResizeStart(event,'aud',${si},'right')"></div>
+  if(audArea) {
+    if(audioTracks.length > 0 && audioSegments.length > 0){
+      audArea.innerHTML = audioSegments.map((seg,si)=>{
+        const t    = audioTracks[seg.trackIdx] || {};
+        const name = (t.name||'Audio').slice(0,12);
+        return `<div class="mt-row">
+          <div class="mt-label" style="border-left:2px solid var(--blue)">🎵 <span style="overflow:hidden;text-overflow:ellipsis">${name}</span></div>
+          <div class="mt-track" style="position:relative" onmousedown="mtDragStart(event,'aud',${si})">
+            <div class="mt-seg audio-seg" id="mts-aud-${si}" style="left:${pct(seg.start)};width:${durPct(seg.dur)}">
+              <div class="mt-seg-handle left"  onmousedown="event.stopPropagation();mtResizeStart(event,'aud',${si},'left')"></div>
+              <span class="mt-seg-label">${fmt(seg.start)}</span>
+              <div class="mt-seg-handle right" onmousedown="event.stopPropagation();mtResizeStart(event,'aud',${si},'right')"></div>
+            </div>
           </div>
-        </div>
-      </div>`;
-    }).join('');
-  } else if(audArea) { audArea.innerHTML = ''; }
+        </div>`;
+      }).join('');
+    } else { audArea.innerHTML = ''; }
+  }
 }
 
 // ── Drag to move segments ──
@@ -3569,16 +3580,7 @@ async function handleGenerate(){
   if(!mainBuf){ toast('⚠ No audio loaded'); return; }
   srcNode=audioCtx.createBufferSource(); srcNode.buffer=mainBuf;
   srcNode.connect(analyser); analyser.connect(audioCtx.destination); analyser.connect(mDest);
-  // Connect additional tracks
-  if(audioTracks.length > 1){
-    audioTracks.slice(1).forEach(t=>{
-      if(t.muted) return;
-      const s=audioCtx.createBufferSource(); s.buffer=t.buffer;
-      const g=audioCtx.createGain(); g.gain.value=t.volume||1;
-      s.connect(g); g.connect(mDest); g.connect(audioCtx.destination);
-      t.gainNode=g; s.start(0, rerecordFrom||0);
-    });
-  }
+  // Connect additional tracks (rerecordFrom resolved after declaration below)
   initParticles();initFXParticles();bassAvg=0;beatIntensity=0;lastBeat=0;camX=0;camY=0;energyHistory=[];lastTransitionTime=0;beatTimestamps=[];
   // Bump the canvas up to the chosen export resolution (HD/Full HD/Ultra HD) right before capturing.
   applyExportResolution();
@@ -3599,6 +3601,16 @@ async function handleGenerate(){
   // Re-record from a specific time if set (user cut and wants to re-record from cutTime)
   const rerecordFrom = window._rerecordFromTime || 0;
   window._rerecordFromTime = null;
+  // Start additional audio tracks at same offset
+  if(audioTracks.length > 1){
+    audioTracks.slice(1).forEach(t=>{
+      if(t.muted) return;
+      const s=audioCtx.createBufferSource(); s.buffer=t.buffer;
+      const g=audioCtx.createGain(); g.gain.value=t.volume||1;
+      s.connect(g); g.connect(mDest); g.connect(audioCtx.destination);
+      t.gainNode=g; s.start(0, rerecordFrom);
+    });
+  }
   playStart = audioCtx.currentTime - rerecordFrom;
   srcNode.start(0, rerecordFrom); // start audio from the cut point
   recorder.start(100); isPlaying=true; isPaused=false;

@@ -54,7 +54,7 @@ body{background:var(--bg);font-family:'Space Grotesk',system-ui,sans-serif;backg
 .s-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
 .s-tab{flex:1;padding:6px 2px 5px;font-size:7px;font-weight:700;color:var(--dim);background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;transition:all .1s;display:flex;flex-direction:column;align-items:center;gap:1px;text-transform:uppercase;letter-spacing:.2px;min-width:0;overflow:hidden;white-space:nowrap}
 .s-tab.on{color:var(--cyan);border-bottom-color:var(--cyan)}
-.panes{flex:1;overflow-y:auto;overflow-x:hidden;padding:0;min-height:0}
+.panes{flex:1;overflow-y:scroll;overflow-x:hidden;padding:0;min-height:0;scroll-behavior:smooth}
 .pane{display:none;flex-direction:column;gap:13px}
 .pane.on{display:flex}
 /* ── CONTROLS ── */
@@ -268,40 +268,103 @@ select.cs{background:var(--card);border:1.5px solid var(--border);color:var(--te
 .mob-pause-btn.paused{border-color:var(--green);background:rgba(16,185,129,.12);color:#6ee7b7}
 .mob-exp{display:flex;gap:7px}
 @media(max-width:768px){
+  /* ── HIDE DESKTOP ELEMENTS ── */
   .sidebar{display:none}
-  .main{grid-template-columns:1fr;height:auto}
-  .preview{min-height:0}
-  .ca{padding:6px}
-  #mainCanvas{width:100%;height:auto;touch-action:none}
-  .cw{width:100%;border-radius:6px}
-  .tl-wrap{height:82px}
-  #tlCanvas{height:54px}
-  .tl-zoom-hint{display:none}
-  .sb{padding:6px 12px}
-  .mob-nav{display:flex}
-  .mob-gen{display:flex}
-  body{padding-bottom:calc(var(--nav-h) + var(--gen-h))}
-  .topbar{padding:6px 10px}
+  #leftToolbar{display:none}
+  #colorPanel{display:none}
+  #menuBar{display:none}
+  .tl-topright{display:none}
   .uname{display:none}
-  .sub-pill{font-size:9px;padding:3px 7px}
-  .so{padding:12px 4px;font-size:11px;min-height:56px}
-  .so span{font-size:20px}
-  .tog{padding:13px 14px}
-  input[type=range]{height:5px}
-  input[type=range]::-webkit-slider-thumb{width:22px;height:22px}
-  .mn-btn{font-size:10px}
-  .mn-btn .ni{font-size:22px}
-  .pv-btn{width:38px;height:38px}
-  .pv-btn.sm{width:30px;height:30px}
-  .dz{padding:18px!important}
-  .tl-fi-save{padding:13px 18px;font-size:14px}
-  .tl-fi-cancel{padding:13px;font-size:16px}
-  .tl-fi-inp{font-size:16px;padding:12px}
-  .bs{-webkit-overflow-scrolling:touch}
-  .bs-body{padding:16px 16px 28px;gap:16px}
-  #imgCtrl{flex-wrap:wrap;gap:5px;padding:7px 10px}
-  .pw{max-width:100%;border-radius:16px 16px 0 0}
-  .paywall{align-items:flex-end}
+  
+  /* ── LAYOUT ── */
+  .main{grid-template-columns:1fr;height:auto}
+  body{padding-bottom:calc(var(--nav-h) + var(--gen-h) + env(safe-area-inset-bottom));background:var(--bg)}
+  
+  /* ── TOPBAR ── */
+  .topbar{padding:6px 12px;height:48px!important;border-bottom:1px solid var(--border)}
+  .topbar .logo{font-size:16px}
+  .sub-pill{font-size:9px;padding:3px 8px}
+  
+  /* ── CANVAS ── */
+  .preview{min-height:0;flex:1}
+  .ca{padding:8px;background:var(--bg);flex:0 0 auto}
+  #mainCanvas{width:100%;height:auto;touch-action:none;border-radius:8px}
+  .cw{width:100%;border-radius:8px;overflow:hidden}
+  
+  /* ── TIMELINE — compact ── */
+  .tl-wrap{flex-shrink:0}
+  #multiTrackArea .mt-row{height:26px}
+  #multiTrackArea .mt-label{width:72px;font-size:8px}
+  #tlCanvas{touch-action:none}
+
+  /* ── MOBILE NAV ── */
+  .mob-nav{display:flex;height:60px;background:#0a0a1e;border-top:1px solid var(--border);box-shadow:0 -4px 20px rgba(0,0,0,.5)}
+  .mn-btn{flex:1;flex-direction:column;gap:2px;font-size:8px;font-weight:700;letter-spacing:.3px;color:var(--dim);padding:6px 4px;min-height:60px}
+  .mn-btn .ni{font-size:22px;line-height:1;display:block}
+  .mn-btn.on{color:var(--accent)}
+  .mn-btn.on .ni{filter:drop-shadow(0 0 6px var(--accent))}
+  
+  /* ── GENERATE BAR ── */
+  .mob-gen{display:flex;background:#0a0a1e;border-top:1px solid var(--border);padding:8px 12px;gap:6px}
+  .mob-gen-btn{flex:1;padding:13px;border:none;background:linear-gradient(135deg,#7c3aed,#06b6d4);color:#fff;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:.5px;text-transform:uppercase;border-radius:6px;-webkit-tap-highlight-color:transparent}
+  .mob-gen-btn:disabled{opacity:.35}
+  .mob-gen-btn.stop{background:linear-gradient(135deg,#ef4444,#991b1b)}
+  .mob-pause-btn{padding:12px 16px;border:1.5px solid var(--amber);background:rgba(245,158,11,.12);color:#fcd34d;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;border-radius:6px}
+  
+  /* ── BOTTOM SHEETS ── */
+  .bs{position:fixed;bottom:0;left:0;right:0;z-index:200;background:var(--surface);border-top:1.5px solid var(--border);border-radius:16px 16px 0 0;max-height:80vh;overflow-y:auto;transform:translateY(100%);transition:transform .25s cubic-bezier(.32,0,.67,0);padding-bottom:env(safe-area-inset-bottom)}
+  .bs.open{transform:translateY(0);transition:transform .28s cubic-bezier(.33,1,.68,1)}
+  .bs-hd{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px;position:sticky;top:0;background:var(--surface);border-bottom:1px solid var(--border);z-index:1}
+  .bs-hd::before{content:'';position:absolute;top:8px;left:50%;transform:translateX(-50%);width:32px;height:4px;background:var(--border);border-radius:2px}
+  .bs-title{font-size:13px;font-weight:700;letter-spacing:.3px;color:var(--text)}
+  .bs-x{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:4px;width:32px;height:32px;display:flex;align-items:center;justify-content:center}
+  .bs-body{padding:12px 16px 20px;display:flex;flex-direction:column;gap:12px}
+  
+  /* ── CONTROLS — touch-friendly ── */
+  .so{padding:14px 6px;font-size:11px;min-height:60px}
+  .so span{font-size:22px}
+  .tog{padding:14px 16px;font-size:13px}
+  .sw{width:44px;height:26px}
+  .sw::after{width:20px;height:20px}
+  .sw.on::after{left:22px}
+  input[type=range]{height:6px;margin:4px 0}
+  input[type=range]::-webkit-slider-thumb{width:24px;height:24px}
+  .cr{padding:8px 12px}
+  .cl{font-size:12px;min-width:100px}
+  .cv{font-size:12px}
+  .sl{font-size:10px;padding:8px 12px}
+  .dz{padding:18px;font-size:13px}
+  .dz .ni{font-size:32px}
+  
+  /* ── LYRIC LIST ── */
+  .lr{padding:10px 12px}
+  .ltxt{font-size:14px}
+  .lt{font-size:12px;padding:3px 7px}
+  .ldel{width:28px;height:28px;font-size:14px}
+  
+  /* ── CONTEXT MENUS ── */
+  #lyricContextMenu{font-size:13px}
+  .lcm-btn{font-size:13px;padding:12px 16px}
+  #moveLyricPopup{min-width:280px;padding:20px}
+  
+  /* ── PLAYER CONTROLS ── */
+  .pv-btn{width:40px;height:40px;font-size:14px}
+  .pv-btn.sm{width:32px;height:32px;font-size:12px}
+  .plr{padding:8px 12px}
+  
+  /* ── VIDEO UPLOAD ── */
+  #videoLayerList .mt-row,#audioTrackList>div{padding:10px 12px;font-size:12px}
+  .split-btn{padding:10px 6px;font-size:9px}
+  .rec-bg-btn{padding:8px 4px;font-size:9px}
+  .cf-btn{padding:6px 10px;font-size:10px}
+}
+
+/* Extra small phones */
+@media(max-width:390px){
+  .topbar .logo{font-size:14px}
+  .mn-btn{font-size:7px}
+  .mn-btn .ni{font-size:20px}
+  .mob-gen-btn{font-size:12px;padding:11px}
 }
 /* ── TEMPLATES ── */
 .tmpl-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
@@ -357,6 +420,11 @@ select.cs{background:var(--card);border:1.5px solid var(--border);color:var(--te
 /* Keep pane show/hide logic */
 .pane{display:none!important;flex-direction:column;gap:0}
 .pane.on{display:flex!important}
+/* Camera filter buttons */
+.cf-btn{border:1px solid var(--border);background:var(--card);color:var(--muted);font-family:inherit;font-size:8px;font-weight:700;padding:3px 6px;cursor:pointer;text-transform:uppercase;letter-spacing:.2px;transition:all .1s}
+.cf-btn:hover,.cf-btn.on{border-color:var(--teal);background:rgba(6,182,212,.15);color:var(--teal)}
+.mcf-btn{padding:10px 6px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;text-transform:uppercase;border-radius:4px;transition:all .12s;-webkit-tap-highlight-color:transparent}
+.mcf-btn.on{border-color:var(--teal);background:rgba(6,182,212,.15);color:var(--teal)}
 
 /* Base */
 *{border-radius:0!important}
@@ -624,6 +692,12 @@ input[type=color]{width:28px;height:22px;border:1px solid var(--border);backgrou
 .fx-filter.on{background:#1e1200;outline:1px solid var(--accent) inset}
 /* Prevent sidebar overflow */
 .pane > div{overflow:hidden}
+/* ── SIDEBAR FIXED LAYOUT ── */
+.sidebar{display:flex;flex-direction:column;height:100%;overflow:hidden}
+.s-tabs{flex-shrink:0}
+.panes{flex:1;overflow-y:auto;overflow-x:hidden;min-height:0;padding:0}
+.actions{flex-shrink:0;background:#08081a;border-top:2px solid var(--border)}
+
 .pane input[type="text"],.pane input[type="number"]{box-sizing:border-box;max-width:100%}
 .pane select{max-width:100%;box-sizing:border-box}
 
@@ -757,6 +831,23 @@ input[type=color]{width:28px;height:22px;border:1px solid var(--border);backgrou
           <span>👁</span><span id="previewCamLabel">Preview Camera (before recording)</span>
         </button>
         <div style="font-size:9px;color:var(--dim);padding:3px 6px;line-height:1.4">⚠ Note: Screen recording of this browser tab shows black — record <strong style="color:var(--muted)">another window or app</strong> for best results</div>
+        <!-- CAMERA FILTERS — shown when recording/previewing camera -->
+        <div id="camFilterBar" style="display:none;flex-direction:column;gap:4px;margin-top:4px;padding:6px 8px;background:rgba(6,182,212,.06);border:1px solid var(--teal)">
+          <div style="font-size:8px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.5px">Camera Filter</div>
+          <div style="display:flex;flex-wrap:wrap;gap:2px">
+            <button class="cf-btn on" data-cf="none"    onclick="setCamFilter('none',this)">Normal</button>
+            <button class="cf-btn" data-cf="warm"       onclick="setCamFilter('warm',this)">Warm</button>
+            <button class="cf-btn" data-cf="cool"       onclick="setCamFilter('cool',this)">Cool</button>
+            <button class="cf-btn" data-cf="vivid"      onclick="setCamFilter('vivid',this)">Vivid</button>
+            <button class="cf-btn" data-cf="fade"       onclick="setCamFilter('fade',this)">Fade</button>
+            <button class="cf-btn" data-cf="vintage"    onclick="setCamFilter('vintage',this)">Vintage</button>
+            <button class="cf-btn" data-cf="bw"         onclick="setCamFilter('bw',this)">B&W</button>
+            <button class="cf-btn" data-cf="drama"      onclick="setCamFilter('drama',this)">Drama</button>
+            <button class="cf-btn" data-cf="glow"       onclick="setCamFilter('glow',this)">Glow</button>
+            <button class="cf-btn" data-cf="neon"       onclick="setCamFilter('neon',this)">Neon</button>
+            <button class="cf-btn" data-cf="retro"      onclick="setCamFilter('retro',this)">Retro</button>
+          </div>
+        </div>
         <!-- Recording status bar -->
         <div id="recStatus" style="display:none;align-items:center;gap:8px;padding:6px 8px;background:#1a0a00;border:1px solid var(--orange);margin-top:4px">
           <span style="width:8px;height:8px;background:var(--red);border-radius:50%;animation:blink 1s infinite;flex-shrink:0"></span>
@@ -1361,19 +1452,95 @@ input[type=color]{width:28px;height:22px;border:1px solid var(--border);backgrou
 </div>
 <!-- ── MOBILE: BOTTOM NAV ── -->
 <div class="mob-nav">
-  <button class="mn-btn" id="mn-upload" onclick="openSheet('upload',this)"><span class="ni">🎵</span>Upload</button>
-  <button class="mn-btn" id="mn-style"  onclick="openSheet('style',this)"><span class="ni">🎨</span>Style</button>
-  <button class="mn-btn" id="mn-lyrics" onclick="openSheet('lyrics',this)"><span class="ni">🎤</span>Lyrics</button>
-  <button class="mn-btn" id="mn-motion" onclick="openSheet('motion',this)"><span class="ni">💃</span>Motion</button>
-  <button class="mn-btn" id="mn-promo"  onclick="setMode('promo');closeSheet()"><span class="ni">📢</span>Promo</button>
+  <button class="mn-btn" id="mn-upload" onclick="openSheet('upload',this)">
+    <span class="ni">📁</span>Upload
+  </button>
+  <button class="mn-btn" id="mn-style" onclick="openSheet('style',this)">
+    <span class="ni">✨</span>Style
+  </button>
+  <button class="mn-btn" id="mn-lyrics" onclick="openSheet('lyrics',this)">
+    <span class="ni">🎤</span>Lyrics
+  </button>
+  <button class="mn-btn" id="mn-fx" onclick="openSheet('fx',this)">
+    <span class="ni">⚡</span>FX
+  </button>
+  <button class="mn-btn" id="mn-record" onclick="openSheet('record',this)">
+    <span class="ni">📷</span>Record
+  </button>
+  <button class="mn-btn" id="mn-motion" onclick="openSheet('motion',this)">
+    <span class="ni">💃</span>Motion
+  </button>
 </div>
 
 <div class="ov" id="sheetOv" onclick="closeSheet()"></div>
+
+<!-- MOBILE RECORD SHEET -->
+<div class="bs" id="bs-record">
+  <div class="bs-hd">
+    <div class="bs-title">📷 Record & Video</div>
+    <button class="bs-x" onclick="closeSheet()">✕</button>
+  </div>
+  <div class="bs-body">
+    <div>
+      <div class="sl">Video Clips</div>
+      <div id="mobVideoList" style="display:flex;flex-direction:column;gap:4px;margin:6px 0"></div>
+      <button onclick="document.getElementById('videoIn').click()" style="width:100%;padding:14px;background:var(--card);border:1.5px dashed var(--teal);color:var(--teal);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px">🎬 Add Video File</button>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+        <button id="mScreenRecBtn" onclick="toggleScreenRecord()" style="padding:14px 8px;background:rgba(124,58,237,.15);border:1.5px solid var(--accent);color:var(--accent);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px">
+          <span style="font-size:24px">🖥</span>Screen Record
+        </button>
+        <button id="mCameraRecBtn" onclick="toggleCameraRecord()" style="padding:14px 8px;background:rgba(6,182,212,.1);border:1.5px solid var(--teal);color:var(--teal);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px">
+          <span style="font-size:24px">📷</span>Camera Record
+        </button>
+      </div>
+      <button onclick="toggleCameraPreviewOnly()" style="width:100%;padding:12px;background:rgba(16,185,129,.1);border:1.5px solid var(--green);color:var(--green);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;margin-bottom:8px">👁 Preview Camera First</button>
+    </div>
+    <!-- Mobile camera filters -->
+    <div id="mobCamFilterBar" style="display:none;flex-direction:column;gap:8px">
+      <div class="sl">Camera Filter</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">
+        <button class="mcf-btn on" onclick="setCamFilter('none',this);updateMcf(this)">Normal</button>
+        <button class="mcf-btn" onclick="setCamFilter('warm',this);updateMcf(this)">Warm</button>
+        <button class="mcf-btn" onclick="setCamFilter('cool',this);updateMcf(this)">Cool</button>
+        <button class="mcf-btn" onclick="setCamFilter('vivid',this);updateMcf(this)">Vivid</button>
+        <button class="mcf-btn" onclick="setCamFilter('vintage',this);updateMcf(this)">Vintage</button>
+        <button class="mcf-btn" onclick="setCamFilter('bw',this);updateMcf(this)">B&amp;W</button>
+        <button class="mcf-btn" onclick="setCamFilter('drama',this);updateMcf(this)">Drama</button>
+        <button class="mcf-btn" onclick="setCamFilter('glow',this);updateMcf(this)">Glow</button>
+        <button class="mcf-btn" onclick="setCamFilter('neon',this);updateMcf(this)">Neon</button>
+        <button class="mcf-btn" onclick="setCamFilter('retro',this);updateMcf(this)">Retro</button>
+      </div>
+    </div>
+    <!-- Layout picker -->
+    <div>
+      <div class="sl">Video Layout</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
+        <button class="split-btn on" data-split="full"   onclick="setSplitMode('full',this)"><div class="sp-icon">▭</div>Full</button>
+        <button class="split-btn" data-split="top"       onclick="setSplitMode('top',this)"><div class="sp-icon">⬆</div>Top</button>
+        <button class="split-btn" data-split="bottom"    onclick="setSplitMode('bottom',this)"><div class="sp-icon">⬇</div>Bottom</button>
+        <button class="split-btn" data-split="left"      onclick="setSplitMode('left',this)"><div class="sp-icon">⬅</div>Left</button>
+        <button class="split-btn" data-split="right"     onclick="setSplitMode('right',this)"><div class="sp-icon">➡</div>Right</button>
+        <button class="split-btn" data-split="pip"       onclick="setSplitMode('pip',this)"><div class="sp-icon">⧉</div>PiP</button>
+      </div>
+    </div>
+    <!-- Recording background -->
+    <div>
+      <div class="sl">Background</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">
+        <button class="rec-bg-btn on" data-rbg="scene"  onclick="setRecBg('scene',this)"  style="background:linear-gradient(135deg,#7c3aed,#06b6d4);padding:10px 4px;font-size:10px">Scene</button>
+        <button class="rec-bg-btn" data-rbg="black"     onclick="setRecBg('black',this)"  style="background:#000;padding:10px 4px;font-size:10px">Black</button>
+        <button class="rec-bg-btn" data-rbg="neon"      onclick="setRecBg('neon',this)"   style="background:linear-gradient(135deg,#ec4899,#7c3aed);padding:10px 4px;font-size:10px">Neon</button>
+        <button class="rec-bg-btn" data-rbg="space"     onclick="setRecBg('space',this)"  style="background:linear-gradient(135deg,#0a0a1e,#1e3a5f);padding:10px 4px;font-size:10px">Space</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- MOBILE GENERATE -->
 <div class="mob-gen" id="mobGenBar">
   <button class="mob-pause-btn" id="pauseBtnMob" onclick="togglePause()">⏸ Pause</button>
-  <button class="mob-pause-btn" id="rerecordBtnMob" onclick="reRecordFromPlayhead()" style="display:none;background:rgba(239,68,68,.15);border:1px solid #ef4444;color:#ef4444">🔄 Re-record from here</button>
-  <button class="mob-gen-btn" id="genBtnMob" onclick="handleGenerate()" disabled>▶ Generate Music Video</button>
+  <button class="mob-pause-btn" id="rerecordBtnMob" onclick="reRecordFromPlayhead()" style="display:none;background:rgba(239,68,68,.15);border:1px solid #ef4444;color:#ef4444">🔄 Re-record</button>
+  <button class="mob-gen-btn" id="genBtnMob" onclick="handleGenerate()" disabled>▶ Generate Video</button>
   <div class="mob-exp">
     <a class="exp-btn g" id="dlWebmMob" download="beatviz.webm" style="display:none">⬇ WebM</a>
     <button class="exp-btn p" id="dlMp4Mob" onclick="exportMP4()" style="display:none">⬇ MP4</button>
@@ -2894,16 +3061,43 @@ function renderMultiTracks() {
   if(vidArea) {
     if(videoLayers.length > 0){
       vidArea.innerHTML = videoLayers.map((v,vi)=>{
-        const dur  = v.el?.duration || audioDuration || 10;
-        const name = v.name.slice(0,12);
-        const modeColor = v.mode==='full'?'var(--teal)':v.mode==='pip'?'var(--accent)':'var(--teal)';
-        return `<div class="mt-row" id="mt-vid-${vi}">
-          <div class="mt-label" style="border-left:2px solid var(--teal)">🎬 <span style="overflow:hidden;text-overflow:ellipsis">${name}</span></div>
-          <div class="mt-track" style="position:relative;cursor:pointer" onclick="selectVideoLayer(${vi})" oncontextmenu="showSegmentMenu(event,'vid',${vi})">
-            <div class="mt-seg" style="left:0%;width:${durPct(dur)};background:rgba(6,182,212,.35);border-color:var(--teal)">
-              <span class="mt-seg-label">${v.mode.toUpperCase()} · ${fmt(dur)}</span>
+        const dur   = isFinite(v.el?.duration||0) ? v.el?.duration : 0;
+        const name  = v.name.slice(0,14);
+        const exp   = v._expanded;
+        const filt  = v.filter || 'none';
+        const filterBtns = Object.keys(VIDEO_FILTERS||{}).map(f=>
+          `<button onclick="event.stopPropagation();setVideoLayerFilter(${vi},'${f}')" style="padding:2px 5px;border:1px solid ${filt===f?'var(--teal)':'var(--border)'};background:${filt===f?'rgba(6,182,212,.2)':'var(--card)'};color:${filt===f?'var(--teal)':'var(--muted)'};font-size:7px;font-weight:700;cursor:pointer;text-transform:uppercase;letter-spacing:.2px">${f}</button>`
+        ).join('');
+        return `<div>
+          <div class="mt-row" id="mt-vid-${vi}" onclick="videoLayers[${vi}]._expanded=!videoLayers[${vi}]._expanded;renderMultiTracks()">
+            <div class="mt-label" style="border-left:2px solid var(--teal);gap:2px">
+              <span style="font-size:9px;cursor:pointer">${exp?'▼':'▶'}</span>
+              🎬 <span style="overflow:hidden;text-overflow:ellipsis;max-width:44px">${name}</span>
+            </div>
+            <div class="mt-track" style="position:relative" onmousedown="event.stopPropagation();mtDragStart(event,'vid',${vi})" oncontextmenu="showSegmentMenu(event,'vid',${vi})">
+              <div class="mt-seg" id="mts-vid-${vi}" style="left:0%;width:${dur?durPct(dur):'100%'};background:rgba(6,182,212,.35);border-color:var(--teal)">
+                <div class="mt-seg-handle left"  onmousedown="event.stopPropagation();mtResizeStart(event,'vid',${vi},'left')"></div>
+                <span class="mt-seg-label">${v.mode.toUpperCase()} · ${fmt(dur)}</span>
+                <div class="mt-seg-handle right" onmousedown="event.stopPropagation();mtResizeStart(event,'vid',${vi},'right')"></div>
+              </div>
             </div>
           </div>
+          ${exp ? `<div style="background:#08081a;border-bottom:1px solid var(--border);padding:6px 8px;display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+              <span style="font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;min-width:30px">Filter</span>
+              <div style="display:flex;flex-wrap:wrap;gap:2px">${filterBtns}</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <span style="font-size:8px;color:var(--muted);min-width:30px">Opacity</span>
+              <input type="range" min="0" max="100" value="${Math.round((v.opacity||1)*100)}" style="flex:1;height:3px;accent-color:var(--teal)" oninput="videoLayers[${vi}].opacity=+this.value/100;document.getElementById('vop${vi}').textContent=this.value+'%'">
+              <span id="vop${vi}" style="font-size:8px;color:var(--text);font-family:monospace;min-width:28px">${Math.round((v.opacity||1)*100)}%</span>
+            </div>
+            <div style="display:flex;gap:4px">
+              <button onclick="if(${vi}>0){const t=videoLayers.splice(${vi},1)[0];videoLayers.splice(${vi}-1,0,t);renderMultiTracks();}" style="flex:1;padding:3px;background:var(--card);border:1px solid var(--border);color:var(--muted);font-size:9px;cursor:pointer">↑ Move Up</button>
+              <button onclick="if(${vi}<videoLayers.length-1){const t=videoLayers.splice(${vi},1)[0];videoLayers.splice(${vi}+1,0,t);renderMultiTracks();}" style="flex:1;padding:3px;background:var(--card);border:1px solid var(--border);color:var(--muted);font-size:9px;cursor:pointer">↓ Move Down</button>
+              <button onclick="removeVideoLayer(${vi})" style="padding:3px 7px;background:rgba(239,68,68,.1);border:1px solid var(--red);color:var(--red);font-size:9px;cursor:pointer">✕</button>
+            </div>
+          </div>` : ''}
         </div>`;
       }).join('');
     } else { vidArea.innerHTML = ''; }
@@ -3145,21 +3339,17 @@ async function addVideoLayer(file) {
   renderVideoLayerList();
   renderMultiTracks();
   document.getElementById('splitModePicker')?.style && (document.getElementById('splitModePicker').style.display='flex');
-  // Mount video in DOM (hidden) and show first frame
-  video.style.cssText='position:fixed;opacity:0;pointer-events:none;width:1px;height:1px;top:-9999px';
+  // Mount in DOM — browser needs this to decode frames
+  video.style.cssText='position:fixed;top:-9999px;left:0;width:1px;height:1px;opacity:0;pointer-events:none';
   document.body.appendChild(video);
+  video.loop = true; video.muted = true;
   video.currentTime = 0;
-  await new Promise(r=>{ video.onseeked=r; video.onloadeddata=r; setTimeout(r,800); });
-  // Start a dedicated continuous draw for this video
-  function _vidDrawLoop() {
-    if(videoLayers.length === 0) return; // stop if all removed
-    if(isPlaying || pvPlaying) return;   // main loopFn handles it
-    ctx.clearRect(0,0,W,H);
-    drawIdlePreview();
-    requestAnimationFrame(_vidDrawLoop);
-  }
-  if(!isPlaying && !pvPlaying) requestAnimationFrame(_vidDrawLoop);
-  else if(!rafId) startLoop();
+  // PLAY the video — ctx.drawImage requires active playback in most browsers
+  try { await video.play(); } catch(e) { try { await video.play(); } catch(e2){} }
+  // Wait for first frame
+  await new Promise(r => { if(video.readyState>=3){r();return;} video.oncanplay=r; setTimeout(r,1200); });
+  // Start continuous draw engine
+  _startVideoDraw();
   // Update audioDuration if no audio loaded
   if(!audioDuration && video.duration) audioDuration = video.duration;
   toast('✓ ' + name + ' — choose layout · click ▶ Preview to check');
@@ -3190,7 +3380,7 @@ function setVideoOpacity(v) {
 }
 
 function removeVideoLayer(idx) {
-  if(videoLayers[idx]) { videoLayers[idx].el.pause(); URL.revokeObjectURL(videoLayers[idx].url); }
+  if(videoLayers[idx]) { try{videoLayers[idx].el.pause();}catch(e){} if(videoLayers[idx].url)URL.revokeObjectURL(videoLayers[idx].url); }
   videoLayers.splice(idx, 1);
   renderVideoLayerList();
   renderMultiTracks();
@@ -3232,6 +3422,25 @@ let _recSeconds      = 0;
 // ── CAMERA PREVIEW ONLY (before recording) ──
 let _previewOnlyStream = null;
 let _previewOnlyEl = null;
+
+function setCamFilter(f, btn) {
+  // Apply to the live camera/preview layer
+  document.querySelectorAll('.cf-btn').forEach(b=>b.classList.remove('on'));
+  btn?.classList.add('on');
+  // Find live video layer and set filter
+  videoLayers.forEach((v,i) => {
+    if(v.isLive || v._previewOnly) {
+      v.filter = f;
+    }
+  });
+  if(!isPlaying && !pvPlaying) { ctx.clearRect(0,0,W,H); drawIdlePreview(); }
+}
+
+// Show camera filter bar when camera recording starts
+function _showCamFilterBar(show) {
+  const bar = document.getElementById('camFilterBar');
+  if(bar) bar.style.display = show ? 'flex' : 'none';
+}
 
 async function toggleCameraPreviewOnly() {
   const btn = document.getElementById('previewCamBtn');
@@ -3278,6 +3487,7 @@ async function toggleCameraPreviewOnly() {
     requestAnimationFrame(_prevLoop);
     if(btn){btn.style.borderColor='var(--red)';btn.style.color='var(--red)';}
     if(lbl) lbl.textContent='■ Stop Preview';
+    _showCamFilterBar(true);
     toast('👁 Camera preview active — position yourself, then click Record Camera');
   } catch(e) {
     if(e.name==='NotAllowedError') toast('⚠ Camera permission denied');
@@ -3353,10 +3563,10 @@ async function _startRecording(stream, type) {
   renderVideoLayerList(); renderMultiTracks();
   checkReady(); drawIdlePreview();
   // Ensure render loop is running to show live video
-  if(rafId) cancelAnimationFrame(rafId);
-  rafId = null;
-  startLoop();
+  _startVideoDraw();
   _showRecBgPicker(true);
+  _showCamFilterBar(_recType === 'camera');
+  _showMobCamFilters(_recType === 'camera');
   _activeRecorder.start(200);
   // Update UI
   const btn  = document.getElementById(type==='screen'?'screenRecBtn':'cameraRecBtn');
@@ -3392,6 +3602,8 @@ async function _onRecordStop() {
     }
   }
   _showRecBgPicker(false);
+  _showCamFilterBar(false);
+  _showMobCamFilters(false);
   // Stop all tracks
   _activeStream?.getTracks().forEach(t=>t.stop());
   // Hide camera preview
@@ -3414,6 +3626,28 @@ async function _onRecordStop() {
   await addVideoLayer(file);
   toast('✓ '+(_recType==='screen'?'Screen':'Camera')+' recording added ('+dur+') — choose layout');
 }
+
+// ── VIDEO LAYER FILTERS ──
+const VIDEO_FILTERS = {
+  none:     'none',
+  warm:     'brightness(1.08) saturate(1.4) hue-rotate(-8deg)',
+  cool:     'brightness(0.95) saturate(0.85) hue-rotate(12deg)',
+  vivid:    'saturate(2) contrast(1.15)',
+  fade:     'opacity(0.82) saturate(0.55) brightness(1.12)',
+  vintage:  'sepia(0.55) saturate(1.3) contrast(0.92)',
+  bw:       'grayscale(1)',
+  drama:    'contrast(1.55) brightness(0.82) saturate(0.75)',
+  glow:     'brightness(1.35) saturate(1.25)',
+  neon:     'saturate(2.5) hue-rotate(280deg) brightness(1.1)',
+  retro:    'sepia(0.3) contrast(1.2) brightness(0.9) saturate(0.8)',
+};
+
+function setVideoLayerFilter(idx, f) {
+  if(videoLayers[idx]) videoLayers[idx].filter = f;
+  // Re-render layer list to show active filter
+  renderVideoLayerList();
+}
+
 // ── RECORDING BACKGROUND PICKER ──
 let _recBg = 'scene';
 (function(){const s=document.createElement('style');s.textContent=`.rec-bg-btn{border:1px solid rgba(255,255,255,.15);color:#fff;font-family:inherit;font-size:8px;font-weight:700;padding:5px 3px;cursor:pointer;text-transform:uppercase;letter-spacing:.3px;transition:all .1s}.rec-bg-btn:hover,.rec-bg-btn.on{outline:2px solid var(--teal);outline-offset:1px}`;document.head.appendChild(s);})();
@@ -3438,6 +3672,62 @@ function _showRecBgPicker(show) {
   if(p) p.style.display=show?'flex':'none';
 }
 
+// ── VIDEO DRAW ENGINE ──
+// Keeps a continuous rAF running whenever video layers exist
+let _vdRaf = null;
+function _startVideoDraw() {
+  if(_vdRaf) return; // already running
+  function _frame() {
+    // Only draw here if main loop isn't already handling it
+    if(!isPlaying && !pvPlaying && videoLayers.length > 0) {
+      ctx.clearRect(0, 0, W, H);
+      // Draw background first
+      if(aiBackground) {
+        ctx.drawImage(aiBackground, 0, 0, W, H);
+      } else {
+        ctx.fillStyle='#04040e'; ctx.fillRect(0,0,W,H);
+      }
+      // Draw each video layer directly
+      videoLayers.forEach(v => {
+        if(!v.el) return;
+        const el = v.el;
+        try {
+          switch(v.mode) {
+            case 'full':   ctx.drawImage(el, 0, 0, W, H); break;
+            case 'top':    ctx.drawImage(el, 0, 0, W, H/2); break;
+            case 'bottom': ctx.drawImage(el, 0, H/2, W, H/2); break;
+            case 'left':   ctx.drawImage(el, 0, 0, W/2, H); break;
+            case 'right':  ctx.drawImage(el, W/2, 0, W/2, H); break;
+            case 'pip': {
+              const ps = (v._pipPct||0.32)*W, ph2 = ps/(v.aspect||1.78);
+              ctx.drawImage(el, W-ps-12, H-ph2-12, ps, ph2);
+              ctx.strokeStyle='rgba(6,182,212,.8)'; ctx.lineWidth=2;
+              ctx.strokeRect(W-ps-12, H-ph2-12, ps, ph2);
+              break;
+            }
+            default: ctx.drawImage(el, 0, 0, W, H);
+          }
+        } catch(e) {}
+      });
+      // Draw characters on top
+      if(chars.length > 0) { try { drawCharacters(0, pvOffset||0); } catch(e){} }
+      // Draw lyrics at playhead
+      if(lyrics.length > 0) { try { drawLyricsOverlay(pvOffset||0, 0); } catch(e){} }
+      drawEditOverlay();
+    }
+    if(videoLayers.length > 0 && !isPlaying && !pvPlaying) {
+      _vdRaf = requestAnimationFrame(_frame);
+    } else {
+      _vdRaf = null;
+    }
+  }
+  _vdRaf = requestAnimationFrame(_frame);
+}
+
+function _stopVideoDraw() {
+  if(_vdRaf) { cancelAnimationFrame(_vdRaf); _vdRaf = null; }
+}
+
 function drawVideoLayers(elapsed) {
   if(!videoLayers.length) return;
   videoLayers.forEach((v, i) => {
@@ -3446,6 +3736,8 @@ function drawVideoLayers(elapsed) {
     try {
     ctx.save();
     ctx.globalAlpha = typeof v.opacity === 'number' ? v.opacity : 1;
+    // Apply filter for this video layer
+    if(v.filter && v.filter !== 'none' && VIDEO_FILTERS[v.filter]) ctx.filter = VIDEO_FILTERS[v.filter]; else ctx.filter='none';
     const el = v.el;
     // Sync video time to elapsed
     if((isPlaying || pvPlaying) && !v.el.paused) {
@@ -3502,16 +3794,21 @@ function drawVideoLayers(elapsed) {
         break;
       }
     }
+    ctx.filter = 'none';
     ctx.restore();
-    } catch(_e) { ctx.restore(); } // ignore draw errors
+    } catch(_e) { try{ctx.filter='none';ctx.restore();}catch(e2){} } // ignore draw errors
   });
 }
 
 // ── Start/stop video playback with audio ──
 function startVideoLayers(offset) {
   videoLayers.forEach(v => {
-    v.el.currentTime = offset || 0;
-    v.el.playbackRate = 1;
+    if(!v.el) return;
+    if(!v.isLive && !v._previewOnly) {
+      // Only seek file-based videos, not live streams
+      try { v.el.currentTime = offset || 0; } catch(e){}
+      v.el.playbackRate = 1;
+    }
     v.el.play().catch(()=>{});
   });
 }
@@ -4430,13 +4727,7 @@ function startLoop(){if(rafId)cancelAnimationFrame(rafId);rafId=requestAnimation
 function loopFn(){
   rafId=requestAnimationFrame(loopFn);
   if(analyser&&isPlaying){analyser.getByteFrequencyData(freqData);analyser.getByteTimeDomainData(timeData);}
-  // If only video layers (no audio playing), still draw them
-  const hasLive = videoLayers.some(v=>v.isLive);
-  if(!isPlaying && !pvPlaying && videoLayers.length > 0) {
-    ctx.clearRect(0,0,W,H);
-    drawIdlePreview();
-    return;
-  }
+  // _startVideoDraw handles idle video drawing — loopFn only runs during playback/recording
   else if(pvAnalyser&&pvPlaying){pvAnalyser.getByteFrequencyData(pvFreqData);freqData=pvFreqData;}
   else{if(!freqData)freqData=new Uint8Array(1024);}
   const beat=detectBeat();

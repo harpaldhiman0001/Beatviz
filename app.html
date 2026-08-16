@@ -3452,6 +3452,20 @@ function removeAudioTrack(i) {
 }
 
 // ════════════════════════════════════════
+
+// ── VIDEO FRAME CALLBACK — triggers canvas redraw on each new video frame ──
+function attachVideoFrameCallback(videoEl) {
+  if(!('requestVideoFrameCallback' in HTMLVideoElement.prototype)) return;
+  function onFrame() {
+    if(videoLayers.some(v=>v.el===videoEl) && !isPlaying && !pvPlaying) {
+      // New frame ready — redraw canvas
+      if(!_vdRaf) { ctx.clearRect(0,0,W,H); drawIdlePreview(); }
+    }
+    videoEl.requestVideoFrameCallback(onFrame);
+  }
+  videoEl.requestVideoFrameCallback(onFrame);
+}
+
 // VIDEO LAYER SYSTEM
 // Upload videos → split screen · PiP · overlay · full
 // ════════════════════════════════════════
@@ -3499,8 +3513,9 @@ async function addVideoLayer(file) {
   renderVideoLayerList();
   renderMultiTracks();
   document.getElementById('splitModePicker')?.style && (document.getElementById('splitModePicker').style.display='flex');
-  // Mount in DOM — browser needs this to decode frames
-  video.style.cssText='position:fixed;top:-9999px;left:0;width:1px;height:1px;opacity:0;pointer-events:none';
+  // Mount visible (opacity:0.01) so browser actively decodes frames
+  // opacity:0 causes browser to skip frame decoding — must be >0
+  video.style.cssText='position:fixed;top:0;left:-2px;width:2px;height:2px;opacity:0.01;pointer-events:none;z-index:-1;';
   document.body.appendChild(video);
   video.loop = true; video.muted = true;
   video.currentTime = 0;
@@ -3509,6 +3524,10 @@ async function addVideoLayer(file) {
   try { await video.play(); } catch(e) { video.muted=true; try { await video.play(); } catch(e2){} }
   // Wait for first frame
   await new Promise(r => { if(video.readyState>=3){r();return;} video.oncanplay=r; setTimeout(r,1200); });
+  // Attach per-frame callback for precise canvas updates
+  attachVideoFrameCallback(video);
+  // Attach per-frame callback for precise canvas updates
+  attachVideoFrameCallback(video);
   // Start continuous draw engine
   _startVideoDraw();
   // Update audioDuration if no audio loaded
@@ -3633,7 +3652,7 @@ async function toggleCameraPreviewOnly() {
     _previewOnlyStream = stream;
     const el = document.createElement('video');
     el.srcObject = stream; el.muted = true; el.autoplay = true; el.playsInline = true;
-    el.style.cssText='position:fixed;opacity:0;pointer-events:none;width:1px;height:1px;top:-9999px';
+    el.style.cssText='position:fixed;top:0;left:-2px;width:2px;height:2px;opacity:0.01;pointer-events:none;z-index:-1;';
     document.body.appendChild(el);
     el.play().catch(()=>{});
     _previewOnlyEl = el;

@@ -3504,8 +3504,9 @@ async function addVideoLayer(file) {
   document.body.appendChild(video);
   video.loop = true; video.muted = true;
   video.currentTime = 0;
-  // PLAY the video — ctx.drawImage requires active playback in most browsers
-  try { await video.play(); } catch(e) { try { await video.play(); } catch(e2){} }
+  // PLAY the video — ctx.drawImage requires active playback in Chromium
+  video.muted = true; video.loop = true;
+  try { await video.play(); } catch(e) { video.muted=true; try { await video.play(); } catch(e2){} }
   // Wait for first frame
   await new Promise(r => { if(video.readyState>=3){r();return;} video.oncanplay=r; setTimeout(r,1200); });
   // Start continuous draw engine
@@ -3881,6 +3882,13 @@ function _startVideoDraw() {
         ctx.fillStyle='#04040e'; ctx.fillRect(0,0,W,H);
       }
       // Draw each video layer directly
+      // Ensure all file videos are playing (muted, loop) so ctx.drawImage gives frames
+      videoLayers.forEach(v => {
+        if(v.el && !v.isLive && !v._previewOnly && v.el.paused && v.el.readyState >= 2) {
+          v.el.muted = true; v.el.loop = true;
+          v.el.play().catch(()=>{});
+        }
+      });
       videoLayers.forEach(v => {
         if(!v.el) return;
         const el = v.el;
@@ -4003,16 +4011,26 @@ function startVideoLayers(offset) {
   videoLayers.forEach(v => {
     if(!v.el) return;
     if(!v.isLive && !v._previewOnly) {
-      // Only seek file-based videos, not live streams
       try { v.el.currentTime = offset || 0; } catch(e){}
       v.el.playbackRate = 1;
+      // Only unmute if audio is enabled for this layer
+      v.el.muted = !v.audioEnabled;
     }
     v.el.play().catch(()=>{});
   });
 }
 
 function stopVideoLayers() {
-  videoLayers.forEach(v => { v.el.pause(); v.el.currentTime = 0; });
+  videoLayers.forEach(v => {
+    if(v.isLive || v._previewOnly) {
+      // Pause live streams
+      try{ v.el.pause(); }catch(e){}
+    } else {
+      // File videos: rewind to start but keep playing (muted loop) for canvas draw
+      try{ v.el.currentTime = 0; v.el.muted = true; v.el.loop = true; }catch(e){}
+      // Don't pause — let them loop so ctx.drawImage works
+    }
+  });
 }
 
 function pauseVideoLayers() {

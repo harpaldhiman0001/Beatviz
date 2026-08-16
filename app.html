@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%237c3aed'/><text y='24' x='3' font-size='22' font-family='sans-serif'>🎬</text></svg>">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>BeatViz Pro — Create</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -2782,7 +2783,7 @@ function restorePreviewResolution(){
   if(chars.length)drawIdle();
 }
 function pickRecorderMime(){
-  const mp4Cands=['video/mp4;codecs=avc1.640028,mp4a.40.2','video/mp4;codecs="avc1.42E01E,mp4a.40.2"','video/mp4;codecs=h264,aac','video/mp4'];
+  const mp4Cands=['video/mp4;codecs=avc3.640028,mp4a.40.2','video/mp4;codecs=avc3.42E01E,mp4a.40.2','video/mp4;codecs=avc1.640028,mp4a.40.2','video/mp4;codecs=h264,aac','video/mp4'];
   if(window.MediaRecorder){
     for(const m of mp4Cands){if(MediaRecorder.isTypeSupported(m))return{mime:m,isMp4:true};}
     const webmCands=['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'];
@@ -3526,9 +3527,9 @@ async function addVideoLayer(file) {
   await new Promise(r => { if(video.readyState>=3){r();return;} video.oncanplay=r; setTimeout(r,1200); });
   // Attach per-frame callback for precise canvas updates
   attachVideoFrameCallback(video);
-  // Attach per-frame callback for precise canvas updates
+  // Start bitmap capture (ensures reliable frame access)
+  _startBitmapCapture();
   attachVideoFrameCallback(video);
-  // Start continuous draw engine
   _startVideoDraw();
   // Update audioDuration if no audio loaded
   if(!audioDuration && video.duration) audioDuration = video.duration;
@@ -3560,7 +3561,7 @@ function setVideoOpacity(v) {
 }
 
 function removeVideoLayer(idx) {
-  if(videoLayers[idx]) { try{videoLayers[idx].el.pause();}catch(e){} if(videoLayers[idx].url)URL.revokeObjectURL(videoLayers[idx].url); }
+  if(videoLayers[idx]) { try{videoLayers[idx].el.pause();}catch(e){} if(videoLayers[idx].url)URL.revokeObjectURL(videoLayers[idx].url); _videoBitmaps.delete(videoLayers[idx]?.el); }
   videoLayers.splice(idx, 1);
   renderVideoLayerList();
   renderMultiTracks();
@@ -3745,6 +3746,7 @@ async function _startRecording(stream, type) {
   renderVideoLayerList(); renderMultiTracks();
   checkReady(); drawIdlePreview();
   // Ensure render loop is running to show live video
+  _startBitmapCapture();
   _startVideoDraw();
   _showRecBgPicker(true);
   _showCamFilterBar(_recType === 'camera');
@@ -3885,6 +3887,65 @@ function _showRecBgPicker(show) {
   if(p) p.style.display=show?'flex':'none';
 }
 
+// ════════════════════════════════════════
+// VIDEO BITMAP CACHE — reliable frame capture
+// createImageBitmap() works regardless of play state
+// ════════════════════════════════════════
+const _videoBitmaps = new Map();
+let _bitmapRaf = null;
+
+function _startBitmapCapture() {
+  if(_bitmapRaf) return;
+  async function _doCapture() {
+    for(const v of videoLayers) {
+      if(!v.el) continue;
+      try {
+        const bmp = await createImageBitmap(v.el);
+        const old = _videoBitmaps.get(v.el);
+        if(old?.bitmap) try{old.bitmap.close();}catch(e){}
+        _videoBitmaps.set(v.el, { bitmap:bmp });
+      } catch(e) {}
+    }
+    _bitmapRaf = videoLayers.length>0 ? setTimeout(()=>{_bitmapRaf=null;_startBitmapCapture();},30) : null;
+  }
+  _doCapture();
+}
+
+function _stopBitmapCapture() {
+  if(_bitmapRaf){clearTimeout(_bitmapRaf);_bitmapRaf=null;}
+  _videoBitmaps.forEach(v=>{try{v.bitmap?.close();}catch(e){}});
+  _videoBitmaps.clear();
+}
+
+function _drawOneBitmapLayer(v) {
+  const cached = _videoBitmaps.get(v.el);
+  if(!cached?.bitmap) return false;
+  const bmp = cached.bitmap;
+  try {
+    ctx.save();
+    ctx.globalAlpha = typeof v.opacity==='number' ? v.opacity : 1;
+    ctx.filter = (v.filter&&VIDEO_FILTERS?.[v.filter]&&v.filter!=='none') ? VIDEO_FILTERS[v.filter] : 'none';
+    const ps=W*(v._pipPct||0.32), ph2=ps/(v.aspect||1.78);
+    switch(v.mode||'full') {
+      case 'full':   ctx.drawImage(bmp,0,0,W,H); break;
+      case 'top':    ctx.drawImage(bmp,0,0,W,H/2); break;
+      case 'bottom': ctx.drawImage(bmp,0,H/2,W,H/2); break;
+      case 'left':   ctx.drawImage(bmp,0,0,W/2,H); break;
+      case 'right':  ctx.drawImage(bmp,W/2,0,W/2,H); break;
+      case 'pip':
+        ctx.shadowBlur=12;ctx.shadowColor='rgba(0,0,0,.6)';
+        ctx.drawImage(bmp,W-ps-12,H-ph2-12,ps,ph2);
+        ctx.shadowBlur=0;ctx.strokeStyle='rgba(6,182,212,.8)';ctx.lineWidth=2;
+        ctx.strokeRect(W-ps-12,H-ph2-12,ps,ph2);
+        break;
+      default: ctx.drawImage(bmp,0,0,W,H);
+    }
+    ctx.filter='none'; ctx.restore();
+    return true;
+  } catch(e){ctx.filter='none';try{ctx.restore();}catch(e2){} return false;}
+}
+
+
 // ── VIDEO DRAW ENGINE ──
 // Keeps a continuous rAF running whenever video layers exist
 let _vdRaf = null;
@@ -3955,75 +4016,17 @@ function _stopVideoDraw() {
 
 function drawVideoLayers(elapsed) {
   if(!videoLayers.length) return;
-  videoLayers.forEach((v, i) => {
+  videoLayers.forEach(v => {
     if(!v.el) return;
-    // Try to draw regardless — errors caught silently
-    try {
-    ctx.save();
-    ctx.globalAlpha = typeof v.opacity === 'number' ? v.opacity : 1;
-    // Apply filter for this video layer
-    if(v.filter && v.filter !== 'none' && VIDEO_FILTERS[v.filter]) ctx.filter = VIDEO_FILTERS[v.filter]; else ctx.filter='none';
-    const el = v.el;
-    // Sync video time to elapsed
-    if((isPlaying || pvPlaying) && !v.el.paused) {
-      // video plays in sync
+    // Use cached bitmap (most reliable — works even when video is paused/hidden)
+    if(!_drawOneBitmapLayer(v)) {
+      // Fallback: direct ctx.drawImage
+      try{ctx.save();ctx.globalAlpha=v.opacity||1;ctx.drawImage(v.el,0,0,W,H);ctx.restore();}
+      catch(e){try{ctx.restore();}catch(e2){}}
     }
-    const mode = v.mode;
-    switch(mode) {
-      case 'full':
-        ctx.drawImage(el, 0, 0, W, H);
-        break;
-      case 'top': {
-        const h2 = H/2;
-        ctx.drawImage(el, 0, 0, W, h2);
-        // Divider line
-        ctx.strokeStyle='rgba(6,182,212,.6)'; ctx.lineWidth=2;
-        ctx.beginPath(); ctx.moveTo(0,h2); ctx.lineTo(W,h2); ctx.stroke();
-        break;
-      }
-      case 'bottom': {
-        const h2 = H/2;
-        ctx.drawImage(el, 0, h2, W, h2);
-        break;
-      }
-      case 'left': {
-        const w2 = W/2;
-        ctx.drawImage(el, 0, 0, w2, H);
-        ctx.strokeStyle='rgba(6,182,212,.6)'; ctx.lineWidth=2;
-        ctx.beginPath(); ctx.moveTo(w2,0); ctx.lineTo(w2,H); ctx.stroke();
-        break;
-      }
-      case 'right': {
-        const w2 = W/2;
-        ctx.drawImage(el, w2, 0, w2, H);
-        break;
-      }
-      case 'pip': {
-        // Small overlay in corner (size from slider or default 32%)
-        const pipScale = v._pipPct || 0.32;
-        const pw = Math.round(W * pipScale);
-        const ph = Math.round(pw / (v.aspect||1.78));
-        const px = W - pw - 16;
-        const py = H - ph - 16;
-        // Drop shadow
-        ctx.shadowBlur = 16; ctx.shadowColor = 'rgba(0,0,0,.7)';
-        ctx.drawImage(el, px, py, pw, ph);
-        ctx.shadowBlur = 0;
-        // Border
-        ctx.strokeStyle = 'rgba(6,182,212,.8)'; ctx.lineWidth = 2;
-        ctx.strokeRect(px, py, pw, ph);
-        // Label
-        ctx.fillStyle='rgba(0,0,0,.6)'; ctx.fillRect(px, py, pw, 16);
-        ctx.fillStyle='#06b6d4'; ctx.font='bold 9px Space Grotesk,sans-serif'; ctx.textAlign='left';
-        ctx.fillText(v.name.slice(0,18), px+4, py+11);
-        break;
-      }
-    }
-    ctx.filter = 'none';
-    ctx.restore();
-    } catch(_e) { try{ctx.filter='none';ctx.restore();}catch(e2){} } // ignore draw errors
   });
 }
+
 
 // ── Start/stop video playback with audio ──
 function startVideoLayers(offset) {
@@ -4873,7 +4876,10 @@ function drawIdlePreview() {
 
   // Draw video layers — force frame at time 0 for idle preview
   if(videoLayers.length > 0) {
-    videoLayers.forEach(v => { if(v.el && !v.isLive && v.el.readyState >= 2) v.el.currentTime = pvOffset || 0; });
+    // Only seek idle videos if NOT playing (seeking during playback = black frame)
+    if(!isPlaying && !pvPlaying) {
+      videoLayers.forEach(v => { if(v.el && !v.isLive && !v._previewOnly && v.el.readyState >= 2) { try{v.el.currentTime = pvOffset||0;}catch(e){} } });
+    }
     drawVideoLayers(pvOffset || 0);
   }
   // Draw images
@@ -5042,18 +5048,39 @@ async function handleGenerate(){
   // Connect additional tracks (rerecordFrom resolved after declaration below)
   initParticles();initFXParticles();bassAvg=0;beatIntensity=0;lastBeat=0;camX=0;camY=0;energyHistory=[];lastTransitionTime=0;beatTimestamps=[];
   // Bump the canvas up to the chosen export resolution (HD/Full HD/Ultra HD) right before capturing.
+  // Apply resolution ONCE before capturing — never change canvas size during recording
   applyExportResolution();
+  // Small delay to ensure canvas resize is fully committed before capture
+  await new Promise(r=>setTimeout(r,50));
   const cvStr=canvas.captureStream(30),audTr=mDest.stream.getAudioTracks();
-  // Add video audio tracks (from videos with audioEnabled)
-  const videoAudTr = [];
+  // Route video audio through AudioContext for proper mixing
   videoLayers.forEach(v=>{
     if(v.audioEnabled && !v.isLive && !v._previewOnly && v.el) {
-      try{ const vs=v.el.captureStream?.();if(vs)vs.getAudioTracks().forEach(t=>videoAudTr.push(t)); }catch(e){}
+      try {
+        v.el.muted = false; // unmute for audio capture
+        const vs = v.el.captureStream?.() || v.el.mozCaptureStream?.();
+        if(vs && vs.getAudioTracks().length > 0) {
+          const vSrc = audioCtx.createMediaStreamSource(vs);
+          const vGain = audioCtx.createGain();
+          vGain.gain.value = 0.8;
+          vSrc.connect(vGain);
+          vGain.connect(mDest);
+          vGain.connect(analyser);
+        }
+      } catch(e) { console.warn('Video audio route failed:', e); }
     }
   });
-  // Add microphone if enabled
-  const micTracks = getMicTracks();
-  const combined=new MediaStream([...cvStr.getVideoTracks(),...audTr,...videoAudTr,...micTracks]);
+  // Route microphone through AudioContext
+  if(_micEnabled && _micStream) {
+    try {
+      const micSrc = audioCtx.createMediaStreamSource(_micStream);
+      const micGain = audioCtx.createGain();
+      micGain.gain.value = 1.0;
+      micSrc.connect(micGain);
+      micGain.connect(mDest);
+    } catch(e) {}
+  }
+  const combined=new MediaStream([...cvStr.getVideoTracks(),...mDest.stream.getAudioTracks()]);
   const picked=pickRecorderMime();recordingIsMp4=picked.isMp4;
   const bitrate=Q_BITRATE[exportQuality]||6000000;
   chunks=[];
@@ -6648,8 +6675,6 @@ function loopFn() {
     ctx.save();
     if(isPlaying&&camShakeOn)ctx.translate(Math.round(camX),Math.round(camY));
     if(isPlaying||pvPlaying){
-      // Sync video to elapsed
-      videoLayers.forEach(v=>{ if(v.el && Math.abs(v.el.currentTime-elapsed)>0.3) v.el.currentTime=elapsed; });
       drawPromoFrame(elapsed);
     } else {
       drawPromoIdle();

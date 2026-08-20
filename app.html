@@ -6866,5 +6866,1087 @@ canvas.addEventListener('touchmove', e => {
 }, {passive:false});
 canvas.addEventListener('touchend', () => { canvas.dispatchEvent(new MouseEvent('mouseup')); });
 </script>
+  <style>
+/*
+ ═══════════════════════════════════════════════════════
+  BEATVIZ STUDIO — UX OPTIMISATION PATCH
+  Drop this entire <style> block and the <script> block
+  at the END of your existing app.html, just before </body>
+ 
+  What this adds:
+  1. First-time onboarding wizard (4 steps)
+  2. Persistent step progress bar on mobile
+  3. Smart empty-state canvas overlay
+  4. "What's missing" tooltip on the Generate button
+  5. Better mobile bottom nav with step badges
+  6. Improved paywall with social proof
+  7. Success celebration when video is ready
+ ═══════════════════════════════════════════════════════
+*/
+ 
+/* ── RESET BOX ── */
+.bv-patch * { box-sizing: border-box; }
+ 
+/* ══════════════════════════════════════
+   1. ONBOARDING WIZARD
+══════════════════════════════════════ */
+#bv-wizard {
+  position: fixed; inset: 0; z-index: 9999;
+  background: rgba(3,3,13,.94);
+  backdrop-filter: blur(18px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  animation: bvFadeIn .35s ease;
+}
+@keyframes bvFadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:none; } }
+#bv-wizard.hidden { display: none; }
+ 
+.bv-wiz-box {
+  background: #0e0e28;
+  border: 1px solid rgba(124,58,237,.35);
+  border-radius: 20px;
+  width: 100%; max-width: 420px;
+  overflow: hidden;
+  box-shadow: 0 32px 80px rgba(0,0,0,.7), 0 0 0 1px rgba(124,58,237,.15);
+}
+ 
+/* Progress dots */
+.bv-wiz-dots {
+  display: flex; align-items: center; justify-content: center;
+  gap: 8px; padding: 20px 24px 0;
+}
+.bv-wiz-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: rgba(255,255,255,.15);
+  transition: all .25s;
+}
+.bv-wiz-dot.active {
+  width: 24px; border-radius: 4px;
+  background: #7c3aed;
+  box-shadow: 0 0 10px rgba(124,58,237,.6);
+}
+.bv-wiz-dot.done { background: #10b981; }
+ 
+/* Step content */
+.bv-wiz-step { display: none; padding: 24px; }
+.bv-wiz-step.active { display: block; animation: bvFadeIn .25s ease; }
+.bv-wiz-emoji { font-size: 48px; text-align: center; margin-bottom: 16px; }
+.bv-wiz-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 22px; font-weight: 700; letter-spacing: -.5px;
+  color: #f0f4ff; text-align: center; margin-bottom: 8px;
+}
+.bv-wiz-sub {
+  font-size: 14px; color: #64748b; text-align: center;
+  line-height: 1.65; margin-bottom: 20px;
+}
+.bv-wiz-sub strong { color: #c4cde0; }
+.bv-wiz-tip {
+  background: rgba(124,58,237,.1);
+  border: 1px solid rgba(124,58,237,.25);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 12px; color: #a78bfa; line-height: 1.6;
+  margin-bottom: 20px;
+  display: flex; align-items: flex-start; gap: 10px;
+}
+.bv-wiz-tip-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+ 
+/* Action buttons */
+.bv-wiz-actions { display: flex; gap: 10px; }
+.bv-wiz-btn-main {
+  flex: 1; padding: 13px;
+  border-radius: 10px; border: none;
+  background: linear-gradient(135deg, #7c3aed, #5b21b6);
+  color: #fff; font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px; font-weight: 700; cursor: pointer;
+  transition: all .15s;
+  box-shadow: 0 4px 20px rgba(124,58,237,.35);
+}
+.bv-wiz-btn-main:hover { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(124,58,237,.5); }
+.bv-wiz-btn-skip {
+  padding: 13px 18px; border-radius: 10px;
+  border: 1px solid rgba(255,255,255,.1);
+  background: transparent; color: #64748b;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px; cursor: pointer; transition: all .15s;
+}
+.bv-wiz-btn-skip:hover { color: #c4cde0; border-color: rgba(255,255,255,.2); }
+ 
+/* Bottom: step counter */
+.bv-wiz-footer {
+  background: rgba(255,255,255,.03);
+  border-top: 1px solid rgba(255,255,255,.06);
+  padding: 12px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 11px; color: #334155;
+}
+.bv-wiz-footer span { font-family: 'Space Grotesk', sans-serif; font-weight: 600; }
+ 
+ 
+/* ══════════════════════════════════════
+   2. MOBILE STEP PROGRESS BAR
+   (sits above the Generate bar on mobile)
+══════════════════════════════════════ */
+#bv-step-bar {
+  display: none; /* shown via JS on mobile */
+  position: fixed;
+  bottom: calc(60px + 70px); /* above mob-nav + mob-gen */
+  left: 0; right: 0;
+  z-index: 186;
+  background: #08081a;
+  border-top: 1px solid rgba(124,58,237,.2);
+  padding: 8px 12px;
+}
+@media (max-width: 768px) {
+  #bv-step-bar { display: block; }
+}
+.bv-step-list {
+  display: flex; gap: 4px; align-items: center;
+}
+.bv-step-item {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; gap: 3px;
+  padding: 5px 2px;
+  border-radius: 6px;
+  transition: background .15s;
+  cursor: pointer;
+}
+.bv-step-item.done { background: rgba(16,185,129,.08); }
+.bv-step-item.active { background: rgba(124,58,237,.12); }
+.bv-step-icon {
+  font-size: 16px; line-height: 1;
+}
+.bv-step-label {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 8px; font-weight: 700;
+  letter-spacing: .3px; text-transform: uppercase;
+  color: #334155;
+}
+.bv-step-item.done .bv-step-label  { color: #10b981; }
+.bv-step-item.active .bv-step-label { color: #a78bfa; }
+.bv-step-check {
+  width: 14px; height: 14px; border-radius: 50%;
+  border: 1.5px solid #1e1e42;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 8px;
+}
+.bv-step-item.done .bv-step-check {
+  background: #10b981; border-color: #10b981; color: #fff;
+}
+.bv-step-item.active .bv-step-check {
+  border-color: #7c3aed;
+  box-shadow: 0 0 6px rgba(124,58,237,.6);
+}
+ 
+ 
+/* ══════════════════════════════════════
+   3. SMART EMPTY CANVAS OVERLAY
+   (replaces the boring #cEmpty)
+══════════════════════════════════════ */
+#bv-empty-overlay {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  background: #04040e;
+  z-index: 4;
+  padding: 24px;
+  gap: 12px;
+}
+#bv-empty-overlay.hidden { display: none; }
+.bv-empty-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 18px; font-weight: 700;
+  color: #f0f4ff; text-align: center; margin-bottom: 4px;
+}
+.bv-empty-sub {
+  font-size: 12px; color: #334155; text-align: center;
+  line-height: 1.6; max-width: 280px; margin-bottom: 4px;
+}
+.bv-empty-btn {
+  width: 100%; max-width: 280px;
+  padding: 13px 20px; border-radius: 10px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: all .15s;
+  display: flex; align-items: center; justify-content: center;
+  gap: 10px; border: none;
+}
+.bv-empty-btn.primary {
+  background: linear-gradient(135deg, #7c3aed, #5b21b6);
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(124,58,237,.35);
+}
+.bv-empty-btn.primary:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(124,58,237,.5); }
+.bv-empty-btn.secondary {
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.1);
+  color: #64748b;
+}
+.bv-empty-btn.secondary:hover { color: #c4cde0; border-color: rgba(255,255,255,.2); }
+.bv-empty-or {
+  font-size: 11px; color: #1e1e42;
+  font-family: 'Space Grotesk', sans-serif; font-weight: 600;
+}
+.bv-empty-features {
+  display: flex; gap: 12px; margin-top: 8px; flex-wrap: wrap;
+  justify-content: center;
+}
+.bv-empty-feat {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 11px; color: #334155;
+  font-family: 'Space Grotesk', sans-serif; font-weight: 600;
+}
+.bv-empty-feat span { color: #7c3aed; }
+ 
+ 
+/* ══════════════════════════════════════
+   4. "WHAT'S MISSING" TOOLTIP
+   appears near the generate button
+══════════════════════════════════════ */
+#bv-missing-tip {
+  display: none;
+  position: fixed;
+  bottom: calc(60px + 140px);
+  left: 12px; right: 12px;
+  background: #0e0e28;
+  border: 1px solid rgba(245,158,11,.3);
+  border-radius: 12px;
+  padding: 12px 14px;
+  z-index: 400;
+  animation: bvFadeIn .2s ease;
+}
+#bv-missing-tip .bv-mt-row {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 7px;
+}
+#bv-missing-tip .bv-mt-row:last-child { margin-bottom: 0; }
+#bv-missing-tip .bv-mt-icon {
+  width: 22px; height: 22px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; flex-shrink: 0;
+}
+#bv-missing-tip .bv-mt-icon.done { background: rgba(16,185,129,.15); }
+#bv-missing-tip .bv-mt-icon.todo { background: rgba(245,158,11,.12); border: 1px dashed rgba(245,158,11,.4); }
+#bv-missing-tip .bv-mt-text { font-size: 12px; font-family: 'Space Grotesk', sans-serif; font-weight: 600; color: #c4cde0; }
+#bv-missing-tip .bv-mt-text.done { color: #10b981; }
+#bv-missing-tip .bv-mt-text.todo { color: #f59e0b; }
+#bv-missing-tip .bv-mt-close {
+  position: absolute; top: 8px; right: 10px;
+  background: none; border: none; color: #334155;
+  font-size: 14px; cursor: pointer;
+}
+ 
+ 
+/* ══════════════════════════════════════
+   5. SUCCESS CELEBRATION
+   shown when video is done
+══════════════════════════════════════ */
+#bv-success {
+  display: none;
+  position: fixed; inset: 0; z-index: 9998;
+  background: rgba(3,3,13,.88);
+  backdrop-filter: blur(14px);
+  align-items: center; justify-content: center;
+  padding: 20px;
+}
+#bv-success.show { display: flex; animation: bvFadeIn .35s ease; }
+.bv-success-box {
+  background: #0e0e28;
+  border: 1px solid rgba(16,185,129,.35);
+  border-radius: 20px;
+  padding: 32px 28px;
+  width: 100%; max-width: 380px;
+  text-align: center;
+}
+.bv-success-anim { font-size: 64px; margin-bottom: 16px; animation: bvBounce .6s ease; }
+@keyframes bvBounce { 0%,100%{transform:scale(1)} 50%{transform:scale(1.25)} }
+.bv-success-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 24px; font-weight: 700; letter-spacing: -.5px;
+  color: #f0f4ff; margin-bottom: 8px;
+}
+.bv-success-sub { font-size: 14px; color: #64748b; line-height: 1.65; margin-bottom: 24px; }
+.bv-success-actions { display: flex; flex-direction: column; gap: 8px; }
+.bv-success-btn {
+  width: 100%; padding: 13px; border-radius: 10px;
+  font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: all .15s; border: none;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.bv-success-btn.webm { background: linear-gradient(135deg,#7c3aed,#5b21b6); color:#fff; box-shadow:0 4px 20px rgba(124,58,237,.35); }
+.bv-success-btn.mp4  { background: rgba(6,182,212,.1); border:1px solid rgba(6,182,212,.35); color:#06b6d4; }
+.bv-success-btn.again{ background: rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); color:#64748b; }
+.bv-success-share {
+  display: flex; gap: 8px; margin-top: 8px;
+}
+.bv-share-btn {
+  flex: 1; padding: 10px; border-radius: 8px;
+  border: 1px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.04);
+  color: #64748b; font-family: 'Space Grotesk', sans-serif;
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  transition: all .15s;
+}
+.bv-share-btn:hover { color: #c4cde0; border-color: rgba(255,255,255,.16); }
+.bv-success-note { font-size: 11px; color: #1e1e42; margin-top: 12px; }
+ 
+ 
+/* ══════════════════════════════════════
+   6. IMPROVED PAYWALL OVERLAY
+══════════════════════════════════════ */
+/* The existing paywall is fine — we enhance it with extra social proof */
+.bv-pw-proof {
+  display: flex; gap: 6px; align-items: center;
+  justify-content: center;
+  padding: 10px 24px 0;
+  font-size: 12px; color: #64748b;
+  font-family: 'Space Grotesk', sans-serif;
+}
+.bv-pw-proof-avs { display: flex; }
+.bv-pw-av {
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 2px solid #0e0e28;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 700; color: #fff;
+  margin-left: -6px; flex-shrink: 0;
+}
+.bv-pw-av:first-child { margin-left: 0; }
+ 
+ 
+/* ══════════════════════════════════════
+   7. QUICK HELP FLOATING BUTTON
+══════════════════════════════════════ */
+#bv-help-btn {
+  position: fixed; bottom: calc(60px + 140px); right: 14px;
+  width: 38px; height: 38px; border-radius: 50%;
+  background: rgba(124,58,237,.2);
+  border: 1px solid rgba(124,58,237,.4);
+  color: #a78bfa; font-size: 16px; font-weight: 700;
+  cursor: pointer; z-index: 180;
+  display: none; /* shown on mobile via JS */
+  align-items: center; justify-content: center;
+  font-family: 'Space Grotesk', sans-serif;
+  transition: all .15s;
+  box-shadow: 0 4px 14px rgba(0,0,0,.4);
+}
+#bv-help-btn:hover { background: rgba(124,58,237,.35); }
+@media(max-width:768px) {
+  #bv-help-btn { display: flex; }
+}
+ 
+ 
+/* ══════════════════════════════════════
+   8. MOBILE UX IMPROVEMENTS
+   Better touch targets, clearer gen bar
+══════════════════════════════════════ */
+@media(max-width:768px) {
+  /* Bigger mobile generate button text + icon */
+  .mob-gen-btn {
+    font-size: 14px !important;
+    letter-spacing: .6px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+  }
+ 
+  /* Add step counter to bottom nav tabs */
+  .mn-btn .bv-badge {
+    display: inline-flex;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: #10b981;
+    font-size: 8px; font-weight: 700; color: #fff;
+    align-items: center; justify-content: center;
+    position: absolute; top: 4px; right: 50%;
+    transform: translateX(8px);
+  }
+  .mn-btn { position: relative !important; }
+ 
+  /* Pad the preview canvas area so step bar doesn't overlap */
+  .mob-gen {
+    bottom: 60px !important;
+  }
+ 
+  /* Bigger download buttons */
+  .exp-btn {
+    padding: 11px !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+  }
+ 
+  /* Clearer separator in generate bar */
+  #mobGenBar {
+    gap: 7px !important;
+    padding: 10px 12px !important;
+  }
+}
+ 
+ 
+/* ══════════════════════════════════════
+   9. DESKTOP IMPROVEMENTS
+══════════════════════════════════════ */
+@media(min-width:769px) {
+  /* Step progress in sidebar header */
+  #bv-desktop-progress {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 7px 10px;
+    background: #08081a;
+    border-bottom: 1px solid #1a1a1a;
+    font-size: 9px; font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700; color: #334155;
+    text-transform: uppercase; letter-spacing: .5px;
+  }
+  .bv-dp-step {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; gap: 3px;
+    padding: 4px 2px;
+  }
+  .bv-dp-step-bar {
+    width: 100%; height: 3px; border-radius: 2px;
+    background: #1a1a2a;
+    transition: background .25s;
+  }
+  .bv-dp-step.done .bv-dp-step-bar { background: #10b981; }
+  .bv-dp-step.active .bv-dp-step-bar { background: #7c3aed; box-shadow: 0 0 6px rgba(124,58,237,.5); }
+  .bv-dp-step-lbl { font-size: 8px; color: #334155; font-weight: 600; }
+  .bv-dp-step.done .bv-dp-step-lbl  { color: #10b981; }
+  .bv-dp-step.active .bv-dp-step-lbl { color: #a78bfa; }
+}
+ 
+/* ══════════════════════════════════════
+   UTILITIES
+══════════════════════════════════════ */
+.bv-hidden { display: none !important; }
+.bv-confetti-canvas {
+  position: fixed; inset: 0; z-index: 9997;
+  pointer-events: none;
+}
+</style>
+  <script>
+/* ═══════════════════════════════════════════════════
+   BEATVIZ UX PATCH — JAVASCRIPT
+   Paste this entire script before </body> in app.html
+   (after the existing script block)
+═══════════════════════════════════════════════════ */
+(function() {
+  'use strict';
+ 
+  // ── WIZARD CONTENT ──
+  const WIZARD_STEPS = [
+    {
+      emoji: '🎵',
+      title: 'Upload your song',
+      sub: 'Tap below and pick any MP3, WAV or AAC file. <strong>Your first video is completely free</strong> — no card needed.',
+      tip: '💡 Works with Bollywood, Punjabi, Hip-Hop, Lo-Fi — any genre. Up to 20 minutes.',
+      btn: '📁 Choose audio file',
+      action: () => {
+        // Open the audio file picker
+        const inp = document.getElementById('audioIn');
+        if (inp) { closeWizardStep(); inp.click(); }
+        else openMobileSheet('upload');
+      }
+    },
+    {
+      emoji: '🎭',
+      title: 'Add your photo or PNG',
+      sub: 'Upload a photo of yourself, your band, or any PNG artwork. It will dance to the beat automatically.',
+      tip: '💡 PNG with no background looks best. Try remove.bg to remove a background free.',
+      btn: '🖼️ Add character / image',
+      action: () => {
+        closeWizardStep();
+        const inp = document.getElementById('charIn');
+        if (inp) { inp.click(); }
+        else openMobileSheet('upload');
+      }
+    },
+    {
+      emoji: '✨',
+      title: 'Pick a visual style',
+      sub: 'Choose a theme — Neon, Stage, Space, Bollywood. Or use the AI background generator to create something unique.',
+      tip: '💡 The "EDM Drop" template sets everything up in one tap.',
+      btn: '✨ Choose style',
+      action: () => {
+        closeWizardStep();
+        if (window.innerWidth <= 768) openMobileSheet('style');
+        else {
+          const styleTab = document.querySelector('[onclick*="showTab(\'style\'"]');
+          if (styleTab) styleTab.click();
+        }
+      }
+    },
+    {
+      emoji: '🚀',
+      title: "You're ready to generate!",
+      sub: 'BeatViz will detect the beats, animate your character, and record the video — all automatically.',
+      tip: '🎬 The video records in real time (same length as your song). Then download.',
+      btn: '▶ Generate my video',
+      action: () => {
+        closeWizardStep();
+        if (typeof handleGenerate === 'function') handleGenerate();
+      }
+    }
+  ];
+ 
+  let wizardCurrentStep = 0;
+  let wizardEl = null;
+  let wizardSeen = false;
+ 
+  function buildWizard() {
+    if (document.getElementById('bv-wizard')) return;
+ 
+    // Check if user has seen it before
+    if (localStorage.getItem('bv_wizard_seen')) {
+      wizardSeen = true;
+      return;
+    }
+ 
+    const el = document.createElement('div');
+    el.id = 'bv-wizard';
+    el.innerHTML = `
+      <div class="bv-wiz-box">
+        <div class="bv-wiz-dots" id="bvWizDots"></div>
+        <div id="bvWizSteps"></div>
+        <div class="bv-wiz-footer">
+          <span id="bvWizStepNum">Step 1 of 4</span>
+          <span>No credit card · 1 free video</span>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(el);
+    wizardEl = el;
+ 
+    // Build dots
+    const dotsEl = el.querySelector('#bvWizDots');
+    WIZARD_STEPS.forEach((_, i) => {
+      const d = document.createElement('div');
+      d.className = 'bv-wiz-dot' + (i === 0 ? ' active' : '');
+      dotsEl.appendChild(d);
+    });
+ 
+    // Build steps
+    const stepsEl = el.querySelector('#bvWizSteps');
+    WIZARD_STEPS.forEach((s, i) => {
+      const step = document.createElement('div');
+      step.className = 'bv-wiz-step' + (i === 0 ? ' active' : '');
+      step.id = 'bvWizStep' + i;
+      step.innerHTML = `
+        <div class="bv-wiz-emoji">${s.emoji}</div>
+        <div class="bv-wiz-title">${s.title}</div>
+        <div class="bv-wiz-sub">${s.sub}</div>
+        <div class="bv-wiz-tip"><span class="bv-wiz-tip-icon">${s.tip.slice(0,2)}</span>${s.tip.slice(2)}</div>
+        <div class="bv-wiz-actions">
+          <button class="bv-wiz-btn-main" id="bvWizMain${i}">${s.btn} →</button>
+          <button class="bv-wiz-btn-skip" onclick="window.bvSkipWizard()">${i < WIZARD_STEPS.length-1 ? 'Skip' : 'Close'}</button>
+        </div>
+      `;
+      stepsEl.appendChild(step);
+      document.getElementById('bvWizMain' + i).addEventListener('click', () => {
+        s.action();
+        if (i < WIZARD_STEPS.length - 1) advanceWizard();
+        else dismissWizard();
+      });
+    });
+ 
+    renderWizardStep();
+  }
+ 
+  function renderWizardStep() {
+    if (!wizardEl) return;
+    const dots = wizardEl.querySelectorAll('.bv-wiz-dot');
+    const steps = wizardEl.querySelectorAll('.bv-wiz-step');
+    dots.forEach((d, i) => {
+      d.className = 'bv-wiz-dot';
+      if (i < wizardCurrentStep) d.classList.add('done');
+      else if (i === wizardCurrentStep) d.classList.add('active');
+    });
+    steps.forEach((s, i) => {
+      s.className = 'bv-wiz-step' + (i === wizardCurrentStep ? ' active' : '');
+    });
+    const numEl = wizardEl.querySelector('#bvWizStepNum');
+    if (numEl) numEl.textContent = `Step ${wizardCurrentStep + 1} of ${WIZARD_STEPS.length}`;
+  }
+ 
+  function advanceWizard() {
+    if (wizardCurrentStep < WIZARD_STEPS.length - 1) {
+      wizardCurrentStep++;
+      renderWizardStep();
+    } else {
+      dismissWizard();
+    }
+  }
+ 
+  function closeWizardStep() {
+    if (!wizardEl) return;
+    wizardEl.classList.add('hidden');
+    setTimeout(() => {
+      // Check if still needs to be shown
+      if (wizardCurrentStep < WIZARD_STEPS.length - 1) {
+        wizardEl.classList.remove('hidden');
+      }
+    }, 4000);
+  }
+ 
+  function dismissWizard() {
+    if (!wizardEl) return;
+    wizardEl.classList.add('hidden');
+    localStorage.setItem('bv_wizard_seen', '1');
+    wizardSeen = true;
+  }
+ 
+  window.bvSkipWizard = dismissWizard;
+ 
+  // ── STEP STATE ──
+  // Tracks which of the 4 main steps are complete
+  function getStepState() {
+    const hasAudio = typeof audioBuffer !== 'undefined' && audioBuffer !== null;
+    const hasVideoLayer = typeof videoLayers !== 'undefined' && videoLayers.length > 0;
+    const hasImg = typeof chars !== 'undefined' && chars.length > 0;
+    const hasAiBg = typeof aiBackground !== 'undefined' && aiBackground !== null;
+    const canGenerate = (typeof audioBuffer !== 'undefined' && audioBuffer !== null) || hasVideoLayer;
+    const hasVisual = hasImg || hasAiBg || hasVideoLayer;
+    const isReady = canGenerate && hasVisual;
+    return {
+      audio:  hasAudio || hasVideoLayer,
+      image:  hasVisual,
+      style:  true, // always "done" — style is optional
+      ready:  isReady
+    };
+  }
+ 
+  // ── MOBILE STEP BAR ──
+  function buildStepBar() {
+    if (document.getElementById('bv-step-bar')) return;
+    const bar = document.createElement('div');
+    bar.id = 'bv-step-bar';
+    bar.innerHTML = `
+      <div class="bv-step-list">
+        <div class="bv-step-item" id="bvStep0" title="Upload audio" onclick="window.bvOpenStep(0)">
+          <div class="bv-step-check" id="bvStepChk0"></div>
+          <div class="bv-step-icon">🎵</div>
+          <div class="bv-step-label">Audio</div>
+        </div>
+        <div style="width:1px;height:30px;background:#1e1e42;flex-shrink:0"></div>
+        <div class="bv-step-item" id="bvStep1" title="Add image" onclick="window.bvOpenStep(1)">
+          <div class="bv-step-check" id="bvStepChk1"></div>
+          <div class="bv-step-icon">🖼️</div>
+          <div class="bv-step-label">Image</div>
+        </div>
+        <div style="width:1px;height:30px;background:#1e1e42;flex-shrink:0"></div>
+        <div class="bv-step-item" id="bvStep2" title="Pick style" onclick="window.bvOpenStep(2)">
+          <div class="bv-step-check" id="bvStepChk2"></div>
+          <div class="bv-step-icon">✨</div>
+          <div class="bv-step-label">Style</div>
+        </div>
+        <div style="width:1px;height:30px;background:#1e1e42;flex-shrink:0"></div>
+        <div class="bv-step-item" id="bvStep3" title="Generate video" onclick="window.bvOpenStep(3)">
+          <div class="bv-step-check" id="bvStepChk3"></div>
+          <div class="bv-step-icon">▶</div>
+          <div class="bv-step-label">Generate</div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(bar);
+  }
+ 
+  window.bvOpenStep = function(idx) {
+    const s = getStepState();
+    switch(idx) {
+      case 0: openMobileSheet('upload'); break;
+      case 1: openMobileSheet('upload'); break;
+      case 2: openMobileSheet('style'); break;
+      case 3:
+        if (s.audio && s.image) {
+          if (typeof handleGenerate === 'function') handleGenerate();
+        } else {
+          showMissingTip();
+        }
+        break;
+    }
+  };
+ 
+  function updateStepBar() {
+    const s = getStepState();
+    const steps = [s.audio, s.image, true, s.ready];
+    const firstIncomplete = steps.findIndex(x => !x);
+ 
+    steps.forEach((done, i) => {
+      const el = document.getElementById('bvStep' + i);
+      const chk = document.getElementById('bvStepChk' + i);
+      if (!el || !chk) return;
+      el.className = 'bv-step-item';
+      if (done) {
+        el.classList.add('done');
+        chk.textContent = '✓';
+        chk.style.color = '#10b981';
+      } else if (i === firstIncomplete) {
+        el.classList.add('active');
+        chk.textContent = '';
+        chk.style.color = '';
+      } else {
+        chk.textContent = '';
+        chk.style.color = '';
+      }
+    });
+  }
+ 
+  // ── DESKTOP PROGRESS BAR ──
+  function buildDesktopProgress() {
+    if (document.getElementById('bv-desktop-progress')) return;
+    const panes = document.querySelector('.panes');
+    if (!panes) return;
+    const bar = document.createElement('div');
+    bar.id = 'bv-desktop-progress';
+    bar.innerHTML = `
+      <div class="bv-dp-step" id="bvDp0"><div class="bv-dp-step-bar"></div><div class="bv-dp-step-lbl">Audio</div></div>
+      <div class="bv-dp-step" id="bvDp1"><div class="bv-dp-step-bar"></div><div class="bv-dp-step-lbl">Image</div></div>
+      <div class="bv-dp-step" id="bvDp2"><div class="bv-dp-step-bar"></div><div class="bv-dp-step-lbl">Style</div></div>
+      <div class="bv-dp-step" id="bvDp3"><div class="bv-dp-step-bar"></div><div class="bv-dp-step-lbl">Generate</div></div>
+    `;
+    panes.parentNode.insertBefore(bar, panes);
+  }
+ 
+  function updateDesktopProgress() {
+    const s = getStepState();
+    const steps = [s.audio, s.image, true, s.ready];
+    const firstIncomplete = steps.findIndex(x => !x);
+    steps.forEach((done, i) => {
+      const el = document.getElementById('bvDp' + i);
+      if (!el) return;
+      el.className = 'bv-dp-step';
+      if (done) el.classList.add('done');
+      else if (i === firstIncomplete) el.classList.add('active');
+    });
+  }
+ 
+  // ── SMART EMPTY STATE ──
+  function buildEmptyOverlay() {
+    const cEmpty = document.getElementById('cEmpty');
+    if (!cEmpty || document.getElementById('bv-empty-overlay')) return;
+ 
+    // Replace the dull existing empty state
+    const wrap = document.getElementById('canvasWrap');
+    if (!wrap) return;
+ 
+    const ov = document.createElement('div');
+    ov.id = 'bv-empty-overlay';
+    ov.style.cssText = 'position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#04040e;z-index:4;padding:24px;gap:10px;';
+    ov.innerHTML = `
+      <div style="font-size:42px;margin-bottom:4px">🎬</div>
+      <div class="bv-empty-title">Create your music video</div>
+      <div class="bv-empty-sub">Upload a song and an image — BeatViz handles beat sync, animation, and export.</div>
+      <button class="bv-empty-btn primary" onclick="document.getElementById('audioIn').click()">🎵 Upload your song first</button>
+      <div class="bv-empty-or">— or —</div>
+      <button class="bv-empty-btn secondary" onclick="document.getElementById('charIn').click()">🖼️ Add a character / image</button>
+      <div class="bv-empty-features">
+        <div class="bv-empty-feat"><span>✓</span>Free first video</div>
+        <div class="bv-empty-feat"><span>✓</span>No watermark</div>
+        <div class="bv-empty-feat"><span>✓</span>No card needed</div>
+      </div>
+    `;
+    wrap.appendChild(ov);
+    cEmpty.style.display = 'none'; // hide old one
+  }
+ 
+  // ── "WHAT'S MISSING" TIP ──
+  function buildMissingTip() {
+    if (document.getElementById('bv-missing-tip')) return;
+    const el = document.createElement('div');
+    el.id = 'bv-missing-tip';
+    el.innerHTML = `
+      <button class="bv-mt-close" onclick="document.getElementById('bv-missing-tip').style.display='none'">✕</button>
+      <div id="bvMtRows"></div>
+      <div id="bvMtAction" style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.06)"></div>
+    `;
+    document.body.appendChild(el);
+  }
+ 
+  function showMissingTip() {
+    const tip = document.getElementById('bv-missing-tip');
+    if (!tip) return;
+    const s = getStepState();
+    const rowsEl = tip.querySelector('#bvMtRows');
+    const actEl = tip.querySelector('#bvMtAction');
+    const rows = [];
+    let nextAction = null;
+ 
+    if (s.audio) rows.push({ done:true, text:'Audio uploaded ✓' });
+    else {
+      rows.push({ done:false, text:'Upload your audio track first' });
+      nextAction = { label:'🎵 Add audio →', fn: () => { document.getElementById('audioIn').click(); tip.style.display='none'; } };
+    }
+    if (s.image) rows.push({ done:true, text:'Character / image added ✓' });
+    else {
+      rows.push({ done:false, text:'Add a character image or AI background' });
+      if (!nextAction) nextAction = { label:'🖼️ Add image →', fn: () => { document.getElementById('charIn').click(); tip.style.display='none'; } };
+    }
+ 
+    rowsEl.innerHTML = rows.map(r => `
+      <div class="bv-mt-row">
+        <div class="bv-mt-icon ${r.done?'done':'todo'}">${r.done?'✓':'○'}</div>
+        <div class="bv-mt-text ${r.done?'done':'todo'}">${r.text}</div>
+      </div>
+    `).join('');
+ 
+    if (nextAction) {
+      actEl.innerHTML = `<button style="width:100%;padding:9px;border-radius:8px;border:none;background:rgba(124,58,237,.2);color:#a78bfa;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;cursor:pointer">${nextAction.label}</button>`;
+      actEl.querySelector('button').addEventListener('click', nextAction.fn);
+    } else {
+      actEl.innerHTML = '';
+    }
+ 
+    tip.style.display = 'block';
+    setTimeout(() => { tip.style.display = 'none'; }, 6000);
+  }
+ 
+  // ── SUCCESS CELEBRATION ──
+  function buildSuccessScreen() {
+    if (document.getElementById('bv-success')) return;
+    const el = document.createElement('div');
+    el.id = 'bv-success';
+    el.innerHTML = `
+      <div class="bv-success-box">
+        <div class="bv-success-anim">🎉</div>
+        <div class="bv-success-title">Your video is ready!</div>
+        <div class="bv-success-sub">Beat-synced, professional-looking, and ready to post on YouTube, Instagram Reels, or WhatsApp Status tonight.</div>
+        <div class="bv-success-actions">
+          <a class="bv-success-btn webm" id="bvSuccWebm" download="beatviz.webm">⬇ Download WebM (free)</a>
+          <button class="bv-success-btn mp4" onclick="if(typeof exportMP4==='function')exportMP4();document.getElementById('bv-success').classList.remove('show')">⬇ Convert to MP4</button>
+          <div class="bv-success-share">
+            <button class="bv-share-btn" onclick="bvShareVideo()">📤 Share</button>
+            <button class="bv-share-btn" onclick="document.getElementById('bv-success').classList.remove('show')">🔁 Edit more</button>
+          </div>
+          <button class="bv-success-btn again" onclick="document.getElementById('bv-success').classList.remove('show')">← Back to editor</button>
+        </div>
+        <div class="bv-success-note" id="bvSuccNote">No watermark · ₹625/month for unlimited videos →</div>
+      </div>
+    `;
+    document.body.appendChild(el);
+  }
+ 
+  function showSuccessScreen() {
+    const el = document.getElementById('bv-success');
+    if (!el) return;
+ 
+    // Wire up the download link
+    const dlWl = document.getElementById('bv-success').querySelector('a.bv-success-btn.webm');
+    const origDl = document.getElementById('dlWebm');
+    if (dlWl && origDl) {
+      dlWl.href = origDl.href;
+    }
+ 
+    // Personalise the note based on sub status
+    const note = document.getElementById('bvSuccNote');
+    if (note && typeof sub !== 'undefined') {
+      if (sub.isActive) note.textContent = '✓ Subscribed — unlimited videos. Go post it!';
+      else note.textContent = 'Free trial used · ₹625/month for unlimited videos →';
+    }
+ 
+    el.classList.add('show');
+    bvFireConfetti();
+  }
+ 
+  window.bvShareVideo = async function() {
+    if (typeof recordedBlob !== 'undefined' && recordedBlob && navigator.share) {
+      try {
+        const file = new File([recordedBlob], 'beatviz.webm', {type:'video/webm'});
+        await navigator.share({ title:'My Music Video — BeatViz', files:[file] });
+      } catch(e) {
+        const url = document.getElementById('dlWebm')?.href;
+        if (url) { const a=document.createElement('a'); a.href=url; a.download='beatviz.webm'; a.click(); }
+      }
+    } else {
+      const url = document.getElementById('dlWebm')?.href;
+      if (url) { const a=document.createElement('a'); a.href=url; a.download='beatviz.webm'; a.click(); }
+    }
+  };
+ 
+  // ── CONFETTI ──
+  function bvFireConfetti() {
+    const canvas = document.createElement('canvas');
+    canvas.className = 'bv-confetti-canvas';
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    document.body.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+    const particles = Array.from({length:90}, () => ({
+      x: Math.random() * canvas.width,
+      y: -20 - Math.random()*80,
+      vx: (Math.random()-0.5)*5,
+      vy: 2 + Math.random()*5,
+      r: 4 + Math.random()*7,
+      col: ['#7c3aed','#22d3ee','#f472b6','#fbbf24','#10b981'][Math.floor(Math.random()*5)],
+      rot: Math.random()*Math.PI*2, rotv: (Math.random()-0.5)*0.18
+    }));
+    let done = false;
+    function frame() {
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      let alive = 0;
+      particles.forEach(p => {
+        p.x += p.vx; p.y += p.vy; p.rot += p.rotv; p.vy += 0.12;
+        if (p.y < canvas.height + 30) alive++;
+        ctx.save();
+        ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+        ctx.fillStyle = p.col; ctx.globalAlpha = Math.min(1, (canvas.height-p.y)/80);
+        ctx.fillRect(-p.r/2, -p.r/2, p.r, p.r*1.5);
+        ctx.restore();
+      });
+      if (alive > 0 && !done) requestAnimationFrame(frame);
+      else { canvas.remove(); }
+    }
+    requestAnimationFrame(frame);
+    setTimeout(() => { done = true; }, 3500);
+  }
+ 
+  // ── HELP BUTTON ──
+  function buildHelpBtn() {
+    if (document.getElementById('bv-help-btn')) return;
+    const btn = document.createElement('button');
+    btn.id = 'bv-help-btn';
+    btn.textContent = '?';
+    btn.title = 'Show guide';
+    btn.addEventListener('click', () => {
+      // Re-open wizard from start OR show missing tip
+      const s = getStepState();
+      if (!s.audio || !s.image) showMissingTip();
+      else {
+        wizardCurrentStep = 3;
+        if (wizardEl) {
+          wizardEl.classList.remove('hidden');
+          renderWizardStep();
+        }
+      }
+    });
+    document.body.appendChild(btn);
+  }
+ 
+  // ── PATCH EXISTING GENERATE BUTTONS ──
+  function patchGenerateButtons() {
+    // Intercept disabled generate button tap to show what's missing
+    ['genBtn','genBtnMob'].forEach(id => {
+      const btn = document.getElementById(id);
+      if (!btn || btn._bvPatched) return;
+      btn._bvPatched = true;
+      btn.addEventListener('click', function(e) {
+        if (this.disabled) { e.stopImmediatePropagation(); showMissingTip(); }
+      }, true);
+    });
+  }
+ 
+  // ── PATCH PAYWALL ──
+  function patchPaywall() {
+    const pw = document.getElementById('paywall');
+    if (!pw || pw._bvPatched) return;
+    pw._bvPatched = true;
+ 
+    // Add social proof strip above the plan card
+    const pwPlan = pw.querySelector('.pw-plan');
+    if (!pwPlan) return;
+    if (pw.querySelector('.bv-pw-proof')) return;
+ 
+    const proof = document.createElement('div');
+    proof.className = 'bv-pw-proof';
+    proof.innerHTML = `
+      <div class="bv-pw-proof-avs">
+        <div class="bv-pw-av" style="background:linear-gradient(135deg,#f472b6,#7c3aed)">R</div>
+        <div class="bv-pw-av" style="background:linear-gradient(135deg,#22d3ee,#6025c4)">P</div>
+        <div class="bv-pw-av" style="background:linear-gradient(135deg,#f59e0b,#ef4444)">S</div>
+      </div>
+      <span style="color:#64748b;font-size:11px;font-family:'Space Grotesk',sans-serif">1,200+ artists subscribed this month</span>
+    `;
+    pwPlan.parentNode.insertBefore(proof, pwPlan);
+ 
+    // Also update the sub title to be warmer
+    const pwTitle = pw.querySelector('.pw-title');
+    if (pwTitle) pwTitle.textContent = "You've used your free video 🎬";
+    const pwSub = pw.querySelector('.pw-sub');
+    if (pwSub) pwSub.textContent = "Subscribe for ₹625/month and create unlimited beat-synced videos — no limit, no watermark.";
+  }
+ 
+  // ── WATCH FOR STATE CHANGES ──
+  // Poll every 800ms to detect when audio/image/video is loaded
+  function startStateWatcher() {
+    let lastState = JSON.stringify({a:false, i:false, r:false});
+    setInterval(() => {
+      try {
+        const s = getStepState();
+        const curr = JSON.stringify({a:s.audio, i:s.image, r:s.ready});
+        if (curr !== lastState) {
+          lastState = curr;
+          updateStepBar();
+          updateDesktopProgress();
+          // Hide empty overlay once something is loaded
+          if (s.audio || s.image) {
+            const ov = document.getElementById('bv-empty-overlay');
+            if (ov) ov.style.display = 'none';
+            // Auto-advance wizard if needed
+            if (!wizardSeen && wizardEl && !wizardEl.classList.contains('hidden')) {
+              if (s.audio && wizardCurrentStep === 0) { wizardCurrentStep = 1; renderWizardStep(); }
+              else if (s.image && wizardCurrentStep === 1) { wizardCurrentStep = 2; renderWizardStep(); }
+            }
+          } else {
+            const ov = document.getElementById('bv-empty-overlay');
+            if (ov) ov.style.display = 'flex';
+          }
+        }
+        patchGenerateButtons();
+        patchPaywall();
+      } catch(e) {}
+    }, 800);
+  }
+ 
+  // ── INTERCEPT FINALIZE / VIDEO READY ──
+  // Watch for dlWebm becoming visible → trigger success screen
+  function watchForVideoReady() {
+    const observer = new MutationObserver(() => {
+      const dlWebm = document.getElementById('dlWebm');
+      if (dlWebm && dlWebm.style.display !== 'none' && dlWebm.href && dlWebm.href !== '#' && dlWebm.href !== '') {
+        if (!document.getElementById('bv-success')?.classList.contains('show')) {
+          showSuccessScreen();
+        }
+      }
+    });
+    const target = document.getElementById('dlWebm') || document.body;
+    observer.observe(target.parentElement || document.body, { attributes:true, subtree:true, attributeFilter:['style','href'] });
+  }
+ 
+  // ── MOBILE SHEET HELPER ──
+  function openMobileSheet(name) {
+    if (typeof openSheet === 'function') openSheet(name, document.getElementById('mn-'+name));
+    else {
+      // Fallback: click the nav button
+      const btn = document.getElementById('mn-'+name);
+      if (btn) btn.click();
+    }
+  }
+ 
+  // ── INIT ──
+  function init() {
+    buildWizard();
+    buildStepBar();
+    buildDesktopProgress();
+    buildEmptyOverlay();
+    buildMissingTip();
+    buildSuccessScreen();
+    buildHelpBtn();
+    startStateWatcher();
+    watchForVideoReady();
+    updateStepBar();
+    updateDesktopProgress();
+    patchGenerateButtons();
+  }
+ 
+  // Run after existing scripts settle
+  if (document.readyState === 'complete') setTimeout(init, 300);
+  else window.addEventListener('load', () => setTimeout(init, 300));
+ 
+  // Expose for debugging
+  window._bvPatch = { showSuccess: showSuccessScreen, showMissing: showMissingTip };
+})();
+</script>
 </body>
 </html>

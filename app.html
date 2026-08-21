@@ -11113,6 +11113,602 @@ else window.addEventListener('load', () => setTimeout(init, 700));
 
 })();
 </script>
+<!-- ═══════════════════════════════════════════════════════
+  BEATVIZ MOBILE FIX — paste this just before </body> in app.html
+  Fixes exactly 2 things:
+  1. Lyrics on mobile — adds stamp button (timeline is hidden on mobile)
+  2. Download button — shows a big full-screen overlay when video is ready
+  Does NOT change any existing code.
+═══════════════════════════════════════════════════════ -->
 
+<style>
+/* ── STAMP BUTTON inside mobile lyrics sheet ── */
+#mob-stamp-wrap {
+  background: var(--card);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Mini scrubber row */
+#mob-stamp-player {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+#mob-stamp-playbtn {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--teal));
+  border: none; color: #fff; font-size: 18px;
+  cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 3px 12px rgba(124,58,237,.4);
+  transition: transform .1s;
+  -webkit-tap-highlight-color: transparent;
+}
+#mob-stamp-playbtn:active { transform: scale(.92); }
+#mob-stamp-time-wrap { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+#mob-stamp-clock { font-size: 14px; font-weight: 700; font-family: monospace; color: var(--text); }
+#mob-stamp-bar {
+  height: 5px; background: var(--border); border-radius: 3px;
+  cursor: pointer; touch-action: none; position: relative;
+}
+#mob-stamp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--teal));
+  border-radius: 3px; pointer-events: none;
+  width: 0%;
+}
+
+/* The big stamp button */
+#mob-stamp-btn {
+  width: 100%; padding: 16px 14px;
+  border-radius: 10px;
+  border: 2px dashed rgba(124,58,237,.5);
+  background: rgba(124,58,237,.05);
+  color: var(--accent); font-family: inherit;
+  font-size: 15px; font-weight: 700;
+  cursor: pointer; display: flex; align-items: center;
+  justify-content: center; gap: 10px;
+  transition: all .18s;
+  -webkit-tap-highlight-color: transparent;
+}
+#mob-stamp-btn:active { background: rgba(124,58,237,.15); border-style: solid; }
+#mob-stamp-btn.lit {
+  border-style: solid; border-color: #f472b6;
+  background: rgba(244,114,182,.08); color: #f472b6;
+  animation: stlit 1.2s infinite;
+}
+@keyframes stlit {
+  0%,100% { box-shadow: 0 0 0 0 rgba(244,114,182,.3); }
+  50%      { box-shadow: 0 0 0 8px rgba(244,114,182,0); }
+}
+#mob-stamp-btn-icon { font-size: 24px; }
+#mob-stamp-btn-body { display: flex; flex-direction: column; gap: 2px; text-align: left; }
+#mob-stamp-lbl { font-size: 15px; font-weight: 800; }
+#mob-stamp-hint { font-size: 11px; font-weight: 500; color: var(--muted); }
+
+/* Input box after stamp */
+#mob-stamp-input {
+  display: none;
+  flex-direction: column; gap: 8px;
+  background: rgba(124,58,237,.07);
+  border: 1.5px solid rgba(124,58,237,.4);
+  border-radius: 10px; padding: 12px;
+}
+#mob-stamp-input.show { display: flex; }
+#mob-stamp-at {
+  font-size: 11px; font-weight: 700;
+  color: var(--accent);
+  background: rgba(124,58,237,.15);
+  padding: 3px 10px; border-radius: 4px;
+  align-self: flex-start;
+}
+#mob-stamp-text {
+  width: 100%; padding: 13px 14px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 8px; color: var(--text);
+  font-family: inherit; font-size: 16px;
+  outline: none; -webkit-appearance: none;
+}
+#mob-stamp-text:focus { border-color: var(--accent); }
+.mob-stamp-btns { display: flex; gap: 8px; }
+.mob-stamp-save {
+  flex: 1; padding: 13px;
+  border: none; border-radius: 8px;
+  background: linear-gradient(135deg, var(--accent), #5b21b6);
+  color: #fff; font-family: inherit;
+  font-size: 14px; font-weight: 800; cursor: pointer;
+}
+.mob-stamp-cancel {
+  padding: 13px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px; background: transparent;
+  color: var(--muted); font-family: inherit; cursor: pointer;
+}
+
+/* Lyrics list in mobile sheet */
+#mob-lyr-list { display: flex; flex-direction: column; gap: 7px; margin-top: 4px; }
+.mob-lyr-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 12px; border-radius: 9px;
+  background: var(--card); border: 1px solid var(--border);
+}
+.mob-lyr-row.mob-now { border-color: var(--green); background: rgba(16,185,129,.07); }
+.mob-lyr-t {
+  font-size: 10px; font-weight: 700;
+  font-family: monospace; color: var(--cyan);
+  background: rgba(6,182,212,.12);
+  border: 1px solid rgba(6,182,212,.25);
+  padding: 3px 8px; border-radius: 4px;
+  flex-shrink: 0; cursor: pointer;
+  white-space: nowrap;
+}
+.mob-lyr-txt {
+  flex: 1; font-size: 13px; color: var(--text);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.mob-lyr-del {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: rgba(239,68,68,.1);
+  border: 1px solid rgba(239,68,68,.2);
+  color: #f87171; font-size: 13px;
+  cursor: pointer; display: flex; align-items: center;
+  justify-content: center; flex-shrink: 0;
+}
+.mob-lyr-empty {
+  text-align: center; padding: 20px 14px;
+  border: 2px dashed var(--border); border-radius: 10px;
+  font-size: 12px; color: var(--muted); line-height: 1.7;
+}
+
+/* ── DOWNLOAD OVERLAY ── */
+#mob-dl-overlay {
+  display: none;
+  position: fixed; inset: 0; z-index: 9998;
+  background: rgba(4,4,20,.96);
+  backdrop-filter: blur(16px);
+  flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 24px; gap: 14px;
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+}
+#mob-dl-overlay.show {
+  display: flex;
+  animation: mobDlUp .35s cubic-bezier(.22,1,.36,1);
+}
+@keyframes mobDlUp {
+  from { opacity:0; transform:translateY(30px); }
+  to   { opacity:1; transform:none; }
+}
+#mob-dl-emoji { font-size: 72px; animation: mobDlBounce .5s ease; display: block; }
+@keyframes mobDlBounce {
+  0%,100% { transform:scale(1); }
+  40%     { transform:scale(1.3) rotate(-6deg); }
+  70%     { transform:scale(.9); }
+}
+#mob-dl-title {
+  font-size: 26px; font-weight: 900;
+  letter-spacing: -.5px; color: #f0f4ff;
+  text-align: center;
+}
+#mob-dl-sub {
+  font-size: 13px; color: var(--muted);
+  text-align: center; line-height: 1.6;
+  margin-bottom: 4px;
+}
+/* Download button — big green */
+#mob-dl-btn {
+  width: 100%; max-width: 380px;
+  padding: 20px 24px;
+  border-radius: 16px; border: none;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #fff; font-family: inherit;
+  font-size: 18px; font-weight: 900;
+  letter-spacing: .3px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  text-decoration: none;
+  box-shadow: 0 6px 30px rgba(16,185,129,.5);
+  transition: all .18s;
+}
+#mob-dl-btn:active { transform: scale(.97); }
+
+#mob-dl-mp4 {
+  width: 100%; max-width: 380px;
+  padding: 14px 24px;
+  border-radius: 14px; border: 1.5px solid rgba(124,58,237,.4);
+  background: rgba(124,58,237,.1);
+  color: #a78bfa; font-family: inherit;
+  font-size: 15px; font-weight: 800;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  transition: all .15s;
+}
+#mob-dl-mp4:active { background: rgba(124,58,237,.2); }
+
+#mob-dl-note {
+  font-size: 11px; color: #334155;
+  text-align: center; margin-top: -4px;
+}
+#mob-dl-back {
+  width: 100%; max-width: 380px;
+  padding: 13px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.04);
+  color: var(--muted); font-family: inherit;
+  font-size: 14px; cursor: pointer;
+  transition: all .15s;
+}
+#mob-dl-back:active { color: var(--text); }
+
+/* Make existing mob-exp hidden — we replace with overlay */
+.mob-exp { display: none !important; }
+</style>
+
+
+<script>
+(function(){
+'use strict';
+
+/* ════════════════════════════════════════
+   1. MOBILE LYRICS — STAMP BUTTON
+════════════════════════════════════════ */
+
+/* Helpers */
+function fmt2(s){ s=Math.max(0,+s||0); return `${Math.floor(s/60)}:${Math.floor(s%60).toString().padStart(2,'0')}`; }
+function g(id){ return document.getElementById(id); }
+
+let _stampT = null; // pending stamp time
+
+function injectMobLyricsPlayer() {
+  const body = g('bs-lyrics')?.querySelector('.bs-body');
+  if (!body || g('mob-stamp-wrap')) return;
+
+  /* Build the stamp section HTML */
+  const wrap = document.createElement('div');
+  wrap.id = 'mob-stamp-wrap';
+  wrap.innerHTML = `
+    <!-- Mini player -->
+    <div id="mob-stamp-player">
+      <button id="mob-stamp-playbtn" onclick="mobTogglePlay()">▶</button>
+      <div id="mob-stamp-time-wrap">
+        <div id="mob-stamp-clock">0:00 / 0:00</div>
+        <div id="mob-stamp-bar">
+          <div id="mob-stamp-fill"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stamp button -->
+    <button id="mob-stamp-btn" onclick="mobStamp()">
+      <span id="mob-stamp-btn-icon">🎤</span>
+      <span id="mob-stamp-btn-body">
+        <span id="mob-stamp-lbl">Stamp lyric here</span>
+        <span id="mob-stamp-hint">Press ▶ to play, then tap this</span>
+      </span>
+    </button>
+
+    <!-- Input (shown after stamp) -->
+    <div id="mob-stamp-input">
+      <div id="mob-stamp-at">at 0:00</div>
+      <input id="mob-stamp-text" placeholder="Type the lyric…"
+        autocomplete="off" autocorrect="on" inputmode="text">
+      <div class="mob-stamp-btns">
+        <button class="mob-stamp-save" onclick="mobSaveLyric()">✓ Save</button>
+        <button class="mob-stamp-cancel" onclick="mobCancelLyric()">Cancel</button>
+      </div>
+    </div>`;
+
+  /* Insert at the top of bs-body, before existing content */
+  body.insertBefore(wrap, body.firstChild);
+
+  /* Lyrics list section heading */
+  const sec = document.createElement('div');
+  sec.innerHTML = `
+    <div class="sl" style="margin-top:4px">
+      Lyrics <span id="mob-lyr-count" style="color:var(--muted);font-size:9px;font-weight:400;letter-spacing:0;text-transform:none;margin-left:4px"></span>
+    </div>
+    <div id="mob-lyr-list"></div>`;
+  body.insertBefore(sec, body.children[1] || null);
+
+  /* Wire up scrubber */
+  initMobScrubber();
+
+  /* Start UI tick */
+  requestAnimationFrame(mobPlayerTick);
+}
+
+/* Toggle play using the existing togglePreview() */
+window.mobTogglePlay = function() {
+  if (typeof togglePreview === 'function') togglePreview();
+};
+
+/* Stamp: capture current time */
+window.mobStamp = function() {
+  const dur = (typeof audioDuration !== 'undefined' && audioDuration > 0) ? audioDuration : 0;
+  if (!dur) {
+    if (typeof toast === 'function') toast('⚠ Upload a song first');
+    return;
+  }
+  _stampT = (typeof pvOffset !== 'undefined' ? pvOffset : 0);
+
+  g('mob-stamp-at').textContent = 'at ' + fmt2(_stampT);
+  g('mob-stamp-text').value = '';
+  g('mob-stamp-input').classList.add('show');
+  g('mob-stamp-btn').classList.add('lit');
+  g('mob-stamp-hint').textContent = '→ Type below and tap Save';
+  setTimeout(() => g('mob-stamp-text')?.focus(), 80);
+};
+
+/* Enter key saves */
+g('bs-lyrics')?.addEventListener('keydown', function(e){
+  if (e.key === 'Enter' && g('mob-stamp-input')?.classList.contains('show')) {
+    e.preventDefault(); window.mobSaveLyric();
+  }
+  if (e.key === 'Escape') window.mobCancelLyric();
+});
+
+window.mobSaveLyric = function() {
+  const text = g('mob-stamp-text')?.value?.trim();
+  if (!text) {
+    const inp = g('mob-stamp-text');
+    if (inp) { inp.style.borderColor='#ef4444'; setTimeout(()=>inp.style.borderColor='',1500); }
+    return;
+  }
+  const t = _stampT ?? 0;
+  const dur = (typeof audioDuration !== 'undefined') ? audioDuration : 0;
+  const next = (typeof lyrics !== 'undefined') ? lyrics.find(l=>l.time>t+0.05) : null;
+  const end = dur>0 ? Math.min(dur, next?Math.min(next.time,t+4):t+4) : t+4;
+
+  if (typeof lyrics !== 'undefined') {
+    lyrics.push({
+      text, time:+t.toFixed(2), endTime:+end.toFixed(2),
+      ds:{beatCount:0,jumpAmt:0,spinAng:0,spinDir:1,phase:Math.random()*Math.PI*2}
+    });
+    lyrics.sort((a,b)=>a.time-b.time);
+  }
+
+  if (typeof renderLyrics === 'function') renderLyrics();
+  if (typeof TL !== 'undefined' && TL.draw) TL.draw(t);
+
+  mobCancelLyric();
+  mobRenderLyrList();
+  if (typeof toast === 'function') toast('✓ Lyric saved');
+};
+
+window.mobCancelLyric = function() {
+  g('mob-stamp-input')?.classList.remove('show');
+  g('mob-stamp-btn')?.classList.remove('lit');
+  _stampT = null;
+  const h = g('mob-stamp-hint');
+  if (h) h.textContent = 'Press ▶ to play, then tap this';
+};
+
+/* Render the lyrics list in the mobile sheet */
+function mobRenderLyrList() {
+  const list = g('mob-lyr-list');
+  const cnt  = g('mob-lyr-count');
+  if (!list) return;
+  const lyrArr = (typeof lyrics !== 'undefined') ? lyrics : [];
+  if (cnt) cnt.textContent = lyrArr.length || '';
+
+  if (!lyrArr.length) {
+    list.innerHTML = `<div class="mob-lyr-empty">
+      No lyrics yet.<br>
+      Press <strong style="color:var(--text)">▶</strong> to play, then tap
+      <strong style="color:var(--accent)">Stamp lyric here</strong>.
+    </div>`;
+    return;
+  }
+  const curT = typeof pvOffset !== 'undefined' ? pvOffset : 0;
+  list.innerHTML = lyrArr.map((l,i) => {
+    const end = l.endTime || l.time+4;
+    const now = curT >= l.time && curT < end;
+    return `<div class="mob-lyr-row${now?' mob-now':''}" id="mob-lr${i}">
+      <span class="mob-lyr-t" onclick="if(typeof seekPreview==='function')seekPreview(${l.time})">${fmt2(l.time)}</span>
+      <span class="mob-lyr-txt">${(l.text||'').replace(/</g,'&lt;')}</span>
+      <button class="mob-lyr-del" onclick="mobDelLyric(${i})">✕</button>
+    </div>`;
+  }).join('');
+}
+
+window.mobDelLyric = function(i) {
+  if (typeof lyrics === 'undefined') return;
+  lyrics.splice(i, 1);
+  if (typeof renderLyrics === 'function') renderLyrics();
+  if (typeof TL !== 'undefined' && TL.draw) TL.draw(typeof pvOffset!=='undefined'?pvOffset:0);
+  mobRenderLyrList();
+};
+
+/* Scrubber on mini player */
+function initMobScrubber() {
+  const bar = g('mob-stamp-bar'); if (!bar) return;
+  let drag = false;
+  const seek = e => {
+    const r = bar.getBoundingClientRect();
+    const cx = e.touches ? e.touches[0].clientX : e.clientX;
+    const pct = Math.max(0, Math.min(1, (cx-r.left)/r.width));
+    const dur = (typeof audioDuration!=='undefined' && audioDuration>0) ? audioDuration : 0;
+    if (dur>0 && typeof seekPreview==='function') seekPreview(pct*dur);
+  };
+  bar.addEventListener('mousedown',  e=>{ drag=true; seek(e); });
+  bar.addEventListener('touchstart', e=>{ drag=true; seek(e); }, {passive:true});
+  document.addEventListener('mousemove',  e=>{ if(drag) seek(e); });
+  document.addEventListener('touchmove',  e=>{ if(drag&&e.touches) seek(e); }, {passive:true});
+  document.addEventListener('mouseup',    ()=>drag=false);
+  document.addEventListener('touchend',   ()=>drag=false);
+}
+
+/* Tick: update mini player + lyric highlights */
+function mobPlayerTick() {
+  requestAnimationFrame(mobPlayerTick);
+
+  const t   = typeof pvOffset !== 'undefined' ? pvOffset : 0;
+  const dur = (typeof audioDuration!=='undefined' && audioDuration>0) ? audioDuration : 0;
+  const pct = dur>0 ? t/dur : 0;
+
+  /* Clock */
+  const clk = g('mob-stamp-clock');
+  if (clk) clk.textContent = fmt2(t) + ' / ' + (dur>0 ? fmt2(dur) : '—');
+
+  /* Fill bar */
+  const fill = g('mob-stamp-fill');
+  if (fill) fill.style.width = (pct*100)+'%';
+
+  /* Play button label */
+  const playing = typeof pvPlaying !== 'undefined' && pvPlaying;
+  const pbtn = g('mob-stamp-playbtn');
+  if (pbtn) pbtn.textContent = playing ? '⏸' : '▶';
+
+  /* Stamp hint */
+  const hint = g('mob-stamp-hint');
+  if (hint && !g('mob-stamp-input')?.classList.contains('show')) {
+    if (!dur) hint.textContent = 'Upload a song first (Upload tab)';
+    else if (playing) hint.textContent = `▶ Playing at ${fmt2(t)} — tap to stamp`;
+    else hint.textContent = `Paused at ${fmt2(t)} — press ▶ then tap`;
+  }
+
+  /* Lyric row highlights */
+  const lyrArr = typeof lyrics !== 'undefined' ? lyrics : [];
+  lyrArr.forEach((_,i) => {
+    const row = g('mob-lr'+i); if (!row) return;
+    const l = lyrArr[i], end = l.endTime||l.time+4;
+    row.classList.toggle('mob-now', t>=l.time && t<end);
+  });
+}
+
+/* Re-render list whenever main renderLyrics is called */
+const _origRL = window.renderLyrics;
+if (_origRL && !_origRL._mobPatched) {
+  window.renderLyrics = function() {
+    _origRL.apply(this, arguments);
+    mobRenderLyrList();
+  };
+  window.renderLyrics._mobPatched = true;
+}
+
+/* ════════════════════════════════════════
+   2. DOWNLOAD OVERLAY — big & always visible
+════════════════════════════════════════ */
+
+function buildDlOverlay() {
+  if (g('mob-dl-overlay')) return;
+  const d = document.createElement('div');
+  d.id = 'mob-dl-overlay';
+  d.innerHTML = `
+    <span id="mob-dl-emoji">🎉</span>
+    <div id="mob-dl-title">Your video is ready!</div>
+    <div id="mob-dl-sub">Download it and post anywhere —<br>YouTube, Reels, WhatsApp Status</div>
+    <a id="mob-dl-btn" download="beatviz.webm">
+      ⬇ Download Video
+    </a>
+    <button id="mob-dl-mp4" onclick="if(typeof exportMP4==='function')exportMP4()">
+      ⬇ Convert to MP4
+    </button>
+    <div id="mob-dl-note">WebM format · works on YouTube, WhatsApp, Telegram</div>
+    <button id="mob-dl-back" onclick="g('mob-dl-overlay').classList.remove('show')">
+      ← Back to editor
+    </button>`;
+  document.body.appendChild(d);
+  confettiMob();
+}
+
+function showDlOverlay(url) {
+  buildDlOverlay();
+  const btn = g('mob-dl-btn');
+  if (btn) { btn.href = url; btn.download = 'beatviz-' + Date.now() + '.webm'; }
+  g('mob-dl-overlay').classList.add('show');
+  confettiMob();
+}
+
+function confettiMob() {
+  const c = document.createElement('canvas');
+  c.style.cssText = 'position:fixed;inset:0;z-index:9997;pointer-events:none';
+  c.width = innerWidth; c.height = innerHeight;
+  document.body.appendChild(c);
+  const x = c.getContext('2d');
+  const cols = ['#7c3aed','#06b6d4','#f472b6','#10b981','#fbbf24','#a78bfa'];
+  const ps = Array.from({length:70}, ()=>({
+    x:Math.random()*c.width, y:-20,
+    vx:(Math.random()-.5)*5, vy:3+Math.random()*4,
+    r:4+Math.random()*7, col:cols[Math.floor(Math.random()*cols.length)],
+    rot:Math.random()*Math.PI*2, rv:(Math.random()-.5)*.15
+  }));
+  let live = true;
+  (function f(){
+    x.clearRect(0,0,c.width,c.height);
+    let any=false;
+    ps.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy; p.rot+=p.rv; p.vy+=.1;
+      if(p.y<c.height+20) any=true;
+      x.save(); x.translate(p.x,p.y); x.rotate(p.rot);
+      x.globalAlpha=Math.max(0,Math.min(1,(c.height-p.y)/80));
+      x.fillStyle=p.col; x.fillRect(-p.r/2,-p.r/2,p.r,p.r*1.5); x.restore();
+    });
+    if(any&&live) requestAnimationFrame(f); else c.remove();
+  })();
+  setTimeout(()=>live=false, 3500);
+}
+
+/* Watch dlWebmMob for when JS sets its href (recording finishes) */
+function watchDownload() {
+  const target = g('dlWebmMob');
+  if (!target) { setTimeout(watchDownload, 500); return; }
+
+  new MutationObserver(() => {
+    const el = g('dlWebmMob');
+    if (el && el.href && !el.href.endsWith('#') && el.style.display !== 'none'
+        && !g('mob-dl-overlay')?.classList.contains('show')) {
+      showDlOverlay(el.href);
+    }
+  }).observe(target, { attributes: true, attributeFilter: ['href','style'] });
+
+  /* Also watch dlWebm (desktop element — same URL, same event) */
+  const dw = g('dlWebm');
+  if (dw) {
+    new MutationObserver(() => {
+      const el = g('dlWebm');
+      if (el && el.href && !el.href.endsWith('#') && el.style.display !== 'none'
+          && window.innerWidth <= 768
+          && !g('mob-dl-overlay')?.classList.contains('show')) {
+        showDlOverlay(el.href);
+      }
+    }).observe(dw, { attributes: true, attributeFilter: ['href','style'] });
+  }
+}
+
+/* ════════════════════════════════════════
+   INIT
+════════════════════════════════════════ */
+function init() {
+  injectMobLyricsPlayer();
+  watchDownload();
+  mobRenderLyrList();
+}
+
+if (document.readyState === 'complete') setTimeout(init, 500);
+else window.addEventListener('load', () => setTimeout(init, 500));
+
+/* Re-init when lyrics sheet is opened */
+const _origOpenSheet = window.openSheet;
+if (_origOpenSheet && !_origOpenSheet._mobFixed) {
+  window.openSheet = function(name, btn) {
+    _origOpenSheet.apply(this, arguments);
+    if (name === 'lyrics') {
+      setTimeout(() => { injectMobLyricsPlayer(); mobRenderLyrList(); }, 80);
+    }
+  };
+  window.openSheet._mobFixed = true;
+}
+
+})();
+</script>
 </body>
 </html>

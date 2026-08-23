@@ -39,9 +39,8 @@ a{text-decoration:none;color:inherit}
 
 /* ─── NAV ─── */
 nav{background:var(--warm);border-bottom:2px solid var(--ink);padding:0 40px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
-.nav-logo{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--ink);display:flex;align-items:center;gap:10px}
-.logo-sq{width:32px;height:32px;background:var(--ink);border-radius:4px;display:flex;align-items:center;justify-content:center;overflow:hidden}
-.logo-sq img{width:100%;height:100%;object-fit:cover}
+.nav-logo{display:flex;align-items:center}
+.nav-logo img{height:34px;width:auto;object-fit:contain;display:block}
 .nav-links{display:flex;gap:28px}
 .nav-links a{font-size:14px;color:var(--muted);font-weight:500;transition:color .15s}
 .nav-links a:hover{color:var(--ink)}
@@ -383,10 +382,7 @@ footer{background:var(--ink2);border-top:2px solid var(--border-dark);padding:48
 <!-- NAV -->
 <nav id="nav">
   <div class="nav-logo">
-    <div class="logo-sq">
-      <img src="https://lh3.google.com/u/0/d/1Z-jNnrm70KGkCtkVB1M6W3g4gwl0jHD8" alt="BeatViz logo">
-    </div>
-    BeatViz
+    <img src="https://lh3.google.com/u/0/d/1Z-jNnrm70KGkCtkVB1M6W3g4gwl0jHD8" alt="BeatViz">
   </div>
   <div class="nav-links">
     <a href="#how">How it works</a>
@@ -938,11 +934,8 @@ footer{background:var(--ink2);border-top:2px solid var(--border-dark);padding:48
   <div class="footer-inner">
     <div class="footer-top">
       <div class="footer-brand">
-        <div class="nav-logo" style="color:var(--warm);margin-bottom:10px">
-          <div class="logo-sq">
-            <img src="https://lh3.google.com/u/0/d/1Z-jNnrm70KGkCtkVB1M6W3g4gwl0jHD8" alt="BeatViz logo">
-          </div>
-          BeatViz
+        <div class="nav-logo" style="margin-bottom:10px">
+          <img src="https://lh3.google.com/u/0/d/1Z-jNnrm70KGkCtkVB1M6W3g4gwl0jHD8" alt="BeatViz" style="height:34px">
         </div>
         <p>Beat-synced music videos in your browser. Built for Indian artists. ₹49/month unlimited.</p>
       </div>

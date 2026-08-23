@@ -3058,17 +3058,20 @@ document.addEventListener('keydown', e => {
   if(e.key==='Escape') hideLyricContextMenu();
   // Ctrl+V = universal paste at playhead (lyrics, images, audio)
   // Ctrl+C — copy selected lyrics
-if((e.ctrlKey||e.metaKey) && e.key==='c' && !e.target.matches('input,textarea,[contenteditable]')){
+if((e.ctrlKey||e.metaKey) && e.key==='c'){
   const toCopy = _selectedIdxSet.size > 0
     ? [..._selectedIdxSet].map(i=>lyrics[i]).filter(Boolean)
     : selectedLyricIdx>=0 ? [lyrics[selectedLyricIdx]] : [];
   if(!toCopy.length) return;
   e.preventDefault();
+  // Close edit bar so it doesn't interfere
+  const fl2 = document.getElementById('tlFloat');
+  if(fl2) fl2.style.display='none';
   _copiedLyric = {...toCopy[0]};
   _copiedLyricIdx = lyrics.indexOf(toCopy[0]);
-  tlCopy('lyric', _copiedLyric);
+  _tlClipboard = { type:'lyric', data:{..._copiedLyric} };
   window._multiCopied = toCopy.map(l=>({...l}));
-  toast(`⎘ Copied ${toCopy.length} lyric${toCopy.length>1?'s':''} — left-click timeline to paste`);
+  toast(`⎘ Copied ${toCopy.length} lyric${toCopy.length>1?'s':''} — click empty timeline to paste`);
 }
   if((e.ctrlKey||e.metaKey) && e.key==='v' && (_tlClipboard||_copiedLyric) && !e.target.matches('input,textarea,[contenteditable]')){
     e.preventDefault();

@@ -1570,7 +1570,7 @@ input[type=color]{width:28px;height:22px;border:1px solid var(--border);backgrou
     <button onclick="hidePaywall()" style="position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .14s;z-index:5;font-family:inherit;line-height:1" onmouseover="this.style.background='rgba(255,255,255,.16)';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,.08)';this.style.color='rgba(255,255,255,.6)'">✕</button>
     <div class="pw-h"><div class="pw-icon">🚀</div><div class="pw-title">Upgrade to BeatViz Pro</div><p class="pw-sub">You've used your free trial video. Subscribe to create unlimited videos with all pro features.</p></div>
     <div class="pw-plan">
-      <div class="pw-pr"><div><div style="font-size:13px;font-weight:700">Monthly Plan</div><div style="font-size:10px;color:var(--muted)">Cancel anytime</div></div><div style="text-align:right"><div class="pw-big">₹625</div><div class="pw-note">per month · incl. GST</div></div></div>
+      <div class="pw-pr"><div><div style="font-size:13px;font-weight:700">Monthly Plan</div><div style="font-size:10px;color:var(--muted)">Cancel anytime</div></div><div style="text-align:right"><div class="pw-big">₹49</div><div class="pw-note">per month · incl. GST</div></div></div>
       <div class="pw-feats">
         <div class="pf2"><div class="pf2-ck">✓</div>Unlimited music videos — no limit</div>
         <div class="pf2"><div class="pf2-ck">✓</div>All 3 aspect ratios — YouTube, TikTok, Instagram</div>
@@ -1581,7 +1581,7 @@ input[type=color]{width:28px;height:22px;border:1px solid var(--border);backgrou
       </div>
     </div>
     <div class="pw-acts">
-      <button class="pw-btn" id="payBtn" onclick="initiatePayment()">Subscribe Now — ₹625/month</button>
+      <button class="pw-btn" id="payBtn" onclick="initiatePayment()">Subscribe Now — ₹49/month</button>
       <p class="pw-note2">Secure payment via Razorpay · GST invoice sent automatically</p>
       <p class="pw-note2" style="margin-top:4px">By subscribing you agree to our <a href="terms.html" target="_blank" style="color:var(--cyan)">Terms of Service</a>, <a href="terms.html#privacy" target="_blank" style="color:var(--cyan)">Privacy Policy</a> and <a href="terms.html#refund" target="_blank" style="color:var(--cyan)">Refund Policy</a></p>
       <button onclick="hidePaywall()" style="width:100%;padding:9px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--muted);font-family:inherit;font-size:12px;cursor:pointer;transition:all .14s" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">Maybe later — go back to app</button>
@@ -2003,10 +2003,10 @@ async function initiatePayment(){
   }
   btn.disabled=true;btn.innerHTML='<span class="pw-sp"></span>Creating order…';
   const or=await callAPI({action:'createOrder',token});
-  if(!or){btn.disabled=false;btn.textContent='Subscribe Now — ₹625/month';toast('❌ Cannot reach server. Check your Apps Script URL.');return;}
-  if(!or.success){btn.disabled=false;btn.textContent='Subscribe Now — ₹625/month';toast('❌ '+(or.error||'Order creation failed.'));return;}
+  if(!or){btn.disabled=false;btn.textContent='Subscribe Now — ₹49/month';toast('❌ Cannot reach server. Check your Apps Script URL.');return;}
+  if(!or.success){btn.disabled=false;btn.textContent='Subscribe Now — ₹49/month';toast('❌ '+(or.error||'Order creation failed.'));return;}
   await loadScript('https://checkout.razorpay.com/v1/checkout.js').catch(()=>{}); // already in head, ignore error
-  btn.disabled=false;btn.textContent='Subscribe Now — ₹625/month';
+  btn.disabled=false;btn.textContent='Subscribe Now — ₹49/month';
   if(typeof Razorpay === 'undefined'){
     toast('❌ Razorpay failed to load. Please disable any ad blocker and try again.');
     return;
@@ -2028,7 +2028,7 @@ async function initiatePayment(){
       }
     },
     modal: {
-      ondismiss: () => { btn.disabled=false; btn.textContent='Subscribe Now — ₹625/month'; toast('Payment cancelled.'); },
+      ondismiss: () => { btn.disabled=false; btn.textContent='Subscribe Now — ₹49/month'; toast('Payment cancelled.'); },
       confirm_close: false,
       escape: true,
       animation: true
@@ -2037,7 +2037,7 @@ async function initiatePayment(){
     'payment.failed': function(failResponse) {
       console.error('Payment failed:', failResponse.error);
       btn.disabled=false;
-      btn.textContent='Subscribe Now — ₹625/month';
+      btn.textContent='Subscribe Now — ₹49/month';
       toast('❌ Payment failed: ' + (failResponse.error.description || 'Please try again.'));
     },
     handler: async function(response){
@@ -2060,12 +2060,12 @@ async function initiatePayment(){
         toast('🎉 Subscription active! GST invoice sent to your email.');
       }else{
         toast('❌ Payment verification failed. Contact support.');
-        btn.disabled=false;btn.textContent='Subscribe Now — ₹625/month';
+        btn.disabled=false;btn.textContent='Subscribe Now — ₹49/month';
       }
     }
   };
   try{ new Razorpay(options).open(); }
-  catch(e){ toast('❌ Razorpay failed to load. Check your internet connection.'); btn.disabled=false; btn.textContent='Subscribe Now — ₹625/month'; }
+  catch(e){ toast('❌ Razorpay failed to load. Check your internet connection.'); btn.disabled=false; btn.textContent='Subscribe Now — ₹49/month'; }
 }
 
 async function callAPI(data){
@@ -7722,7 +7722,7 @@ canvas.addEventListener('touchend', () => { canvas.dispatchEvent(new MouseEvent(
           </div>
           <button class="bv-success-btn again" onclick="document.getElementById('bv-success').classList.remove('show')">← Back to editor</button>
         </div>
-        <div class="bv-success-note" id="bvSuccNote">No watermark · ₹625/month for unlimited videos →</div>
+        <div class="bv-success-note" id="bvSuccNote">No watermark · ₹49/month for unlimited videos →</div>
       </div>
     `;
     document.body.appendChild(el);
@@ -7743,7 +7743,7 @@ canvas.addEventListener('touchend', () => { canvas.dispatchEvent(new MouseEvent(
     const note = document.getElementById('bvSuccNote');
     if (note && typeof sub !== 'undefined') {
       if (sub.isActive) note.textContent = '✓ Subscribed — unlimited videos. Go post it!';
-      else note.textContent = 'Free trial used · ₹625/month for unlimited videos →';
+      else note.textContent = 'Free trial used · ₹49/month for unlimited videos →';
     }
  
     el.classList.add('show');
@@ -7864,7 +7864,7 @@ canvas.addEventListener('touchend', () => { canvas.dispatchEvent(new MouseEvent(
     const pwTitle = pw.querySelector('.pw-title');
     if (pwTitle) pwTitle.textContent = "You've used your free video 🎬";
     const pwSub = pw.querySelector('.pw-sub');
-    if (pwSub) pwSub.textContent = "Subscribe for ₹625/month and create unlimited beat-synced videos — no limit, no watermark.";
+    if (pwSub) pwSub.textContent = "Subscribe for ₹49/month and create unlimited beat-synced videos — no limit, no watermark.";
   }
  
   // ── WATCH FOR STATE CHANGES ──

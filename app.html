@@ -5068,8 +5068,18 @@ function loopFn(){
 // ── GENERATE ──
 async function handleGenerate(){
   // 7-day trial — allow unlimited videos during trial period
-  const canGenerate = sub.isActive || sub.trialActive || (sub.trialDaysLeft > 0);
+const canGenerate = sub.isActive || sub.trialActive || (sub.trialDaysLeft > 0);
   if(!canGenerate){showPaywall();return;}
+
+  // Trial users: max 1 video only
+  if(!sub.isActive && (sub.trialActive || sub.trialDaysLeft > 0)){
+    const trialVids = parseInt(localStorage.getItem('bv_trial_vids')||'0', 10);
+    if(trialVids >= 1){
+      showPaywall();
+      toast('⚠ Trial allows 1 video only. Subscribe for unlimited!');
+      return;
+    }
+  }
   if(isPlaying){stopAll();return;}
   // Allow generate with video only (no separate audio needed)
   const hasVideoForGen = videoLayers.length > 0;
@@ -5330,6 +5340,11 @@ function finalize(){
   document.getElementById('statusTxt').textContent='Done! Video ready.';
   document.getElementById('progFill').style.width='100%';
   toast('🎬 Video ready! Download below.');
+    // Save trial video count
+  if(!sub.isActive && (sub.trialActive || sub.trialDaysLeft > 0)){
+    const prev = parseInt(localStorage.getItem('bv_trial_vids')||'0', 10);
+    localStorage.setItem('bv_trial_vids', prev + 1);
+  }
 }
 
 // ── MP4 EXPORT ──

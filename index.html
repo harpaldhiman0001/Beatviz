@@ -2,945 +2,1228 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>BeatViz — ₹49/month · Make Music Videos on Your Phone</title>
-<meta name="description" content="Create professional beat-sync music videos in minutes. ₹49/month unlimited. Used by 10,000+ Indian creators.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BeatViz — Music Videos for ₹49/month | Beat Sync | India</title>
+<meta name="description" content="Make beat-synced lyric videos for your songs. Upload MP3, add photos, download MP4. ₹49/month unlimited. Used by 1200+ Indian artists.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800;900&family=Baloo+2:wght@400;600;800&display=swap');
-
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html{scroll-behavior:smooth}
-body{
-  background:#04040e;color:#e2e8f0;
-  font-family:'Space Grotesk',system-ui,sans-serif;
-  overflow-x:hidden;
-}
-
-/* ── VARIABLES ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --p:#7c3aed;--p2:#a78bfa;
-  --g:#10b981;--y:#f59e0b;--r:#ef4444;
-  --pink:#ec4899;--cyan:#06b6d4;
-  --card:#0e0e28;--brd:#1a1a2a;
-  --txt:#e2e8f0;--mute:#64748b;
+  --ink:#0d0d0d;
+  --ink2:#1a1a1a;
+  --ink3:#2a2a2a;
+  --warm:#f5f0e8;
+  --warm2:#ede8df;
+  --accent:#c84b00;
+  --accent2:#e85a00;
+  --gold:#d4a017;
+  --green:#1a7a3c;
+  --green-bg:#e8f5ee;
+  --red-muted:#8b2020;
+  --muted:#6b6b6b;
+  --muted2:#999;
+  --border:#e0d8cc;
+  --border-dark:#333;
 }
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--warm);color:var(--ink);overflow-x:hidden;line-height:1.6}
+a{text-decoration:none;color:inherit}
 
-/* ── HEADER ── */
-header{
-  position:fixed;top:0;left:0;right:0;z-index:100;
-  padding:12px 20px;
-  display:flex;align-items:center;justify-content:space-between;
-  background:rgba(4,4,14,.85);
-  backdrop-filter:blur(20px);
-  border-bottom:1px solid rgba(255,255,255,.06);
-}
-.logo{font-size:20px;font-weight:900;letter-spacing:-.5px}
-.logo b{background:linear-gradient(135deg,#a78bfa,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.hdr-cta{
-  padding:9px 18px;border-radius:20px;border:none;
-  background:linear-gradient(135deg,#7c3aed,#5b21b6);
-  color:#fff;font-family:inherit;font-size:13px;font-weight:700;
-  cursor:pointer;text-decoration:none;
-  box-shadow:0 2px 12px rgba(124,58,237,.4);
-  transition:all .15s;white-space:nowrap;
-}
-.hdr-cta:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(124,58,237,.55)}
+/* ─── TOP STRIP ─── */
+.top-strip{background:var(--ink);color:var(--warm);text-align:center;padding:10px 20px;font-family:'DM Sans',sans-serif;font-size:13px;display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap}
+.ts-price{font-weight:700;font-size:15px;color:#fbbf24}
+.ts-sep{opacity:.3}
+.ts-cta{background:var(--accent);color:#fff;border:none;border-radius:4px;padding:5px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .15s}
+.ts-cta:hover{background:var(--accent2)}
 
-/* ── HERO ── */
-#hero{
-  min-height:100vh;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:100px 20px 60px;
-  text-align:center;
-  position:relative;overflow:hidden;
-}
-/* Animated bg blobs */
-.blob{
-  position:absolute;border-radius:50%;filter:blur(80px);
-  pointer-events:none;animation:blobFloat 8s ease-in-out infinite;
-}
-.b1{width:400px;height:400px;background:rgba(124,58,237,.18);top:-100px;left:-100px;animation-delay:0s}
-.b2{width:350px;height:350px;background:rgba(6,182,212,.12);bottom:-80px;right:-80px;animation-delay:-3s}
-.b3{width:250px;height:250px;background:rgba(236,72,153,.1);top:50%;left:60%;animation-delay:-6s}
-@keyframes blobFloat{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(20px,-30px) scale(1.08)}}
+/* ─── NAV ─── */
+nav{background:var(--warm);border-bottom:2px solid var(--ink);padding:0 40px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.nav-logo{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--ink);display:flex;align-items:center;gap:10px}
+.logo-sq{width:32px;height:32px;background:var(--ink);border-radius:4px;display:flex;align-items:center;justify-content:center}
+.logo-sq svg{fill:var(--warm);width:18px;height:18px}
+.nav-links{display:flex;gap:28px}
+.nav-links a{font-size:14px;color:var(--muted);font-weight:500;transition:color .15s}
+.nav-links a:hover{color:var(--ink)}
+.nav-right{display:flex;gap:10px;align-items:center}
+.nav-login{font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;background:none;border:none;font-family:'DM Sans',sans-serif}
+.nav-signup{background:var(--ink);color:var(--warm);border:none;border-radius:6px;padding:9px 20px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .15s}
+.nav-signup:hover{background:var(--ink3)}
+.nav-toggle{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:4px}
+.nav-toggle span{display:block;width:22px;height:2px;background:var(--ink);border-radius:2px}
 
-.hero-eyebrow{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:6px 16px;border-radius:20px;
-  background:rgba(16,185,129,.1);
-  border:1px solid rgba(16,185,129,.3);
-  color:#34d399;font-size:12px;font-weight:700;
-  letter-spacing:.5px;text-transform:uppercase;
-  margin-bottom:20px;
-}
-.hero-eyebrow-dot{
-  width:7px;height:7px;border-radius:50%;background:#10b981;
-  animation:pulse 1.5s infinite;
-}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
+/* ─── HERO ─── */
+.hero{padding:60px 40px 0;max-width:1100px;margin:0 auto}
+.hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start}
+.hero-left{}
+.hero-kicker{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.kicker-dot{width:8px;height:8px;background:var(--green);border-radius:50%;animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+h1{font-family:'Syne',sans-serif;font-size:clamp(36px,4.5vw,58px);font-weight:800;line-height:1.04;letter-spacing:-2px;margin-bottom:20px;color:var(--ink)}
+.h1-price{display:inline-block;background:var(--ink);color:var(--warm);padding:0 10px;border-radius:4px;font-size:.75em;letter-spacing:-1px;vertical-align:middle;margin-left:6px}
+.hero-desc{font-size:17px;color:var(--muted);line-height:1.7;margin-bottom:32px;max-width:420px}
+.hero-form{display:flex;gap:10px;margin-bottom:16px}
+.hero-form input{flex:1;border:2px solid var(--ink);border-radius:6px;padding:12px 16px;font-size:15px;font-family:'DM Sans',sans-serif;background:#fff;color:var(--ink);outline:none}
+.hero-form input:focus{border-color:var(--accent)}
+.hero-form button{background:var(--ink);color:var(--warm);border:none;border-radius:6px;padding:12px 22px;font-size:15px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:background .15s}
+.hero-form button:hover{background:var(--accent)}
+.hero-meta{font-size:12px;color:var(--muted);margin-bottom:32px}
+.hero-meta strong{color:var(--ink)}
+.hero-trust{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.ht-item{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);font-weight:500}
+.ht-icon{font-size:14px}
 
-.hero-h1{
-  font-family:'Space Grotesk',sans-serif;
-  font-size:clamp(32px,8vw,68px);
-  font-weight:900;line-height:1.05;
-  letter-spacing:-2px;
-  color:#fff;
-  margin-bottom:16px;
-  max-width:700px;
-}
-.hero-h1 .grad{
-  background:linear-gradient(135deg,#a78bfa 0%,#ec4899 50%,#f59e0b 100%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-}
+/* ─── HERO SCREENSHOT STACK ─── */
+.hero-right{position:relative;padding-top:8px}
+.screenshot-stack{position:relative}
+/* Main screenshot — upload screen */
+.ss-main{border-radius:12px;border:2px solid var(--ink);overflow:hidden;background:#fff;box-shadow:6px 6px 0 var(--ink)}
+.ss-topbar{background:var(--ink);padding:10px 16px;display:flex;align-items:center;gap:8px}
+.ss-dots{display:flex;gap:5px}
+.ss-dot{width:10px;height:10px;border-radius:50%}
+.dot-r{background:#ff5f57}.dot-y{background:#febc2e}.dot-g{background:#28c840}
+.ss-title{font-family:'DM Sans',sans-serif;font-size:11px;color:rgba(255,255,255,.5);margin-left:auto}
+.ss-body{padding:20px}
+.ss-section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted2);margin-bottom:10px}
+.ss-upload-zone{border:2px dashed #ccc;border-radius:8px;padding:24px 20px;text-align:center;margin-bottom:16px;background:#fafafa}
+.ss-upload-icon{font-size:28px;margin-bottom:6px}
+.ss-upload-text{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:3px}
+.ss-upload-sub{font-size:12px;color:var(--muted2)}
+.ss-file-loaded{display:flex;align-items:center;gap:12px;background:#e8f5ee;border:1px solid #b8dfc8;border-radius:8px;padding:12px 14px;margin-bottom:16px}
+.ss-file-icon{font-size:22px}
+.ss-file-info{}
+.ss-file-name{font-size:14px;font-weight:700;color:var(--ink)}
+.ss-file-meta{font-size:11px;color:var(--muted)}
+.ss-file-check{margin-left:auto;font-size:18px;color:var(--green)}
+.ss-bpm-row{display:flex;gap:10px;margin-bottom:16px}
+.ss-bpm-pill{background:var(--ink);color:var(--warm);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:700;font-family:'DM Sans',sans-serif}
+.ss-bpm-pill.outline{background:transparent;color:var(--ink);border:1.5px solid var(--ink)}
+.ss-waveform{height:40px;background:#f0f0f0;border-radius:6px;overflow:hidden;position:relative;display:flex;align-items:flex-end;gap:1px;padding:4px}
+.ss-bar{flex:1;border-radius:2px 2px 0 0;min-height:3px;transition:height .3s}
+/* Floating result card */
+.ss-float-card{position:absolute;bottom:-20px;right:-20px;background:#fff;border:2px solid var(--ink);border-radius:10px;padding:14px 16px;box-shadow:4px 4px 0 var(--ink);min-width:180px;z-index:2}
+.sfc-label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+.sfc-title{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:2px}
+.sfc-sub{font-size:11px;color:var(--muted)}
+.sfc-badge{display:inline-block;background:var(--green-bg);color:var(--green);font-size:11px;font-weight:700;border-radius:4px;padding:2px 8px;margin-top:6px}
 
-.hero-sub{
-  font-size:clamp(15px,3vw,20px);color:#94a3b8;
-  max-width:500px;line-height:1.65;margin-bottom:36px;
-}
+/* ─── HOW IT WORKS — REALISTIC STEPS ─── */
+.how-section{background:#fff;border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);padding:80px 40px}
+.section-inner{max-width:1100px;margin:0 auto}
+.section-tag{font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+h2{font-family:'Syne',sans-serif;font-size:clamp(28px,3.5vw,44px);font-weight:800;letter-spacing:-1.5px;line-height:1.1;margin-bottom:40px;color:var(--ink)}
+.steps-row{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
 
-/* ── BIG PRICE ── */
-.price-hero{
-  display:flex;flex-direction:column;align-items:center;
-  gap:4px;margin-bottom:32px;
-}
-.price-old{
-  font-size:20px;color:#475569;text-decoration:line-through;
-  font-weight:600;
-}
-.price-main{
-  font-family:'Baloo 2',sans-serif;
-  font-size:clamp(72px,18vw,120px);
-  font-weight:800;line-height:1;
-  background:linear-gradient(135deg,#fff 0%,#a78bfa 60%,#06b6d4 100%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  filter:drop-shadow(0 0 40px rgba(167,139,250,.4));
-  position:relative;
-}
-.price-rupee{font-size:.55em;vertical-align:middle}
-.price-period{font-size:22px;color:#64748b;font-family:'Space Grotesk',sans-serif;font-weight:600}
-.price-tag{
-  display:inline-flex;align-items:center;gap:6px;
-  padding:6px 16px;border-radius:20px;
-  background:rgba(245,158,11,.12);
-  border:1px solid rgba(245,158,11,.35);
-  color:#fbbf24;font-size:13px;font-weight:700;
-}
+/* Each step card with a real screenshot */
+.step-card{border:2px solid var(--ink);border-radius:10px;overflow:hidden;background:var(--warm)}
+.step-card-head{background:var(--ink);padding:10px 14px;display:flex;align-items:center;justify-content:space-between}
+.step-num{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--warm);letter-spacing:1px;opacity:.5}
+.step-chip{background:var(--warm);color:var(--ink);border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700;font-family:'DM Sans',sans-serif}
+.step-screen{padding:14px;border-bottom:2px solid var(--ink);background:#fff;min-height:130px}
+.step-info{padding:14px}
+.step-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--ink);margin-bottom:5px}
+.step-desc{font-size:12px;color:var(--muted);line-height:1.55}
 
-/* ── CTA BUTTONS ── */
-.cta-group{display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;max-width:360px}
-.cta-primary{
-  width:100%;padding:18px 24px;border-radius:16px;border:none;
-  background:linear-gradient(135deg,#7c3aed,#5b21b6 50%,#ec4899);
-  color:#fff;font-family:inherit;font-size:18px;font-weight:900;
-  cursor:pointer;text-decoration:none;
-  display:flex;align-items:center;justify-content:center;gap:10px;
-  box-shadow:0 6px 30px rgba(124,58,237,.5);
-  transition:all .18s;letter-spacing:.3px;
-}
-.cta-primary:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(124,58,237,.65)}
-.cta-primary:active{transform:scale(.98)}
-.cta-note{font-size:12px;color:#475569;display:flex;align-items:center;gap:6px}
+/* Step 1 screen — file upload */
+.s1-dropzone{border:2px dashed #ccc;border-radius:6px;padding:14px 10px;text-align:center;margin-bottom:8px}
+.s1-dropzone .icon{font-size:24px;display:block;margin-bottom:4px}
+.s1-dropzone p{font-size:11px;color:var(--muted2);font-weight:500}
+.s1-formats{display:flex;gap:4px;flex-wrap:wrap}
+.fmt-tag{background:#f0f0f0;border-radius:3px;padding:2px 6px;font-size:10px;font-weight:600;color:var(--muted)}
 
-/* ── TRUST STRIP ── */
-.trust-strip{
-  display:flex;align-items:center;justify-content:center;
-  gap:clamp(12px,3vw,28px);flex-wrap:wrap;
-  padding:20px;
-  border-top:1px solid #0e0e1a;border-bottom:1px solid #0e0e1a;
-  background:#070710;
-}
-.trust-item{
-  display:flex;align-items:center;gap:7px;
-  font-size:12px;font-weight:600;color:#475569;
-  white-space:nowrap;
-}
-.trust-item span{font-size:16px}
+/* Step 2 screen — character upload */
+.s2-chars{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px}
+.s2-char{border:2px solid var(--border);border-radius:6px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:20px;background:#f9f9f9;overflow:hidden;position:relative}
+.s2-char.filled{background:#e8f5ee;border-color:#b8dfc8;border-style:solid}
+.s2-char.empty{border-style:dashed;font-size:18px;color:#ccc}
+.s2-char .char-label{position:absolute;bottom:2px;left:0;right:0;text-align:center;font-size:8px;font-weight:700;color:var(--muted)}
+.s2-tip{font-size:10px;color:var(--muted2);text-align:center}
 
-/* ── SECTION ── */
-.section{padding:80px 20px;max-width:1000px;margin:0 auto}
-.section-label{
-  font-size:11px;font-weight:700;letter-spacing:1.5px;
-  text-transform:uppercase;color:var(--p2);
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  margin-bottom:12px;
-}
-.section-label::before,.section-label::after{
-  content:'';width:30px;height:1px;background:rgba(167,139,250,.3);
-}
-.section-h{
-  font-size:clamp(24px,5vw,42px);font-weight:900;
-  text-align:center;letter-spacing:-1px;color:#fff;
-  line-height:1.15;margin-bottom:10px;
-}
-.section-sub{
-  font-size:16px;color:#64748b;text-align:center;
-  max-width:540px;margin:0 auto 48px;line-height:1.65;
-}
+/* Step 3 screen — lyric editor */
+.s3-track-bar{display:flex;align-items:center;gap:6px;margin-bottom:10px}
+.s3-play-btn{width:26px;height:26px;background:var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.s3-play-btn svg{fill:var(--warm);width:10px;height:10px;margin-left:2px}
+.s3-progress-track{flex:1;height:4px;background:#e0e0e0;border-radius:2px;position:relative}
+.s3-progress-fill{width:35%;height:100%;background:var(--ink);border-radius:2px}
+.s3-progress-dot{width:10px;height:10px;background:var(--ink);border-radius:50%;position:absolute;top:-3px;left:35%;transform:translateX(-50%)}
+.s3-time{font-size:10px;color:var(--muted2);font-family:monospace}
+.s3-lyrics{display:flex;flex-direction:column;gap:4px}
+.s3-lyric-row{display:flex;gap:6px;align-items:center}
+.s3-lyric-ts{font-size:9px;font-family:monospace;color:var(--accent);font-weight:700;flex-shrink:0;width:30px}
+.s3-lyric-text{font-size:11px;color:var(--ink);flex:1;background:#f0f0f0;border-radius:3px;padding:3px 6px}
+.s3-lyric-text.active{background:var(--ink);color:var(--warm)}
+.s3-lyric-add{font-size:10px;color:var(--muted2);text-align:center;padding:3px;border:1px dashed #ccc;border-radius:3px;margin-top:4px}
 
-/* ── VALUE COMPARISON ── */
-.compare-grid{
-  display:grid;grid-template-columns:1fr 1fr;gap:14px;
-  max-width:640px;margin:0 auto 48px;
-}
-.cmp-card{
-  padding:20px;border-radius:16px;
-  border:1.5px solid;
-  display:flex;flex-direction:column;gap:10px;
-}
-.cmp-card.them{
-  border-color:#1e1e2a;background:#09091a;opacity:.7;
-}
-.cmp-card.us{
-  border-color:rgba(124,58,237,.5);
-  background:linear-gradient(135deg,rgba(124,58,237,.12),rgba(6,182,212,.06));
-  position:relative;overflow:hidden;
-}
-.cmp-card.us::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,#7c3aed,#06b6d4);
-}
-.cmp-badge{
-  display:inline-flex;padding:3px 10px;border-radius:20px;
-  font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
-  width:fit-content;
-}
-.cmp-badge.b-gray{background:rgba(255,255,255,.06);color:#475569}
-.cmp-badge.b-green{background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:#34d399}
-.cmp-price{font-size:28px;font-weight:900;line-height:1}
-.cmp-price.cross{text-decoration:line-through;color:#475569;font-size:20px}
-.cmp-price.win{
-  background:linear-gradient(135deg,#fff,#a78bfa);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  font-size:36px;
-}
-.cmp-list{display:flex;flex-direction:column;gap:5px}
-.cmp-row{font-size:12px;color:#64748b;display:flex;align-items:center;gap:6px}
-.cmp-row .ck{font-size:14px}
+/* Step 4 screen — theme picker & export */
+.s4-themes{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:8px}
+.s4-theme{border:2px solid var(--border);border-radius:5px;aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;text-align:center;cursor:pointer;transition:border-color .15s;line-height:1.2;padding:3px}
+.s4-theme.active{border-color:var(--ink);border-width:2px;background:var(--ink);color:var(--warm)}
+.s4-theme:nth-child(1){background:linear-gradient(135deg,#1a0030,#3b006f);color:rgba(255,255,255,.8);border-color:#3b006f}
+.s4-theme:nth-child(2){background:linear-gradient(135deg,#001a30,#003060);color:rgba(255,255,255,.8);border-color:#003060}
+.s4-theme:nth-child(3){background:linear-gradient(135deg,#300020,#600040);color:rgba(255,255,255,.8);border-color:#600040}
+.s4-theme.active{background:linear-gradient(135deg,#1a0030,#3b006f);border-color:var(--ink);border-width:3px}
+.s4-export-row{display:flex;gap:6px}
+.s4-export-btn{flex:1;background:var(--ink);color:var(--warm);border:none;border-radius:5px;padding:8px 6px;font-size:11px;font-weight:700;text-align:center;cursor:pointer;font-family:'DM Sans',sans-serif}
+.s4-export-btn.outline{background:transparent;color:var(--ink);border:1.5px solid var(--ink)}
 
-/* ── FEATURES GRID ── */
-.feat-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
-  gap:14px;
-}
-.feat{
-  padding:22px 20px;border-radius:16px;
-  border:1px solid #1a1a2a;background:#09091a;
-  transition:all .2s;
-}
-.feat:hover{border-color:rgba(124,58,237,.4);transform:translateY(-3px)}
-.feat-icon{font-size:32px;margin-bottom:12px}
-.feat-name{font-size:15px;font-weight:800;color:#e2e8f0;margin-bottom:5px}
-.feat-desc{font-size:13px;color:#475569;line-height:1.6}
-.feat-tag{
-  display:inline-flex;margin-top:8px;padding:2px 8px;border-radius:10px;
-  font-size:10px;font-weight:700;
-  background:rgba(124,58,237,.15);color:#a78bfa;
-}
+/* ─── REAL OUTPUT PREVIEW ─── */
+.output-section{background:var(--ink);color:var(--warm);padding:80px 40px}
+.output-inner{max-width:1100px;margin:0 auto}
+.output-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;margin-top:40px}
+.output-left{}
+.output-left p{font-size:16px;color:rgba(255,255,255,.6);line-height:1.7;margin-bottom:20px}
+.output-left p strong{color:#fff}
+.output-checklist{display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
+.oc-item{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:rgba(255,255,255,.7)}
+.oc-tick{width:20px;height:20px;background:#1a7a3c;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;margin-top:1px}
+.out-cta{background:var(--warm);color:var(--ink);border:none;border-radius:8px;padding:14px 28px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Syne',sans-serif;transition:background .15s;display:inline-flex;align-items:center;gap:8px}
+.out-cta:hover{background:var(--warm2)}
+.out-note{font-size:12px;color:rgba(255,255,255,.35);margin-top:10px}
 
-/* ── HOW IT WORKS ── */
-.steps{display:flex;flex-direction:column;gap:0;max-width:560px;margin:0 auto}
-.step{
-  display:flex;gap:20px;align-items:flex-start;
-  padding:20px 0;border-left:1.5px solid #1a1a2a;
-  padding-left:28px;position:relative;
-}
-.step:last-child{border-left-color:transparent}
-.step-num{
-  position:absolute;left:-16px;top:20px;
-  width:30px;height:30px;border-radius:50%;
-  background:linear-gradient(135deg,#7c3aed,#5b21b6);
-  display:flex;align-items:center;justify-content:center;
-  font-size:13px;font-weight:800;color:#fff;
-  box-shadow:0 0 0 4px #04040e;
-  flex-shrink:0;
-}
-.step-icon{font-size:28px;flex-shrink:0}
-.step-body{flex:1}
-.step-title{font-size:17px;font-weight:800;color:#e2e8f0;margin-bottom:4px}
-.step-desc{font-size:13px;color:#64748b;line-height:1.6}
-.step-time{
-  display:inline-flex;margin-top:6px;padding:2px 9px;border-radius:20px;
-  font-size:10px;font-weight:700;
-  background:rgba(16,185,129,.12);color:#34d399;
-}
+/* Realistic video output mockup */
+.video-mockup{border:3px solid rgba(255,255,255,.15);border-radius:12px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.vm-topbar{background:#111;padding:8px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(255,255,255,.08)}
+.vm-dots{display:flex;gap:5px}
+.vm-dot{width:9px;height:9px;border-radius:50%}
+.vm-site{flex:1;background:rgba(255,255,255,.07);border-radius:4px;padding:3px 10px;font-size:10px;color:rgba(255,255,255,.35);text-align:center;font-family:monospace}
+.vm-screen{position:relative;background:#050508;aspect-ratio:16/9;overflow:hidden}
+.vm-bg-gradient{position:absolute;inset:0;background:radial-gradient(ellipse at 60% 40%,rgba(80,20,160,.5),transparent 70%),linear-gradient(180deg,transparent 50%,rgba(0,0,0,.8))}
+/* Fake waveform bars in video */
+.vm-bars{position:absolute;bottom:40px;left:0;right:0;display:flex;gap:2px;align-items:flex-end;padding:0 20px;height:70px}
+.vm-bar{flex:1;border-radius:2px 2px 0 0;background:rgba(150,80,255,.7)}
+/* Fake lyric overlay in video */
+.vm-lyric{position:absolute;bottom:20px;left:0;right:0;text-align:center;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:#fff;text-shadow:0 0 20px rgba(150,80,255,.8);letter-spacing:.5px}
+/* Fake character in video */
+.vm-char{position:absolute;bottom:50px;left:50%;transform:translateX(-50%);text-align:center}
+.vm-char-body{width:40px;height:60px;background:rgba(130,60,240,.8);border-radius:8px 8px 4px 4px;position:relative;margin:0 auto}
+.vm-char-head{width:28px;height:28px;background:rgba(150,80,255,.9);border-radius:50%;position:absolute;top:-20px;left:50%;transform:translateX(-50%);box-shadow:0 0 20px rgba(150,80,255,.6)}
+/* Artist info in video */
+.vm-artist{position:absolute;top:16px;left:20px;font-family:'DM Sans',sans-serif;font-size:13px;color:rgba(255,255,255,.8);font-weight:600;letter-spacing:.3px}
+.vm-playing-tag{position:absolute;top:14px;right:16px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:3px 10px;font-size:10px;color:rgba(255,255,255,.6);font-weight:600;display:flex;align-items:center;gap:5px}
+.vm-playing-dot{width:6px;height:6px;background:#22c55e;border-radius:50%;animation:blink 1.2s infinite}
+.vm-progress{position:absolute;bottom:0;left:0;right:0;height:3px;background:rgba(255,255,255,.1)}
+.vm-progress-fill{height:100%;width:42%;background:linear-gradient(90deg,#7c3aed,#22d3ee)}
+/* Download button overlay */
+.vm-controls{background:#111;padding:12px 16px;display:flex;align-items:center;gap:12px;border-top:1px solid rgba(255,255,255,.08)}
+.vm-ctrl-btn{background:rgba(255,255,255,.1);border:none;border-radius:5px;padding:6px 12px;font-size:11px;font-weight:600;color:rgba(255,255,255,.6);cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:5px}
+.vm-ctrl-btn.dl{background:#7c3aed;color:#fff}
+.vm-duration{font-size:11px;color:rgba(255,255,255,.35);margin-left:auto;font-family:monospace}
 
-/* ── TESTIMONIALS ── */
-.testi-grid{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-  gap:14px;
-}
-.testi{
-  padding:22px;border-radius:16px;
-  background:#09091a;border:1px solid #1a1a2a;
-  position:relative;
-}
-.testi::before{
-  content:'"';position:absolute;top:14px;right:18px;
-  font-size:52px;color:#1a1a2a;font-family:serif;line-height:1;
-}
-.testi-stars{color:#f59e0b;font-size:14px;margin-bottom:10px}
-.testi-text{font-size:14px;color:#94a3b8;line-height:1.7;margin-bottom:14px}
-.testi-user{display:flex;align-items:center;gap:10px}
-.testi-av{
-  width:38px;height:38px;border-radius:50%;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-  font-size:18px;font-weight:700;color:#fff;
-}
-.testi-name{font-size:13px;font-weight:700;color:#e2e8f0}
-.testi-loc{font-size:11px;color:#475569}
+/* ─── COMPARISON ─── */
+.compare-section{background:var(--warm);padding:80px 40px;border-top:2px solid var(--ink)}
+.compare-inner{max-width:1100px;margin:0 auto}
+.compare-table{border:2px solid var(--ink);border-radius:12px;overflow:hidden;margin-top:40px}
+.ct-head{display:grid;grid-template-columns:1.5fr 1fr 1fr 1.2fr;background:var(--ink);color:var(--warm)}
+.ct-cell{padding:14px 18px;font-size:13px;font-weight:700;font-family:'Syne',sans-serif}
+.ct-cell:first-child{font-size:12px;font-weight:400;color:rgba(255,255,255,.5);font-family:'DM Sans',sans-serif}
+.ct-body{}
+.ct-row{display:grid;grid-template-columns:1.5fr 1fr 1fr 1.2fr;border-bottom:1px solid var(--border)}
+.ct-row:last-child{border-bottom:none}
+.ct-row:nth-child(even){background:#fff}
+.ct-col{padding:13px 18px;font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.ct-col:first-child{font-weight:600;color:var(--ink)}
+.ct-col.good{color:var(--green);font-weight:600}
+.ct-col.bad{color:var(--red-muted)}
+.ct-col.best{background:rgba(200,75,0,.04)}
+.ct-icon{font-size:14px;flex-shrink:0}
+.ct-winner-col{background:rgba(200,75,0,.05)}
+.ct-head .ct-winner-col{background:var(--accent);font-weight:800}
 
-/* ── VALUE STACK ── */
-.value-stack{
-  background:linear-gradient(135deg,rgba(124,58,237,.08),rgba(6,182,212,.04));
-  border:1px solid rgba(124,58,237,.25);
-  border-radius:20px;padding:32px;max-width:540px;margin:0 auto;
-}
-.vs-row{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:12px 0;border-bottom:1px solid #1a1a2a;
-}
-.vs-row:last-of-type{border-bottom:none}
-.vs-feat{font-size:14px;color:#94a3b8;display:flex;align-items:center;gap:8px}
-.vs-feat span{font-size:16px}
-.vs-price{font-size:14px;font-weight:700;color:#475569;text-decoration:line-through}
-.vs-total-row{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:16px 0 0;margin-top:4px;
-}
-.vs-total-label{font-size:16px;font-weight:700;color:#e2e8f0}
-.vs-total-price{font-size:20px;font-weight:800;color:#475569;text-decoration:line-through}
-.vs-you-pay{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:16px 20px;
-  background:rgba(124,58,237,.15);border-radius:12px;
-  border:1px solid rgba(124,58,237,.4);margin-top:14px;
-}
-.vs-you-label{font-size:16px;font-weight:800;color:#e2e8f0}
-.vs-you-price{
-  font-size:32px;font-weight:900;
-  background:linear-gradient(135deg,#a78bfa,#06b6d4);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-}
+/* ─── TESTIMONIALS ─── */
+.testi-section{background:#fff;border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);padding:80px 40px}
+.testi-inner{max-width:1100px;margin:0 auto}
+.testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:40px}
+.testi-card{border:2px solid var(--ink);border-radius:10px;padding:24px;background:var(--warm);position:relative}
+.testi-stars{color:#d4a017;font-size:16px;margin-bottom:10px;letter-spacing:2px}
+.testi-result-badge{display:inline-flex;align-items:center;gap:5px;background:var(--green-bg);border:1.5px solid #b8dfc8;border-radius:5px;padding:3px 10px;font-size:11px;font-weight:700;color:var(--green);margin-bottom:14px;font-family:'DM Sans',sans-serif}
+.testi-text{font-size:14px;color:var(--ink);line-height:1.7;margin-bottom:18px}
+.testi-author{display:flex;align-items:center;gap:12px;padding-top:14px;border-top:1px solid var(--border)}
+.ta-avatar{width:40px;height:40px;border-radius:50%;border:2px solid var(--ink);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:15px;color:#fff;flex-shrink:0}
+.ta-name{font-size:14px;font-weight:700;color:var(--ink);font-family:'Syne',sans-serif}
+.ta-role{font-size:12px;color:var(--muted)}
+.testi-photo-thumb{position:absolute;top:20px;right:20px;width:48px;height:64px;border-radius:6px;border:2px solid var(--ink);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:24px}
 
-/* ── PRICING CARD ── */
-#pricing{padding:80px 20px;background:#070710}
-.pricing-wrap{max-width:460px;margin:0 auto;text-align:center}
-.pricing-card{
-  background:#0c0c24;
-  border:2px solid rgba(124,58,237,.5);
-  border-radius:24px;overflow:hidden;
-  box-shadow:0 0 0 1px rgba(124,58,237,.12), 0 40px 100px rgba(0,0,0,.6);
-  position:relative;
-}
-.pricing-card::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:3px;
-  background:linear-gradient(90deg,#7c3aed,#ec4899,#06b6d4);
-}
-.pc-top{padding:32px 28px 24px}
-.pc-plan{
-  display:inline-flex;align-items:center;gap:6px;
-  padding:5px 14px;border-radius:20px;
-  background:linear-gradient(135deg,rgba(245,158,11,.15),rgba(236,72,153,.1));
-  border:1px solid rgba(245,158,11,.35);
-  color:#fbbf24;font-size:12px;font-weight:800;
-  letter-spacing:.5px;text-transform:uppercase;
-  margin-bottom:20px;
-}
-.pc-price-wrap{margin-bottom:8px}
-.pc-was{font-size:18px;color:#334155;text-decoration:line-through;font-weight:600;margin-bottom:6px}
-.pc-price{
-  font-family:'Baloo 2',sans-serif;
-  font-size:90px;font-weight:800;line-height:1;
-  background:linear-gradient(135deg,#fff 0%,#a78bfa 60%,#06b6d4 100%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-}
-.pc-month{font-size:22px;color:#475569;font-weight:600;margin-bottom:16px}
-.pc-saving{
-  display:inline-flex;align-items:center;gap:6px;padding:6px 16px;
-  border-radius:20px;
-  background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);
-  color:#34d399;font-size:13px;font-weight:700;margin-bottom:24px;
-}
-.pc-items{text-align:left;display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
-.pc-item{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:#94a3b8;line-height:1.5}
-.pc-item-ck{
-  width:20px;height:20px;border-radius:50%;flex-shrink:0;margin-top:1px;
-  background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.35);
-  display:flex;align-items:center;justify-content:center;color:#34d399;font-size:11px;
-}
-.pc-cta{
-  width:100%;padding:18px;border-radius:14px;border:none;
-  background:linear-gradient(135deg,#7c3aed,#5b21b6 50%,#ec4899);
-  color:#fff;font-family:inherit;font-size:18px;font-weight:900;
-  cursor:pointer;letter-spacing:.3px;
-  box-shadow:0 6px 28px rgba(124,58,237,.5);
-  transition:all .18s;margin-bottom:14px;
-}
-.pc-cta:hover{transform:translateY(-2px);box-shadow:0 10px 36px rgba(124,58,237,.65)}
-.pc-note{font-size:12px;color:#334155;text-align:center}
+/* ─── BEFORE / AFTER ─── */
+.ba-section{background:var(--warm);padding:80px 40px}
+.ba-inner{max-width:1100px;margin:0 auto}
+.ba-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-top:40px;border-radius:12px;overflow:hidden;border:2px solid var(--ink)}
+.ba-panel{padding:32px 28px}
+.ba-panel.before{background:#fff3f3;border-right:2px solid var(--ink)}
+.ba-panel.after{background:var(--green-bg)}
+.ba-label{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+.ba-label.before-l{color:var(--red-muted)}
+.ba-label.after-l{color:var(--green)}
+.ba-item{display:flex;align-items:flex-start;gap:10px;margin-bottom:14px;font-size:14px}
+.ba-icon{flex-shrink:0;margin-top:1px;font-size:15px}
+.ba-text{color:var(--ink);line-height:1.5}
+.ba-text strong{font-weight:700}
 
-.pc-bottom{
-  padding:20px 28px;background:rgba(0,0,0,.2);
-  border-top:1px solid #1a1a2a;
-  display:flex;justify-content:center;gap:20px;flex-wrap:wrap;
-}
-.pc-pay{
-  display:flex;align-items:center;gap:6px;
-  font-size:12px;font-weight:600;color:#334155;
-}
-.pc-pay span{font-size:16px}
+/* ─── PRICING ─── */
+.pricing-section{background:var(--ink);color:var(--warm);padding:80px 40px}
+.pricing-inner{max-width:1100px;margin:0 auto}
+.pricing-inner .section-tag{color:#fbbf24}
+.pricing-inner h2{color:var(--warm)}
+.price-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:40px}
+.price-card{border:2px solid rgba(255,255,255,.15);border-radius:12px;padding:32px 28px;background:rgba(255,255,255,.04)}
+.price-card.hot{border-color:var(--accent);background:rgba(200,75,0,.08)}
+.pc-tier{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:12px}
+.pc-tier.fire{color:#fbbf24}
+.pc-amount{font-family:'Syne',sans-serif;font-size:64px;font-weight:800;line-height:1;letter-spacing:-3px;margin-bottom:4px;color:#fff}
+.pc-amount.hot-num{color:#fbbf24}
+.pc-cycle{font-size:14px;color:rgba(255,255,255,.4);margin-bottom:8px}
+.pc-save{display:inline-block;background:rgba(26,122,60,.25);border:1px solid rgba(26,122,60,.4);border-radius:4px;padding:3px 10px;font-size:12px;font-weight:700;color:#4ade80;margin-bottom:16px}
+.pc-desc{font-size:14px;color:rgba(255,255,255,.5);line-height:1.6;margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid rgba(255,255,255,.1)}
+.pc-features{display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
+.pc-feat{display:flex;align-items:center;gap:10px;font-size:14px;color:rgba(255,255,255,.7)}
+.pc-feat svg{width:16px;height:16px;flex-shrink:0}
+.pc-feat.yes svg{stroke:#4ade80;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.pc-feat.no svg{stroke:rgba(255,255,255,.2);fill:none;stroke-width:2;stroke-linecap:round}
+.pc-feat.no{color:rgba(255,255,255,.3)}
+.pc-btn{width:100%;padding:14px;border-radius:8px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Syne',sans-serif;transition:all .15s;border:none}
+.pc-btn.free{background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);border:1.5px solid rgba(255,255,255,.15)}
+.pc-btn.free:hover{background:rgba(255,255,255,.12)}
+.pc-btn.paid{background:var(--warm);color:var(--ink)}
+.pc-btn.paid:hover{background:var(--warm2)}
+.pricing-note{text-align:center;font-size:12px;color:rgba(255,255,255,.3);margin-top:16px}
 
-/* ── URGENCY STRIP ── */
-.urgency{
-  background:linear-gradient(135deg,rgba(245,158,11,.12),rgba(236,72,153,.08));
-  border-top:1px solid rgba(245,158,11,.2);
-  border-bottom:1px solid rgba(245,158,11,.2);
-  padding:16px 20px;text-align:center;
-}
-.urgency-inner{
-  font-size:14px;font-weight:700;color:#fbbf24;
-  display:flex;align-items:center;justify-content:center;
-  gap:10px;flex-wrap:wrap;
-}
-.urgency-timer{
-  display:inline-flex;gap:4px;
-  background:rgba(0,0,0,.4);border-radius:6px;padding:4px 10px;
-  font-family:monospace;font-size:16px;font-weight:800;color:#fff;
-}
+/* ─── FAQ ─── */
+.faq-section{background:var(--warm2);border-top:2px solid var(--ink);padding:80px 40px}
+.faq-inner{max-width:800px;margin:0 auto}
+.faq-list{margin-top:32px;border:2px solid var(--ink);border-radius:10px;overflow:hidden}
+.faq-item{border-bottom:1px solid var(--border)}
+.faq-item:last-child{border-bottom:none}
+.faq-q{width:100%;text-align:left;background:none;border:none;padding:18px 22px;font-size:15px;font-weight:600;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:16px;color:var(--ink);font-family:'DM Sans',sans-serif;transition:background .15s}
+.faq-q:hover{background:rgba(0,0,0,.03)}
+.faq-item.open .faq-q{background:#fff}
+.faq-chevron{flex-shrink:0;width:20px;height:20px;border:1.5px solid var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:transform .2s}
+.faq-item.open .faq-chevron{transform:rotate(45deg);background:var(--ink)}
+.faq-chevron svg{width:8px;height:8px;stroke:var(--ink);fill:none;stroke-width:2.5;stroke-linecap:round;transition:stroke .2s}
+.faq-item.open .faq-chevron svg{stroke:var(--warm)}
+.faq-a{font-size:14px;color:var(--muted);line-height:1.7;max-height:0;overflow:hidden;transition:all .3s;padding:0 22px;background:#fff}
+.faq-item.open .faq-a{max-height:200px;padding:0 22px 18px}
 
-/* ── FAQ ── */
-.faq-list{display:flex;flex-direction:column;gap:10px;max-width:640px;margin:0 auto}
-.faq-item{
-  background:#09091a;border:1px solid #1a1a2a;
-  border-radius:12px;overflow:hidden;
-}
-.faq-q{
-  width:100%;padding:16px 18px;
-  display:flex;align-items:center;justify-content:space-between;gap:14px;
-  background:none;border:none;color:#e2e8f0;
-  font-family:inherit;font-size:14px;font-weight:700;
-  cursor:pointer;text-align:left;
-}
-.faq-icon{
-  width:24px;height:24px;border-radius:50%;flex-shrink:0;
-  background:rgba(124,58,237,.15);display:flex;align-items:center;justify-content:center;
-  color:#a78bfa;font-size:14px;transition:transform .2s;
-}
-.faq-item.open .faq-icon{transform:rotate(45deg)}
-.faq-a{
-  max-height:0;overflow:hidden;transition:max-height .25s ease;
-  padding:0 18px;font-size:13px;color:#64748b;line-height:1.7;
-}
-.faq-item.open .faq-a{max-height:200px;padding:0 18px 16px}
+/* ─── FINAL CTA ─── */
+.final-cta{background:var(--accent);color:#fff;padding:80px 40px;text-align:center;border-top:2px solid #a33a00}
+.fc-inner{max-width:600px;margin:0 auto}
+.fc-inner h2{font-family:'Syne',sans-serif;font-size:clamp(30px,4vw,48px);font-weight:800;letter-spacing:-1.5px;line-height:1.1;color:#fff;margin-bottom:12px}
+.fc-price{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:rgba(255,255,255,.7);margin-bottom:24px}
+.fc-price strong{color:#fff;font-size:28px}
+.fc-actions{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+.fc-btn-main{background:#fff;color:var(--accent);border:none;border-radius:8px;padding:16px 36px;font-size:16px;font-weight:800;cursor:pointer;font-family:'Syne',sans-serif;transition:all .15s;display:inline-flex;align-items:center;gap:8px}
+.fc-btn-main:hover{background:var(--warm);transform:translateY(-2px)}
+.fc-btn-sub{background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3);border-radius:8px;padding:16px 24px;font-size:15px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.fc-btn-sub:hover{border-color:rgba(255,255,255,.6)}
+.fc-note{font-size:12px;color:rgba(255,255,255,.5)}
 
-/* ── FOOTER CTA ── */
-.footer-cta{
-  padding:80px 20px;text-align:center;
-  background:linear-gradient(180deg,#070710 0%,#04040e 100%);
-  position:relative;overflow:hidden;
-}
-.footer-cta .blob{opacity:.7}
-.fct-h{
-  font-size:clamp(28px,6vw,52px);font-weight:900;
-  color:#fff;letter-spacing:-1.5px;margin-bottom:12px;line-height:1.1;
-}
-.fct-h .accent{
-  background:linear-gradient(135deg,#a78bfa,#ec4899);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-}
-.fct-sub{font-size:16px;color:#64748b;margin-bottom:32px}
-.fct-price-pill{
-  display:inline-flex;align-items:center;gap:10px;
-  padding:12px 24px;border-radius:20px;
-  background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.3);
-  font-size:18px;font-weight:800;color:#a78bfa;
-  margin-bottom:28px;
-}
-.fct-price-big{font-size:28px;color:#fff}
+/* ─── FOOTER ─── */
+footer{background:var(--ink2);border-top:2px solid var(--border-dark);padding:48px 40px 28px;color:rgba(255,255,255,.5)}
+.footer-inner{max-width:1100px;margin:0 auto}
+.footer-top{display:flex;justify-content:space-between;gap:32px;flex-wrap:wrap;margin-bottom:40px}
+.footer-brand .nav-logo{color:var(--warm);margin-bottom:10px}
+.footer-brand p{font-size:13px;line-height:1.7;max-width:240px}
+.footer-links-row{display:flex;gap:48px;flex-wrap:wrap}
+.footer-col h4{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:14px}
+.footer-col a{display:block;font-size:13px;margin-bottom:9px;transition:color .14s}
+.footer-col a:hover{color:var(--warm)}
+.footer-bottom{border-top:1px solid rgba(255,255,255,.08);padding-top:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;font-size:12px}
+.footer-bottom-right{display:flex;gap:20px;flex-wrap:wrap}
+.footer-bottom-right a{color:rgba(255,255,255,.35);transition:color .15s}
+.footer-bottom-right a:hover{color:rgba(255,255,255,.7)}
 
-/* ── FOOTER ── */
-footer{
-  padding:24px 20px;
-  border-top:1px solid #0e0e1a;
-  text-align:center;
-  font-size:12px;color:#1e1e3a;
-}
+/* ─── STICKY BAR ─── */
+.sticky-bar{position:fixed;bottom:0;left:0;right:0;z-index:200;background:var(--ink);border-top:2px solid var(--accent);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;transform:translateY(100%);transition:transform .3s}
+.sticky-bar.visible{transform:translateY(0)}
+.sb-left{display:flex;align-items:center;gap:14px}
+.sb-price{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#fbbf24}
+.sb-text{font-size:13px;color:rgba(255,255,255,.6)}
+.sb-text strong{color:#fff}
+.sb-right{display:flex;align-items:center;gap:10px}
+.sb-btn{background:var(--accent);color:#fff;border:none;border-radius:6px;padding:10px 22px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;transition:background .15s}
+.sb-btn:hover{background:var(--accent2)}
+.sb-dismiss{background:none;border:none;color:rgba(255,255,255,.4);font-size:18px;cursor:pointer;line-height:1}
 
-/* ── STICKY MOBILE CTA ── */
-#sticky-mob{
-  display:none;
-  position:fixed;bottom:0;left:0;right:0;z-index:99;
-  padding:10px 14px calc(10px + env(safe-area-inset-bottom));
-  background:rgba(4,4,14,.95);
-  backdrop-filter:blur(16px);
-  border-top:1px solid #1a1a2a;
-  box-shadow:0 -8px 32px rgba(0,0,0,.6);
-}
-@media(max-width:640px){#sticky-mob{display:block}}
-.smob-inner{display:flex;align-items:center;gap:10px}
-.smob-price{flex-shrink:0}
-.smob-p1{font-size:10px;color:#475569;font-weight:600}
-.smob-p2{font-size:22px;font-weight:900;color:#fff;line-height:1}
-.smob-btn{
-  flex:1;padding:14px;border-radius:12px;border:none;
-  background:linear-gradient(135deg,#7c3aed,#5b21b6 60%,#ec4899);
-  color:#fff;font-family:inherit;font-size:15px;font-weight:800;
-  cursor:pointer;
-  box-shadow:0 3px 16px rgba(124,58,237,.4);
-}
+/* ─── EXIT POPUP ─── */
+.exit-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;padding:20px}
+.exit-overlay.active{display:flex}
+.exit-popup{background:var(--warm);border:3px solid var(--ink);border-radius:16px;padding:36px 32px;max-width:420px;width:100%;text-align:center;box-shadow:8px 8px 0 var(--ink);position:relative}
+.ep-close{position:absolute;top:14px;right:16px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted)}
+.ep-emoji{font-size:40px;margin-bottom:14px;display:block}
+.ep-title{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--ink);margin-bottom:10px;line-height:1.1}
+.ep-desc{font-size:14px;color:var(--muted);margin-bottom:20px;line-height:1.6}
+.ep-offer{background:var(--ink);border-radius:8px;padding:16px;margin-bottom:20px;color:var(--warm)}
+.ep-offer-num{font-family:'Syne',sans-serif;font-size:44px;font-weight:800;color:#fbbf24;line-height:1;letter-spacing:-2px}
+.ep-offer-sub{font-size:13px;color:rgba(255,255,255,.5)}
+.ep-btn{width:100%;padding:14px;background:var(--ink);color:var(--warm);border:none;border-radius:8px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Syne',sans-serif;margin-bottom:10px;transition:background .15s}
+.ep-btn:hover{background:var(--accent)}
+.ep-skip{background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif}
 
-/* ── SCROLL REVEAL ── */
-.reveal{opacity:0;transform:translateY(24px);transition:opacity .5s,transform .5s}
-.reveal.in{opacity:1;transform:none}
-
-/* ── RESPONSIVE ── */
+/* ─── RESPONSIVE ─── */
+@media(max-width:900px){
+  nav{padding:0 20px}
+  .nav-links{display:none}
+  .nav-toggle{display:flex}
+  .hero{padding:40px 20px 0}
+  .hero-grid{grid-template-columns:1fr;gap:32px}
+  .hero-right{display:none}
+  .how-section,.output-section,.compare-section,.testi-section,.ba-section,.pricing-section,.faq-section,.final-cta{padding:60px 20px}
+  .steps-row{grid-template-columns:1fr 1fr;gap:16px}
+  .output-grid{grid-template-columns:1fr;gap:32px}
+  .testi-grid{grid-template-columns:1fr;gap:16px}
+  .ba-grid{grid-template-columns:1fr}
+  .ba-panel.before{border-right:none;border-bottom:2px solid var(--ink)}
+  .price-grid{grid-template-columns:1fr}
+  .footer-top{flex-direction:column;gap:24px}
+  .sticky-bar{flex-direction:column;text-align:center;gap:8px;padding:12px 16px}
+  .sb-left{flex-direction:column;gap:4px}
+  .ct-head,.ct-row{grid-template-columns:1.5fr 1fr 1.2fr}
+  .ct-col:nth-child(3),.ct-head .ct-cell:nth-child(3){display:none}
+}
 @media(max-width:600px){
-  .compare-grid{grid-template-columns:1fr 1fr}
-  .testi-grid{grid-template-columns:1fr}
-  .feat-grid{grid-template-columns:1fr 1fr}
-  .pc-top{padding:24px 20px 20px}
-}
-@media(max-width:400px){
-  .feat-grid{grid-template-columns:1fr}
-  .compare-grid{grid-template-columns:1fr}
+  .steps-row{grid-template-columns:1fr}
+  h1{letter-spacing:-1.5px}
+  .hero-form{flex-direction:column}
+  .testi-photo-thumb{display:none}
+  .ct-head,.ct-row{grid-template-columns:1fr 1.2fr}
+  .ct-col:nth-child(2),.ct-head .ct-cell:nth-child(2){display:none}
 }
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
-<header>
-  <div class="logo">Beat<b>Viz</b></div>
-  <a href="#pricing" class="hdr-cta">Start for ₹49 →</a>
-</header>
-
-<!-- HERO -->
-<section id="hero">
-  <div class="blob b1"></div>
-  <div class="blob b2"></div>
-  <div class="blob b3"></div>
-
-  <div class="hero-eyebrow">
-    <div class="hero-eyebrow-dot"></div>
-    10,000+ Indian creators already using BeatViz
-  </div>
-
-  <h1 class="hero-h1">
-    Make Professional<br>
-    <span class="grad">Music Videos</span><br>
-    on Your Phone
-  </h1>
-
-  <p class="hero-sub">
-    Upload your song. Add your photo. BeatViz automatically syncs the beat,
-    adds lyrics, and creates a video ready to post on Instagram, YouTube &amp; WhatsApp Status.
-  </p>
-
-  <!-- Price -->
-  <div class="price-hero">
-    <div class="price-old">₹499/month</div>
-    <div class="price-main"><span class="price-rupee">₹</span>49</div>
-    <div class="price-period">per month · unlimited videos</div>
-    <div class="price-tag">🔥 Limited Launch Price — Only ₹49</div>
-  </div>
-
-  <div class="cta-group">
-    <a href="#pricing" class="cta-primary">
-      🎬 Start Making Videos Now
-    </a>
-    <div class="cta-note">
-      ✓ No hidden charges &nbsp;·&nbsp; ✓ Pay via UPI &nbsp;·&nbsp; ✓ Cancel anytime
-    </div>
-  </div>
-</section>
-
-<!-- TRUST STRIP -->
-<div class="trust-strip">
-  <div class="trust-item"><span>🔒</span> 100% Secure</div>
-  <div class="trust-item"><span>📱</span> Works on Mobile</div>
-  <div class="trust-item"><span>⚡</span> Pay via UPI / Card</div>
-  <div class="trust-item"><span>🎵</span> Any Indian Song</div>
-  <div class="trust-item"><span>🔄</span> Cancel Anytime</div>
+<!-- TOP STRIP -->
+<div class="top-strip">
+  <span>🔥 Unlimited music videos for just</span>
+  <span class="ts-price">₹49/month</span>
+  <span style="color:rgba(255,255,255,.3)">·</span>
+  <span style="color:rgba(255,255,255,.5)">Less than a Swiggy order</span>
+  <button class="ts-cta" onclick="window.location.href='auth.html?mode=signup'">Start free →</button>
 </div>
 
-<!-- URGENCY -->
-<div class="urgency" id="urgency-strip">
-  <div class="urgency-inner">
-    ⚠️ Launch offer ending in
-    <div class="urgency-timer" id="timer">11:59:43</div>
-    — Price goes to ₹499 after this
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-logo">
+    <div class="logo-sq">
+      <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13M9 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12 0c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2z"/></svg>
+    </div>
+    BeatViz
+  </div>
+  <div class="nav-links">
+    <a href="#how">How it works</a>
+    <a href="#output">See output</a>
+    <a href="#pricing">₹49/month</a>
+    <a href="#faq">FAQ</a>
+  </div>
+  <div class="nav-right">
+    <button class="nav-login" onclick="window.location.href='auth.html?mode=login'">Log in</button>
+    <button class="nav-signup" onclick="window.location.href='auth.html?mode=signup'">Try free</button>
+    <button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<main>
+
+<!-- ─── HERO ─── -->
+<div style="background:var(--warm);border-bottom:2px solid var(--ink)">
+<div class="hero">
+  <div class="hero-grid">
+    <div class="hero-left">
+      <div class="hero-kicker">
+        <span class="kicker-dot"></span>
+        Music video maker · Made for Indian artists
+      </div>
+      <h1>
+        Make lyric videos<br>
+        that look 🔥<br>
+        for <span class="h1-price">₹49/mo</span>
+      </h1>
+      <p class="hero-desc">
+        Upload your MP3, add a photo, pick a visual — download your video. No editing skills. No Premiere Pro. No waiting 5 days for a freelancer. <strong style="color:var(--ink)">Ready in 10 minutes.</strong>
+      </p>
+      <div class="hero-form">
+        <input id="artistInput" type="text" placeholder="Enter your artist name to see live preview" autocomplete="off">
+        <button onclick="window.location.href='auth.html?mode=signup'">Create free →</button>
+      </div>
+      <p class="hero-meta">No credit card needed. 1 full video free. Then <strong>₹49/month</strong> for unlimited.</p>
+      <div class="hero-trust">
+        <span class="ht-item"><span class="ht-icon">✅</span> No watermark on free video</span>
+        <span class="ht-item"><span class="ht-icon">📥</span> MP4 download</span>
+        <span class="ht-item"><span class="ht-icon">🇮🇳</span> Made for Indian artists</span>
+      </div>
+    </div>
+
+    <!-- HERO SCREENSHOT — realistic upload screen -->
+    <div class="hero-right">
+      <div class="screenshot-stack">
+        <div class="ss-main">
+          <div class="ss-topbar">
+            <div class="ss-dots">
+              <div class="ss-dot dot-r"></div>
+              <div class="ss-dot dot-y"></div>
+              <div class="ss-dot dot-g"></div>
+            </div>
+            <div class="ss-title">BeatViz Studio</div>
+          </div>
+          <div class="ss-body">
+            <div class="ss-section-label">Step 1 — Upload your track</div>
+            <!-- Loaded file state -->
+            <div class="ss-file-loaded">
+              <div class="ss-file-icon">🎵</div>
+              <div class="ss-file-info">
+                <div class="ss-file-name">Tera Naam.mp3</div>
+                <div class="ss-file-meta">3:42 · 5.2 MB · 128kbps</div>
+              </div>
+              <div class="ss-file-check">✓</div>
+            </div>
+            <div class="ss-bpm-row">
+              <div class="ss-bpm-pill">🥁 BPM: 126</div>
+              <div class="ss-bpm-pill outline">Key: D minor</div>
+              <div class="ss-bpm-pill outline">4/4 time</div>
+            </div>
+            <div class="ss-section-label" style="margin-top:12px">Detected beats</div>
+            <div class="ss-waveform" id="waveformPreview">
+              <!-- bars injected by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Floating status card -->
+        <div class="ss-float-card">
+          <div class="sfc-label">Beat analysis</div>
+          <div class="sfc-title">248 beats found</div>
+          <div class="sfc-sub">Drops detected at 0:42, 1:24, 2:08</div>
+          <div class="sfc-badge">✓ Ready to sync</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Social proof bar -->
+  <div style="display:flex;align-items:center;gap:24px;padding:24px 0;border-top:1px solid var(--border);margin-top:48px;flex-wrap:wrap">
+    <div style="display:flex">
+      <div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#f472b6,#7c3aed);border:2px solid var(--warm);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;margin-left:-8px;z-index:4">RK</div>
+      <div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#22d3ee,#6025c4);border:2px solid var(--warm);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;margin-left:-8px;z-index:3">PA</div>
+      <div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#ef4444);border:2px solid var(--warm);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;margin-left:-8px;z-index:2">SM</div>
+      <div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#10b981,#0891b2);border:2px solid var(--warm);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;margin-left:-8px;z-index:1">VK</div>
+    </div>
+    <div style="font-size:14px;color:var(--muted)"><strong style="color:var(--ink)">1,200+ artists</strong> made their first video this month</div>
+    <div style="margin-left:auto;font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px"><span style="color:#d4a017">★★★★★</span> Rated 4.8 by real users</div>
   </div>
 </div>
+</div>
 
-<!-- VALUE COMPARE -->
-<section class="section reveal" id="compare">
-  <div class="section-label">Why BeatViz</div>
-  <h2 class="section-h">Less than a cup of chai.<br>Better than any studio.</h2>
-  <p class="section-sub">Professional video editors charge ₹2,000+ per video. BeatViz gives you unlimited videos for less than ₹2 per day.</p>
+<!-- ─── HOW IT WORKS ─── -->
+<section class="how-section" id="how">
+  <div class="section-inner">
+    <div class="section-tag">How it works</div>
+    <h2>4 steps. 10 minutes. Done.</h2>
+    <div class="steps-row">
 
-  <div class="compare-grid">
-    <div class="cmp-card them">
-      <div class="cmp-badge b-gray">Video Editor / Studio</div>
-      <div class="cmp-price cross">₹2,000+</div>
-      <div class="cmp-list">
-        <div class="cmp-row"><span class="ck">✗</span> Per video charge</div>
-        <div class="cmp-row"><span class="ck">✗</span> Wait 2–3 days</div>
-        <div class="cmp-row"><span class="ck">✗</span> No creative control</div>
-        <div class="cmp-row"><span class="ck">✗</span> Watermark on cheap ones</div>
+      <!-- Step 1 — Upload audio -->
+      <div class="step-card">
+        <div class="step-card-head">
+          <span class="step-num">STEP 01</span>
+          <span class="step-chip">Upload</span>
+        </div>
+        <div class="step-screen">
+          <div class="s1-dropzone">
+            <span class="icon">🎵</span>
+            <p style="font-size:13px;font-weight:600;color:#333;margin-bottom:3px">Drop your audio file</p>
+            <p>or click to browse</p>
+          </div>
+          <div class="s1-formats">
+            <span class="fmt-tag">MP3</span>
+            <span class="fmt-tag">WAV</span>
+            <span class="fmt-tag">AAC</span>
+            <span class="fmt-tag">OGG</span>
+            <span class="fmt-tag">up to 20 min</span>
+          </div>
+        </div>
+        <div class="step-info">
+          <div class="step-title">Upload your track</div>
+          <div class="step-desc">Drop any audio file. BeatViz finds the BPM and every beat automatically. No settings to touch.</div>
+        </div>
       </div>
+
+      <!-- Step 2 — Add photos -->
+      <div class="step-card">
+        <div class="step-card-head">
+          <span class="step-num">STEP 02</span>
+          <span class="step-chip">Add photos</span>
+        </div>
+        <div class="step-screen">
+          <div class="s2-chars">
+            <div class="s2-char filled">
+              <div style="font-size:28px">🧑‍🎤</div>
+              <div class="char-label">You</div>
+            </div>
+            <div class="s2-char filled">
+              <div style="font-size:28px">🎸</div>
+              <div class="char-label">Guitar</div>
+            </div>
+            <div class="s2-char empty">
+              <div>+</div>
+            </div>
+            <div class="s2-char empty"><div>+</div></div>
+            <div class="s2-char empty"><div>+</div></div>
+            <div class="s2-char empty"><div>+</div></div>
+          </div>
+          <div class="s2-tip">PNG with transparent background looks best · up to 5 photos</div>
+        </div>
+        <div class="step-info">
+          <div class="step-title">Add your photos</div>
+          <div class="step-desc">Upload up to 5 photos or PNG cutouts. They'll dance to the beat automatically.</div>
+        </div>
+      </div>
+
+      <!-- Step 3 — Write lyrics -->
+      <div class="step-card">
+        <div class="step-card-head">
+          <span class="step-num">STEP 03</span>
+          <span class="step-chip">Add lyrics</span>
+        </div>
+        <div class="step-screen">
+          <div class="s3-track-bar">
+            <div class="s3-play-btn">
+              <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            </div>
+            <div class="s3-progress-track">
+              <div class="s3-progress-fill"></div>
+              <div class="s3-progress-dot"></div>
+            </div>
+            <span class="s3-time">1:18 / 3:42</span>
+          </div>
+          <div class="s3-lyrics">
+            <div class="s3-lyric-row">
+              <span class="s3-lyric-ts">0:08</span>
+              <span class="s3-lyric-text">Tera naam likh diya...</span>
+            </div>
+            <div class="s3-lyric-row">
+              <span class="s3-lyric-ts">0:42</span>
+              <span class="s3-lyric-text active">Dil ki deewar par</span>
+            </div>
+            <div class="s3-lyric-row">
+              <span class="s3-lyric-ts">1:18</span>
+              <span class="s3-lyric-text" style="color:#aaa;font-style:italic">Type here...</span>
+            </div>
+            <div class="s3-lyric-add">▶ Pause &amp; type to add next line</div>
+          </div>
+        </div>
+        <div class="step-info">
+          <div class="step-title">Stamp your lyrics</div>
+          <div class="step-desc">Play the song, pause where you want lyrics, type the line. Repeat. Choose Karaoke, Neon, Float, or Typewriter style.</div>
+        </div>
+      </div>
+
+      <!-- Step 4 — Export -->
+      <div class="step-card">
+        <div class="step-card-head">
+          <span class="step-num">STEP 04</span>
+          <span class="step-chip">Download</span>
+        </div>
+        <div class="step-screen">
+          <div class="s4-themes" style="margin-bottom:10px">
+            <div class="s4-theme active">Neon<br>Synthwave</div>
+            <div class="s4-theme">Space<br>Nebula</div>
+            <div class="s4-theme">Stage<br>Lights</div>
+            <div class="s4-theme">Retro<br>CRT</div>
+            <div class="s4-theme">Forest<br>Moon</div>
+            <div class="s4-theme">Ocean<br>Wave</div>
+          </div>
+          <div class="s4-export-row">
+            <div class="s4-export-btn">⬇ MP4</div>
+            <div class="s4-export-btn outline">WebM</div>
+          </div>
+        </div>
+        <div class="step-info">
+          <div class="step-title">Pick theme &amp; download</div>
+          <div class="step-desc">Choose from 6 visual themes. Hit Generate. Download your video as MP4 — ready for YouTube, Reels, WhatsApp Status.</div>
+        </div>
+      </div>
+
     </div>
-    <div class="cmp-card us">
-      <div class="cmp-badge b-green">✓ BeatViz</div>
-      <div class="cmp-price win">₹49</div>
-      <div class="cmp-list">
-        <div class="cmp-row"><span class="ck" style="color:#34d399">✓</span> Unlimited videos</div>
-        <div class="cmp-row"><span class="ck" style="color:#34d399">✓</span> Ready in 2 minutes</div>
-        <div class="cmp-row"><span class="ck" style="color:#34d399">✓</span> Full creative control</div>
-        <div class="cmp-row"><span class="ck" style="color:#34d399">✓</span> No watermark</div>
+  </div>
+</section>
+
+<!-- ─── REALISTIC OUTPUT PREVIEW ─── -->
+<section class="output-section" id="output">
+  <div class="output-inner">
+    <div class="section-tag">What you actually get</div>
+    <h2 style="color:var(--warm)">This is what the output looks like</h2>
+    <div class="output-grid">
+      <div class="output-left">
+        <p>This is a real preview of a BeatViz video playing in the browser. <strong>Beats detected automatically. Lyrics synced. Character bouncing.</strong> The download you get is an MP4 you can upload anywhere.</p>
+        <div class="output-checklist">
+          <div class="oc-item"><span class="oc-tick">✓</span>Bars pulse on every beat — automatic, no manual syncing</div>
+          <div class="oc-item"><span class="oc-tick">✓</span>Your lyrics appear exactly where you stamped them</div>
+          <div class="oc-item"><span class="oc-tick">✓</span>Your photo dances with the music — arms, legs, all of it</div>
+          <div class="oc-item"><span class="oc-tick">✓</span>Camera shake on the drop — feels cinematic</div>
+          <div class="oc-item"><span class="oc-tick">✓</span>Download as MP4 · upload to YouTube or Reels directly</div>
+        </div>
+        <button class="out-cta" onclick="window.location.href='auth.html?mode=signup'">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Make mine free — ₹49/mo after
+        </button>
+        <p class="out-note">No credit card · No watermark on first video · Cancel anytime</p>
+      </div>
+
+      <!-- Realistic video preview mockup -->
+      <div>
+        <div class="video-mockup">
+          <div class="vm-topbar">
+            <div class="vm-dots">
+              <div class="vm-dot" style="background:#ff5f57"></div>
+              <div class="vm-dot" style="background:#febc2e"></div>
+              <div class="vm-dot" style="background:#28c840"></div>
+            </div>
+            <div class="vm-site">BeatViz Studio — Neon Synthwave</div>
+          </div>
+
+          <!-- The actual simulated video screen -->
+          <div class="vm-screen">
+            <div class="vm-bg-gradient"></div>
+            <!-- Grid lines like synthwave -->
+            <canvas id="outputCanvas" width="600" height="338" style="position:absolute;inset:0;width:100%;height:100%"></canvas>
+            <div class="vm-artist" id="vmArtistName">Ranjeet K. — Tera Naam</div>
+            <div class="vm-playing-tag">
+              <span class="vm-playing-dot"></span> Recording...
+            </div>
+            <div class="vm-progress"><div class="vm-progress-fill" id="vmProgressFill"></div></div>
+          </div>
+
+          <div class="vm-controls">
+            <button class="vm-ctrl-btn">▶ Preview</button>
+            <button class="vm-ctrl-btn">✂ Trim</button>
+            <button class="vm-ctrl-btn dl">⬇ Download MP4</button>
+            <span class="vm-duration">3:42</span>
+          </div>
+        </div>
+
+        <!-- Labels pointing to features -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px">
+          <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:10px 12px">
+            <div style="font-size:11px;font-weight:700;color:#fbbf24;margin-bottom:2px">BEAT BARS</div>
+            <div style="font-size:12px;color:rgba(255,255,255,.5)">Pulse on every beat, auto-detected from your audio</div>
+          </div>
+          <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:10px 12px">
+            <div style="font-size:11px;font-weight:700;color:#22d3ee;margin-bottom:2px">LYRIC OVERLAY</div>
+            <div style="font-size:12px;color:rgba(255,255,255,.5)">Appears at the exact timestamp you set</div>
+          </div>
+          <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:10px 12px">
+            <div style="font-size:11px;font-weight:700;color:#a78bfa;margin-bottom:2px">YOUR PHOTO</div>
+            <div style="font-size:12px;color:rgba(255,255,255,.5)">Dances to the beat — arms, legs, bounce</div>
+          </div>
+          <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:10px 12px">
+            <div style="font-size:11px;font-weight:700;color:#4ade80;margin-bottom:2px">MP4 EXPORT</div>
+            <div style="font-size:12px;color:rgba(255,255,255,.5)">Download and post to YouTube / Reels same day</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- FEATURES -->
-<section class="section reveal" style="padding-top:20px">
-  <div class="section-label">Features</div>
-  <h2 class="section-h">Everything in one app</h2>
-  <p class="section-sub">No extra apps needed. No complicated editing. Just upload and it's done.</p>
-
-  <div class="feat-grid">
-    <div class="feat">
-      <div class="feat-icon">🎵</div>
-      <div class="feat-name">Auto Beat Sync</div>
-      <div class="feat-desc">Your character dances to the beat automatically. Works with Bollywood, EDM, Hip-Hop, every genre.</div>
-    </div>
-    <div class="feat">
-      <div class="feat-icon">🎤</div>
-      <div class="feat-name">Lyric Videos</div>
-      <div class="feat-desc">Tap to stamp lyrics exactly when they appear. 9 animated styles including Karaoke, Neon &amp; Insta Card.</div>
-    </div>
-    <div class="feat">
-      <div class="feat-icon">🌅</div>
-      <div class="feat-name">AI Backgrounds</div>
-      <div class="feat-desc">Type "Bollywood stage" or "neon city night" — AI generates the perfect background in seconds.</div>
-      <div class="feat-tag">FREE · No extra cost</div>
-    </div>
-    <div class="feat">
-      <div class="feat-icon">📱</div>
-      <div class="feat-name">Export for Every Platform</div>
-      <div class="feat-desc">YouTube (16:9), Instagram Reels (9:16), WhatsApp Status (1:1). One click, right size.</div>
-    </div>
-    <div class="feat">
-      <div class="feat-icon">🎨</div>
-      <div class="feat-name">No Design Skills Needed</div>
-      <div class="feat-desc">Pick a style, upload your photo, done. If you can use WhatsApp, you can use BeatViz.</div>
-    </div>
-    <div class="feat">
-      <div class="feat-icon">🚀</div>
-      <div class="feat-name">Works on Any Phone</div>
-      <div class="feat-desc">Android, iPhone — any browser. No app download needed. Open the link and start.</div>
-    </div>
-  </div>
-</section>
-
-<!-- HOW IT WORKS -->
-<section class="section reveal">
-  <div class="section-label">How It Works</div>
-  <h2 class="section-h">3 steps. 2 minutes. 1 viral video.</h2>
-  <p class="section-sub">Simpler than sending a WhatsApp message.</p>
-
-  <div class="steps">
-    <div class="step">
-      <div class="step-num">1</div>
-      <div class="step-icon">🎵</div>
-      <div class="step-body">
-        <div class="step-title">Upload your song</div>
-        <div class="step-desc">Any MP3 from your phone — Bollywood, EDM, Punjabi, whatever you like. BeatViz auto-detects the beats.</div>
-        <div class="step-time">⏱ 10 seconds</div>
+<!-- ─── COMPARISON TABLE ─── -->
+<section class="compare-section" id="compare">
+  <div class="compare-inner">
+    <div class="section-tag">Why BeatViz</div>
+    <h2>₹49/month vs the old way</h2>
+    <div class="compare-table">
+      <div class="ct-head">
+        <div class="ct-cell"></div>
+        <div class="ct-cell">Freelancer</div>
+        <div class="ct-cell">Premiere Pro</div>
+        <div class="ct-cell ct-winner-col">BeatViz ₹49/mo</div>
       </div>
-    </div>
-    <div class="step">
-      <div class="step-num">2</div>
-      <div class="step-icon">🖼️</div>
-      <div class="step-body">
-        <div class="step-title">Add your photo &amp; style</div>
-        <div class="step-desc">Upload your photo or a PNG character. Pick an AI background — type "golden temple", "neon Mumbai", anything.</div>
-        <div class="step-time">⏱ 30 seconds</div>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num">3</div>
-      <div class="step-icon">🎬</div>
-      <div class="step-body">
-        <div class="step-title">Generate &amp; download</div>
-        <div class="step-desc">Tap Generate. BeatViz records the full video with beat sync and lyrics. Download and post it anywhere.</div>
-        <div class="step-time">⏱ 1 minute</div>
+      <div class="ct-body">
+        <div class="ct-row">
+          <div class="ct-col">Cost</div>
+          <div class="ct-col bad"><span class="ct-icon">💸</span>₹3,000–8,000/video</div>
+          <div class="ct-col bad"><span class="ct-icon">💸</span>₹1,300+/mo (Adobe)</div>
+          <div class="ct-col good ct-winner-col"><span class="ct-icon">✅</span>₹49/month unlimited</div>
+        </div>
+        <div class="ct-row">
+          <div class="ct-col">Time to get video</div>
+          <div class="ct-col bad">5–7 days wait</div>
+          <div class="ct-col bad">2 weeks to learn</div>
+          <div class="ct-col good ct-winner-col">10 minutes</div>
+        </div>
+        <div class="ct-row">
+          <div class="ct-col">Beat sync</div>
+          <div class="ct-col bad">Manual (if done)</div>
+          <div class="ct-col bad">Manual — tedious</div>
+          <div class="ct-col good ct-winner-col">Automatic</div>
+        </div>
+        <div class="ct-row">
+          <div class="ct-col">Update lyrics yourself</div>
+          <div class="ct-col bad">Extra charge</div>
+          <div class="ct-col bad">Re-edit whole file</div>
+          <div class="ct-col good ct-winner-col">30 seconds</div>
+        </div>
+        <div class="ct-row">
+          <div class="ct-col">Works in browser</div>
+          <div class="ct-col" style="color:var(--muted2)">—</div>
+          <div class="ct-col bad">No — install required</div>
+          <div class="ct-col good ct-winner-col">Yes, any laptop</div>
+        </div>
+        <div class="ct-row">
+          <div class="ct-col">Bollywood / Punjabi style</div>
+          <div class="ct-col" style="color:var(--muted2)">Depends on freelancer</div>
+          <div class="ct-col" style="color:var(--muted2)">DIY only</div>
+          <div class="ct-col good ct-winner-col">6 built-in themes</div>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- TESTIMONIALS -->
-<section class="section reveal" style="background:#070710;max-width:100%;padding:60px 20px">
-  <div style="max-width:1000px;margin:0 auto">
-    <div class="section-label">What Creators Say</div>
-    <h2 class="section-h">Real people. Real results.</h2>
-    <p class="section-sub" style="margin-bottom:32px">From college students to independent artists across India.</p>
-
+<!-- ─── TESTIMONIALS ─── -->
+<section class="testi-section" id="reviews">
+  <div class="testi-inner">
+    <div class="section-tag">From actual users</div>
+    <h2>What artists are saying</h2>
     <div class="testi-grid">
-      <div class="testi">
+
+      <div class="testi-card">
+        <div class="testi-photo-thumb">🧑‍🎤</div>
         <div class="testi-stars">★★★★★</div>
-        <div class="testi-text">"Maine pehli video banai thi 5 minute mein. Mere friends ko laga kisi professional ne banaya. Ab har song pe video banta hai!"</div>
-        <div class="testi-user">
-          <div class="testi-av" style="background:linear-gradient(135deg,#7c3aed,#ec4899)">R</div>
+        <div class="testi-result-badge">🎬 Posted same night</div>
+        <p class="testi-text">"Bhai ₹49 mein ye sab? Pehle ek lyric video ke liye ₹4,000 deta tha aur 5 din wait karta tha. Abhi apna track finish kiya aur 20 minute mein video bhi ready. Real hai yaar."</p>
+        <div class="testi-author">
+          <div class="ta-avatar" style="background:linear-gradient(135deg,#f472b6,#7c3aed)">RK</div>
           <div>
-            <div class="testi-name">Rahul Sharma</div>
-            <div class="testi-loc">Delhi • Music Creator</div>
+            <div class="ta-name">Ranjeet K.</div>
+            <div class="ta-role">Punjabi artist · Ludhiana</div>
           </div>
         </div>
       </div>
-      <div class="testi">
+
+      <div class="testi-card">
+        <div class="testi-photo-thumb">🎤</div>
         <div class="testi-stars">★★★★★</div>
-        <div class="testi-text">"₹49 mein itna sab? Seriously unbelievable. I use it for all my Instagram reels now. My followers increased 3x!"</div>
-        <div class="testi-user">
-          <div class="testi-av" style="background:linear-gradient(135deg,#ec4899,#f59e0b)">P</div>
+        <div class="testi-result-badge">💰 Saved ₹4,951 this month</div>
+        <p class="testi-text">"The beat sync actually works — I was surprised. Used 3 other tools before this. They all felt fake. BeatViz locks to the drop properly. The neon theme looks genuinely cinematic. For ₹49 this is a no-brainer for any indie artist."</p>
+        <div class="testi-author">
+          <div class="ta-avatar" style="background:linear-gradient(135deg,#22d3ee,#6025c4)">PA</div>
           <div>
-            <div class="testi-name">Priya Nair</div>
-            <div class="testi-loc">Mumbai • Content Creator</div>
+            <div class="ta-name">Priya A.</div>
+            <div class="ta-role">Indie pop · Mumbai</div>
           </div>
         </div>
       </div>
-      <div class="testi">
-        <div class="testi-stars">★★★★★</div>
-        <div class="testi-text">"The AI background feature is mind-blowing. I typed 'Punjab wheat fields sunset' and it looked cinematic. Worth every rupee!"</div>
-        <div class="testi-user">
-          <div class="testi-av" style="background:linear-gradient(135deg,#10b981,#06b6d4)">A</div>
+
+      <div class="testi-card">
+        <div class="testi-photo-thumb">🎧</div>
+        <div class="testi-stars">★★★★☆</div>
+        <div class="testi-result-badge">📈 3× more Reels posted</div>
+        <p class="testi-text">"4 stars because MP4 export takes 1–2 mins. But that's fine. The lyric stamp editor is the standout — finally works the way your brain expects. Hit pause, type, done. I now make a Reel for every track I drop. ₹49 is nothing."</p>
+        <div class="testi-author">
+          <div class="ta-avatar" style="background:linear-gradient(135deg,#f59e0b,#ef4444)">SM</div>
           <div>
-            <div class="testi-name">Arjun Singh</div>
-            <div class="testi-loc">Chandigarh • Singer</div>
+            <div class="ta-name">Sahil M.</div>
+            <div class="ta-role">Hip-hop producer · Delhi</div>
           </div>
         </div>
       </div>
+
     </div>
   </div>
 </section>
 
-<!-- VALUE STACK -->
-<section class="section reveal">
-  <div class="section-label">Unbeatable Value</div>
-  <h2 class="section-h">₹49 gets you everything</h2>
-  <p class="section-sub">Compare what you'd pay buying these separately.</p>
-
-  <div class="value-stack">
-    <div class="vs-row">
-      <div class="vs-feat"><span>🎵</span> Beat detection &amp; sync</div>
-      <div class="vs-price">₹299</div>
+<!-- ─── BEFORE / AFTER ─── -->
+<section class="ba-section">
+  <div class="ba-inner">
+    <div style="text-align:center;margin-bottom:40px">
+      <div class="section-tag" style="display:inline-block">The real difference</div>
+      <h2>Release day — then vs now</h2>
     </div>
-    <div class="vs-row">
-      <div class="vs-feat"><span>🌅</span> AI Background Generator</div>
-      <div class="vs-price">₹499</div>
-    </div>
-    <div class="vs-row">
-      <div class="vs-feat"><span>🎤</span> Lyric Video Maker</div>
-      <div class="vs-price">₹399</div>
-    </div>
-    <div class="vs-row">
-      <div class="vs-feat"><span>📱</span> Multi-format Export</div>
-      <div class="vs-price">₹199</div>
-    </div>
-    <div class="vs-row">
-      <div class="vs-feat"><span>✨</span> Animated Effects &amp; Styles</div>
-      <div class="vs-price">₹349</div>
-    </div>
-    <div class="vs-total-row">
-      <div class="vs-total-label">Total value</div>
-      <div class="vs-total-price">₹1,745/month</div>
-    </div>
-    <div class="vs-you-pay">
-      <div class="vs-you-label">You pay today</div>
-      <div class="vs-you-price">₹49/month</div>
-    </div>
-  </div>
-</section>
-
-<!-- PRICING CARD -->
-<section id="pricing">
-  <div class="pricing-wrap">
-    <div class="section-label" style="justify-content:center;margin-bottom:12px">Pricing</div>
-    <h2 class="section-h" style="margin-bottom:8px">One plan. Everything included.</h2>
-    <p class="section-sub" style="margin-bottom:32px">No tiers. No limits. No surprises.</p>
-
-    <div class="pricing-card">
-      <div class="pc-top">
-        <div class="pc-plan">🔥 Launch Special</div>
-        <div class="pc-price-wrap">
-          <div class="pc-was">₹499/month</div>
-          <div class="pc-price"><span style="font-size:42px;vertical-align:middle">₹</span>49</div>
-          <div class="pc-month">per month · billed monthly</div>
-        </div>
-        <div class="pc-saving">🎉 You save ₹450 every month</div>
-
-        <div class="pc-items">
-          <div class="pc-item"><div class="pc-item-ck">✓</div>Unlimited music videos — make as many as you want</div>
-          <div class="pc-item"><div class="pc-item-ck">✓</div>AI Background Generator (any language, any style)</div>
-          <div class="pc-item"><div class="pc-item-ck">✓</div>Beat-sync animations — auto-detects Bollywood, EDM, Hip-Hop</div>
-          <div class="pc-item"><div class="pc-item-ck">✓</div>9 lyric styles — Karaoke, Neon, Subtitle, Insta Card &amp; more</div>
-          <div class="pc-item"><div class="pc-item-ck">✓</div>Export for YouTube, Reels &amp; WhatsApp Status</div>
-          <div class="pc-item"><div class="pc-item-ck">✓</div>No watermark on any video</div>
-          <div class="pc-item"><div class="pc-item-ck">✓</div>Works on any Android or iPhone — no app install</div>
-          <div class="pc-item"><div class="pc-item-ck">✓</div>Priority support via WhatsApp</div>
-        </div>
-
-        <button class="pc-cta" onclick="startNow()">🎬 Get Unlimited Access — ₹49</button>
-        <div class="pc-note">✓ UPI / Card / Net Banking &nbsp;·&nbsp; ✓ Cancel anytime &nbsp;·&nbsp; ✓ Instant access</div>
+    <div class="ba-grid">
+      <div class="ba-panel before">
+        <div class="ba-label before-l">😩 Before BeatViz</div>
+        <div class="ba-item"><span class="ba-icon">⏳</span><div class="ba-text">Track is done. <strong>Waiting 5 days</strong> for the freelancer to even reply.</div></div>
+        <div class="ba-item"><span class="ba-icon">💸</span><div class="ba-text">Paid <strong>₹4,500</strong> for a lyric video. Revisions cost extra. No guarantee on quality.</div></div>
+        <div class="ba-item"><span class="ba-icon">📵</span><div class="ba-text">Can't post on release day. <strong>Momentum lost.</strong> Fans waiting, asking "where's the video?"</div></div>
+        <div class="ba-item"><span class="ba-icon">😤</span><div class="ba-text">Final file comes as a <strong>low-res MP4</strong> you have to re-encode before uploading to YouTube.</div></div>
+        <div class="ba-item"><span class="ba-icon">🔁</span><div class="ba-text"><strong>Repeat every single time</strong> you release a new song. ₹5,000 × 12 tracks = ₹60,000/year.</div></div>
       </div>
-
-      <div class="pc-bottom">
-        <div class="pc-pay"><span>⚡</span> UPI</div>
-        <div class="pc-pay"><span>💳</span> Visa / Mastercard</div>
-        <div class="pc-pay"><span>🏦</span> Net Banking</div>
-        <div class="pc-pay"><span>🔒</span> SSL Secured</div>
+      <div class="ba-panel after">
+        <div class="ba-label after-l">🚀 With BeatViz</div>
+        <div class="ba-item"><span class="ba-icon">⚡</span><div class="ba-text">Track is done. <strong>Video is live in 10 minutes.</strong> Same night post. Momentum kept.</div></div>
+        <div class="ba-item"><span class="ba-icon">✅</span><div class="ba-text"><strong>₹49/month, unlimited videos.</strong> Changed the lyrics in 30 seconds when you spotted a typo.</div></div>
+        <div class="ba-item"><span class="ba-icon">🎯</span><div class="ba-text">Posted on exact release day. <strong>Algorithm caught it.</strong> First 500 views in 2 hours.</div></div>
+        <div class="ba-item"><span class="ba-icon">📥</span><div class="ba-text"><strong>Full-quality MP4</strong> ready to upload to YouTube, Reels, WhatsApp Status. No re-encoding.</div></div>
+        <div class="ba-item"><span class="ba-icon">♾️</span><div class="ba-text"><strong>Make a video for every track</strong> — singles, covers, snippets. Still just ₹49 that month.</div></div>
       </div>
     </div>
-  </div>
-</section>
-
-<!-- FAQ -->
-<section class="section reveal">
-  <div class="section-label">Questions</div>
-  <h2 class="section-h">Frequently Asked</h2>
-  <p class="section-sub" style="margin-bottom:32px">Still thinking? These answers might help.</p>
-
-  <div class="faq-list">
-    <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">
-        Is ₹49 really the total price? No hidden charges?
-        <div class="faq-icon">+</div>
+    <div style="text-align:center;margin-top:32px">
+      <button style="background:var(--ink);color:var(--warm);border:none;border-radius:8px;padding:15px 36px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Syne',sans-serif;display:inline-flex;align-items:center;gap:8px" onclick="window.location.href='auth.html?mode=signup'">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Start free — no card needed
       </button>
-      <div class="faq-a">Yes, exactly ₹49 per month. No setup fee, no hidden charge, no "premium features" extra. Everything listed is included. You can cancel before the next month and nothing more is charged.</div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">
-        Which payment methods are accepted?
-        <div class="faq-icon">+</div>
-      </button>
-      <div class="faq-a">UPI (GPay, PhonePe, Paytm), all Debit/Credit cards (Visa, Mastercard, RuPay), Net Banking from all major Indian banks. Payments are processed securely via Razorpay.</div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">
-        Do I need to install any app?
-        <div class="faq-icon">+</div>
-      </button>
-      <div class="faq-a">No. BeatViz works directly in your phone browser — Chrome, Safari, any browser. Just open the link, log in, and start making videos. No Play Store or App Store needed.</div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">
-        Can I use any Bollywood or Hindi song?
-        <div class="faq-icon">+</div>
-      </button>
-      <div class="faq-a">Yes! BeatViz works with any MP3 or audio file from your phone. Bollywood, Punjabi, EDM, ghazals, devotional — any genre, any language. Just upload the file from your device.</div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">
-        How many videos can I make per month?
-        <div class="faq-icon">+</div>
-      </button>
-      <div class="faq-a">Unlimited. Make 1 video or 1,000 videos — same price of ₹49. No per-video charge, no cap, no slowdown.</div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">
-        Will the price stay at ₹49?
-        <div class="faq-icon">+</div>
-      </button>
-      <div class="faq-a">This is a launch price. The regular price is ₹499/month. If you subscribe now at ₹49, you keep that price as long as you stay subscribed. New users after the launch will pay the higher price.</div>
+      <p style="font-size:12px;color:var(--muted);margin-top:10px">Then ₹49/month for unlimited videos · Cancel anytime</p>
     </div>
   </div>
 </section>
 
-<!-- FOOTER CTA -->
-<section class="footer-cta reveal">
-  <div class="blob b1" style="opacity:.4"></div>
-  <div class="blob b2" style="opacity:.4"></div>
-  <div class="fct-h">
-    Your next video is<br><span class="accent">2 minutes away.</span>
+<!-- ─── PRICING ─── -->
+<section class="pricing-section" id="pricing">
+  <div class="pricing-inner">
+    <div class="section-tag">Pricing</div>
+    <h2>Honest pricing for independent artists</h2>
+    <div class="price-grid">
+
+      <div class="price-card">
+        <div class="pc-tier">Free trial</div>
+        <div class="pc-amount">₹0</div>
+        <div class="pc-cycle">1 complete video, yours to keep</div>
+        <p class="pc-desc">No credit card. No watermark. One full video to see if BeatViz works for you. Download it, post it, keep it.</p>
+        <div class="pc-features">
+          <div class="pc-feat yes"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>1 music video, no watermark</div>
+          <div class="pc-feat yes"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>All 6 visual themes</div>
+          <div class="pc-feat yes"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Character upload — up to 5 photos</div>
+          <div class="pc-feat yes"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>WebM download</div>
+          <div class="pc-feat no"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Lyric overlay</div>
+          <div class="pc-feat no"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>MP4 export</div>
+          <div class="pc-feat no"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Unlimited videos</div>
+        </div>
+        <button class="pc-btn free" onclick="window.location.href='auth.html?mode=signup'">Start free trial</button>
+      </div>
+
+      <div class="price-card hot">
+        <div class="pc-tier fire">🔥 Pro plan — most popular</div>
+        <div class="pc-amount hot-num">₹49</div>
+        <div class="pc-cycle">per month · inclusive of GST · cancel anytime</div>
+        <div class="pc-save">💰 Saves ₹4,951 vs one freelancer video</div>
+        <p class="pc-desc">Unlimited videos, all features unlocked. Less than one chai pe charcha at your local dhaba. Make as many videos as tracks you release.</p>
+        <div class="pc-features">
+          <div class="pc-feat yes"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><strong>Unlimited</strong> music videos</div>
+          <div class="pc-feat yes"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>All 6 visual themes</div>
+          <div class="pc-feat yes"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Lyric overlay — all 5 styles</div>
+          <div class="pc-feat yes"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>All 6 dance move modes</div>
+          <div class="pc-feat yes"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Camera shake on drops</div>
+          <div class="pc-feat yes"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>MP4 + WebM export</div>
+          <div class="pc-feat yes"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>GST invoice every month</div>
+          <div class="pc-feat yes"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Priority email support</div>
+        </div>
+        <button class="pc-btn paid" onclick="window.location.href='auth.html?mode=signup'">Get unlimited for ₹49/month</button>
+      </div>
+
+    </div>
+    <p class="pricing-note">Payments via Razorpay · PCI-DSS secure · Auto-renews monthly · Cancels with 1 click · Deactivates after 12 months</p>
   </div>
-  <div class="fct-sub">Join 10,000+ creators who already make videos with BeatViz</div>
-  <div class="fct-price-pill">
-    Starting at <span class="fct-price-big">&nbsp;₹49/month</span>
-  </div>
-  <a href="#pricing" class="cta-primary" style="max-width:360px;margin:0 auto;display:flex">
-    🎬 Start Making Videos — ₹49
-  </a>
 </section>
+
+<!-- ─── FAQ ─── -->
+<section class="faq-section" id="faq">
+  <div class="faq-inner">
+    <div class="section-tag">Common questions</div>
+    <h2>Got questions? Here are answers.</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">Is it really ₹49? What's the catch?<div class="faq-chevron"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></button>
+        <div class="faq-a">Yes, genuinely ₹49/month inclusive of GST. No per-video charge. No watermarks. No hidden fees. We kept it low because most independent artists in India can't afford ₹5,000 per video from a freelancer. You can cancel anytime with one click — no calls, no forms.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">Do I need to install anything?<div class="faq-chevron"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></button>
+        <div class="faq-a">Nothing to install. BeatViz runs entirely in your browser — just open it in Chrome, upload your file, and start. Works on any laptop or desktop. No download, no setup.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">What photo format works best for characters?<div class="faq-chevron"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></button>
+        <div class="faq-a">PNG with a transparent background looks the best — your cutout layers cleanly over any visual theme. If you only have a JPG, use remove.bg (free) to strip the background first. It takes under 30 seconds and the result is much better.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">How long does it take to make one video?<div class="faq-chevron"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></button>
+        <div class="faq-a">For a simple video with no lyrics — about 5 minutes. For a full lyric video (typing every line into the stamp editor) — 15–20 minutes depending on how long the song is. The MP4 export takes 1–2 extra minutes after you hit Generate.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">Can I upload a full Bollywood / Punjabi track?<div class="faq-chevron"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></button>
+        <div class="faq-a">Yes. Any MP3, WAV, AAC, or OGG up to 20 minutes works. The beat detection is tuned to work with complex rhythmic patterns — it handles dhol beats, tabla, and 808s equally well. You can adjust the sensitivity if needed.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">What happens to my videos if I cancel?<div class="faq-chevron"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></button>
+        <div class="faq-a">Your account and all saved projects stay. You can still view them. You just can't generate new videos until you resubscribe. Resubscribing at any time re-activates everything instantly.</div>
+      </div>
+    </div>
+    <p style="text-align:center;font-size:13px;color:var(--muted);margin-top:20px">Still have questions? Email us at <a href="mailto:support@beatviz.in" style="color:var(--accent);font-weight:600">support@beatviz.in</a> — we reply same day.</p>
+  </div>
+</section>
+
+<!-- ─── FINAL CTA ─── -->
+<div class="final-cta">
+  <div class="fc-inner">
+    <h2>Your track is done.<br>Make the video tonight.</h2>
+    <div class="fc-price">Unlimited videos for <strong>₹49/month</strong></div>
+    <p style="font-size:15px;color:rgba(255,255,255,.65);margin-bottom:24px">First video is completely free. No credit card. No watermark. 10 minutes.</p>
+    <div class="fc-actions">
+      <button class="fc-btn-main" onclick="window.location.href='auth.html?mode=signup'">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Create my free video
+      </button>
+      <button class="fc-btn-sub" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">See full pricing</button>
+    </div>
+    <p class="fc-note">No credit card · No watermark on free video · ₹49/month unlimited after · Cancel anytime</p>
+  </div>
+</div>
+
+</main>
 
 <!-- FOOTER -->
 <footer>
-  <div style="margin-bottom:8px">
-    <a href="#" style="color:#1e1e3a;text-decoration:none;margin:0 10px">Privacy Policy</a>
-    <a href="#" style="color:#1e1e3a;text-decoration:none;margin:0 10px">Terms of Use</a>
-    <a href="#" style="color:#1e1e3a;text-decoration:none;margin:0 10px">Refund Policy</a>
-    <a href="#" style="color:#1e1e3a;text-decoration:none;margin:0 10px">Contact</a>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="nav-logo" style="color:var(--warm);margin-bottom:10px">
+          <div class="logo-sq"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13M9 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12 0c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2z"/></svg></div>
+          BeatViz
+        </div>
+        <p>Beat-synced music videos in your browser. Built for Indian artists. ₹49/month unlimited.</p>
+      </div>
+      <div class="footer-links-row">
+        <div class="footer-col">
+          <h4>Product</h4>
+          <a href="#how">How it works</a>
+          <a href="#output">See output</a>
+          <a href="#pricing">Pricing — ₹49/mo</a>
+        </div>
+        <div class="footer-col">
+          <h4>Account</h4>
+          <a href="auth.html?mode=login">Log in</a>
+          <a href="auth.html?mode=signup">Sign up free</a>
+        </div>
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <a href="terms.html#privacy">Privacy Policy</a>
+          <a href="terms.html">Terms of Service</a>
+          <a href="terms.html#refund">Refund Policy</a>
+          <a href="mailto:support@beatviz.in">Contact</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 BeatViz. All rights reserved.</p>
+      <div class="footer-bottom-right">
+        <span style="color:rgba(255,255,255,.3)">🔒 Payments by Razorpay</span>
+        <a href="terms.html">Terms</a>
+        <a href="terms.html#privacy">Privacy</a>
+        <a href="terms.html#refund">Refund</a>
+      </div>
+    </div>
   </div>
-  © 2025 BeatViz · Made in India 🇮🇳
 </footer>
 
-<!-- STICKY MOBILE CTA -->
-<div id="sticky-mob">
-  <div class="smob-inner">
-    <div class="smob-price">
-      <div class="smob-p1">Only</div>
-      <div class="smob-p2">₹49<small style="font-size:13px;color:#475569">/mo</small></div>
+<!-- STICKY BAR -->
+<div class="sticky-bar" id="stickyBar">
+  <div class="sb-left">
+    <div class="sb-price">₹49/mo</div>
+    <div>
+      <div class="sb-text"><strong>Unlimited music videos</strong></div>
+      <div class="sb-text" style="font-size:11px;color:rgba(255,255,255,.4)">No card · First video free · Cancel anytime</div>
     </div>
-    <button class="smob-btn" onclick="startNow()">🎬 Get Unlimited Access</button>
+  </div>
+  <div class="sb-right">
+    <button class="sb-btn" onclick="window.location.href='auth.html?mode=signup'">Get started free →</button>
+    <button class="sb-dismiss" onclick="dismissSticky()" aria-label="Close">×</button>
+  </div>
+</div>
+
+<!-- EXIT POPUP -->
+<div class="exit-overlay" id="exitOverlay" role="dialog">
+  <div class="exit-popup">
+    <button class="ep-close" onclick="closeExit()">×</button>
+    <span class="ep-emoji">🎬</span>
+    <h3 class="ep-title">Wait — unlimited videos for just ₹49</h3>
+    <p class="ep-desc">Your first video is free. No credit card. If you like it — just ₹49/month for every video after that. Cancel with one click.</p>
+    <div class="ep-offer">
+      <div style="font-size:11px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,.4);margin-bottom:6px;text-transform:uppercase">Pro plan</div>
+      <div class="ep-offer-num">₹49</div>
+      <div class="ep-offer-sub">per month · unlimited videos · all features</div>
+    </div>
+    <button class="ep-btn" onclick="window.location.href='auth.html?mode=signup';closeExit()">Create my free video →</button>
+    <button class="ep-skip" onclick="closeExit()">I'll come back later</button>
   </div>
 </div>
 
 <script>
-/* ── Countdown timer ── */
+// ─── WAVEFORM BARS (hero screenshot) ───
 (function(){
-  let secs = 11*3600 + 59*60 + 43;
-  function tick(){
-    secs--;
-    if(secs<0) secs=23*3600;
-    const h=Math.floor(secs/3600);
-    const m=Math.floor((secs%3600)/60);
-    const s=secs%60;
-    const el=document.getElementById('timer');
-    if(el) el.textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-  }
-  setInterval(tick,1000);
+  const container = document.getElementById('waveformPreview');
+  if(!container) return;
+  const heights = [30,45,60,35,70,55,40,65,80,50,45,70,60,35,55,75,40,65,50,35,60,45,70,55,80,40,65,30,50,70,45,60];
+  heights.forEach(h => {
+    const bar = document.createElement('div');
+    bar.className = 'ss-bar';
+    const isHigh = h > 60;
+    bar.style.cssText = `height:${h}%;background:${isHigh ? '#7c3aed' : '#bba8f0'};`;
+    container.appendChild(bar);
+  });
+  // Animate
+  let t = 0;
+  setInterval(() => {
+    container.querySelectorAll('.ss-bar').forEach((b, i) => {
+      const newH = (Math.sin(i * 0.5 + t * 0.08) + 1) * 0.5 * 70 + 10;
+      b.style.height = newH + '%';
+    });
+    t++;
+  }, 60);
 })();
 
-/* ── FAQ toggle ── */
+// ─── OUTPUT CANVAS (realistic video preview) ───
+(function(){
+  const c = document.getElementById('outputCanvas');
+  if(!c) return;
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  let t = 0;
+  let currentArtist = 'Ranjeet K.';
+
+  // Update artist name from input
+  const input = document.getElementById('artistInput');
+  if(input) {
+    input.addEventListener('input', () => {
+      const v = input.value.trim();
+      if(v.length > 1) {
+        currentArtist = v;
+        document.getElementById('vmArtistName').textContent = v + ' — New Track';
+      }
+    });
+  }
+
+  const particles = Array.from({length:35}, () => ({
+    x: Math.random()*W, y: Math.random()*H,
+    vx: (Math.random()-.5)*0.8, vy: (Math.random()-.5)*0.8,
+    r: Math.random()*2+.5, hue: 250+Math.random()*50
+  }));
+
+  const lyrics = ['Tera naam likh diya...', 'Dil ki deewar par', 'Har pal yaad aate ho', 'Tum hi tum ho mere'];
+  let currentLyric = 0;
+
+  function draw(){
+    // Background
+    ctx.fillStyle = 'rgba(5,5,16,.25)';
+    ctx.fillRect(0,0,W,H);
+
+    // Synthwave grid
+    ctx.strokeStyle = 'rgba(124,58,237,.06)';
+    ctx.lineWidth = 1;
+    const horizon = H * 0.55;
+    for(let x = 0; x < W; x += 30) {
+      ctx.beginPath();
+      ctx.moveTo(x, horizon);
+      ctx.lineTo(W/2 + (x - W/2) * 0.1, H);
+      ctx.stroke();
+    }
+    for(let i = 0; i < 5; i++) {
+      const y = horizon + (H - horizon) * (i/4);
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    }
+
+    // Bars
+    const bars = 40, bw = W / bars;
+    for(let i = 0; i < bars; i++){
+      const e = (Math.sin(i*0.4+t*0.06)+1)*0.5*(Math.sin(t*0.04)*0.5+0.5);
+      const bh = e * H * 0.38 + 6;
+      const gr = ctx.createLinearGradient(0, horizon-bh, 0, horizon);
+      gr.addColorStop(0,'rgba(157,99,245,.85)');
+      gr.addColorStop(1,'rgba(34,211,238,.2)');
+      ctx.fillStyle = gr;
+      const bx = i*bw+1;
+      ctx.beginPath();
+      if(ctx.roundRect) ctx.roundRect(bx, horizon-bh, bw-2, bh, 3);
+      else ctx.rect(bx, horizon-bh, bw-2, bh);
+      ctx.fill();
+    }
+
+    // Character
+    const cx = W*0.5, cy = H*0.35, bob = Math.sin(t*0.07)*5;
+    ctx.save(); ctx.translate(cx, cy+bob);
+    // Glow
+    const g = ctx.createRadialGradient(0,0,0,0,0,50);
+    g.addColorStop(0,'rgba(157,99,245,.2)'); g.addColorStop(1,'transparent');
+    ctx.fillStyle=g; ctx.fillRect(-50,-70,100,100);
+    // Head
+    ctx.fillStyle='rgba(157,99,245,.9)'; ctx.shadowBlur=16; ctx.shadowColor='#7c3aed';
+    ctx.beginPath(); ctx.arc(0,-44,14,0,Math.PI*2); ctx.fill();
+    // Body
+    ctx.fillStyle='rgba(124,58,237,.8)';
+    if(ctx.roundRect) ctx.roundRect(-12,-30,24,34,4); else ctx.rect(-12,-30,24,34);
+    ctx.fill();
+    // Arms
+    const arm = Math.sin(t*0.07)*16;
+    ctx.strokeStyle='rgba(124,58,237,.9)'; ctx.lineWidth=6; ctx.lineCap='round';
+    ctx.shadowBlur=0;
+    ctx.beginPath(); ctx.moveTo(-12,-24); ctx.lineTo(-25+arm*0.4,-6+arm*0.3); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(12,-24); ctx.lineTo(25-arm*0.4,-6-arm*0.3); ctx.stroke();
+    // Legs
+    const leg = Math.sin(t*0.07)*12;
+    ctx.beginPath(); ctx.moveTo(-5,4); ctx.lineTo(-10+leg,24); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(5,4); ctx.lineTo(10-leg,24); ctx.stroke();
+    ctx.restore();
+
+    // Lyric overlay
+    if(Math.floor(t/100) !== currentLyric) currentLyric = Math.floor(t/100) % lyrics.length;
+    const lyricA = Math.min(1, (t%100)/15) * Math.max(0, 1-(t%100-80)/20);
+    ctx.save();
+    ctx.textAlign='center';
+    ctx.font='bold 16px DM Sans,sans-serif';
+    ctx.fillStyle=`rgba(255,255,255,${lyricA})`;
+    ctx.shadowColor='rgba(157,99,245,.9)'; ctx.shadowBlur=20;
+    ctx.fillText(lyrics[currentLyric], W/2, H*0.82);
+    ctx.restore();
+
+    // Particles
+    particles.forEach(p => {
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x<0||p.x>W) p.vx*=-1;
+      if(p.y<0||p.y>H) p.vy*=-1;
+      ctx.fillStyle=`hsla(${p.hue},80%,65%,.5)`;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+    });
+
+    // Progress
+    const prog = (t%400)/400;
+    document.getElementById('vmProgressFill').style.width = (prog*100)+'%';
+
+    t++; requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ─── NAV SCROLL ───
+window.addEventListener('scroll', () => handleSticky());
+
+// ─── STICKY BAR ───
+let stickyClosed = false;
+function handleSticky(){
+  if(stickyClosed) return;
+  const sb = document.getElementById('stickyBar');
+  sb.classList.toggle('visible', window.scrollY > window.innerHeight * 0.6);
+}
+function dismissSticky(){
+  stickyClosed = true;
+  document.getElementById('stickyBar').classList.remove('visible');
+}
+
+// ─── EXIT INTENT ───
+let exitShown = false;
+document.addEventListener('mouseleave', e => {
+  if(exitShown || e.clientY > 10 || sessionStorage.getItem('bv_exit')) return;
+  if(window.scrollY < 200) return;
+  exitShown = true;
+  sessionStorage.setItem('bv_exit','1');
+  document.getElementById('exitOverlay').classList.add('active');
+});
+function closeExit(){
+  document.getElementById('exitOverlay').classList.remove('active');
+}
+document.getElementById('exitOverlay').addEventListener('click', e => { if(e.target===document.getElementById('exitOverlay')) closeExit(); });
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeExit(); });
+
+// ─── FAQ ───
 function toggleFaq(btn){
-  const item=btn.closest('.faq-item');
-  const isOpen=item.classList.contains('open');
-  document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));
-  if(!isOpen) item.classList.add('open');
+  const item = btn.closest('.faq-item');
+  const open = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
+  if(!open) item.classList.add('open');
 }
-
-/* ── Scroll reveal ── */
-const observer=new IntersectionObserver(entries=>{
-  entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('in'); });
-},{threshold:.1});
-document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
-
-/* ── CTA action ── */
-function startNow(){
-  // Replace with your actual payment/signup link
-  alert('Redirect to payment/signup page here.\nIntegrate Razorpay or your auth system.');
-}
-
-/* ── Hide sticky bar on pricing section ── */
-const pricingEl=document.getElementById('pricing');
-if(pricingEl){
-  const stickyObs=new IntersectionObserver(entries=>{
-    const mob=document.getElementById('sticky-mob');
-    if(mob) mob.style.display=entries[0].isIntersecting?'none':'block';
-  },{threshold:.3});
-  stickyObs.observe(pricingEl);
-}
+document.querySelectorAll('.faq-q').forEach(q => q.addEventListener('click', () => toggleFaq(q)));
 </script>
 </body>
 </html>

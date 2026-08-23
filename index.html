@@ -40,8 +40,8 @@ a{text-decoration:none;color:inherit}
 /* ─── NAV ─── */
 nav{background:var(--warm);border-bottom:2px solid var(--ink);padding:0 40px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
 .nav-logo{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--ink);display:flex;align-items:center;gap:10px}
-.logo-sq{width:32px;height:32px;background:var(--ink);border-radius:4px;display:flex;align-items:center;justify-content:center}
-.logo-sq svg{fill:var(--warm);width:18px;height:18px}
+.logo-sq{width:32px;height:32px;background:var(--ink);border-radius:4px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.logo-sq img{width:100%;height:100%;object-fit:cover}
 .nav-links{display:flex;gap:28px}
 .nav-links a{font-size:14px;color:var(--muted);font-weight:500;transition:color .15s}
 .nav-links a:hover{color:var(--ink)}
@@ -76,7 +76,6 @@ h1{font-family:'Syne',sans-serif;font-size:clamp(36px,4.5vw,58px);font-weight:80
 /* ─── HERO SCREENSHOT STACK ─── */
 .hero-right{position:relative;padding-top:8px}
 .screenshot-stack{position:relative}
-/* Main screenshot — upload screen */
 .ss-main{border-radius:12px;border:2px solid var(--ink);overflow:hidden;background:#fff;box-shadow:6px 6px 0 var(--ink)}
 .ss-topbar{background:var(--ink);padding:10px 16px;display:flex;align-items:center;gap:8px}
 .ss-dots{display:flex;gap:5px}
@@ -100,21 +99,18 @@ h1{font-family:'Syne',sans-serif;font-size:clamp(36px,4.5vw,58px);font-weight:80
 .ss-bpm-pill.outline{background:transparent;color:var(--ink);border:1.5px solid var(--ink)}
 .ss-waveform{height:40px;background:#f0f0f0;border-radius:6px;overflow:hidden;position:relative;display:flex;align-items:flex-end;gap:1px;padding:4px}
 .ss-bar{flex:1;border-radius:2px 2px 0 0;min-height:3px;transition:height .3s}
-/* Floating result card */
 .ss-float-card{position:absolute;bottom:-20px;right:-20px;background:#fff;border:2px solid var(--ink);border-radius:10px;padding:14px 16px;box-shadow:4px 4px 0 var(--ink);min-width:180px;z-index:2}
 .sfc-label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
 .sfc-title{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:2px}
 .sfc-sub{font-size:11px;color:var(--muted)}
 .sfc-badge{display:inline-block;background:var(--green-bg);color:var(--green);font-size:11px;font-weight:700;border-radius:4px;padding:2px 8px;margin-top:6px}
 
-/* ─── HOW IT WORKS — REALISTIC STEPS ─── */
+/* ─── HOW IT WORKS ─── */
 .how-section{background:#fff;border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);padding:80px 40px}
 .section-inner{max-width:1100px;margin:0 auto}
 .section-tag{font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
 h2{font-family:'Syne',sans-serif;font-size:clamp(28px,3.5vw,44px);font-weight:800;letter-spacing:-1.5px;line-height:1.1;margin-bottom:40px;color:var(--ink)}
 .steps-row{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
-
-/* Each step card with a real screenshot */
 .step-card{border:2px solid var(--ink);border-radius:10px;overflow:hidden;background:var(--warm)}
 .step-card-head{background:var(--ink);padding:10px 14px;display:flex;align-items:center;justify-content:space-between}
 .step-num{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--warm);letter-spacing:1px;opacity:.5}
@@ -123,23 +119,17 @@ h2{font-family:'Syne',sans-serif;font-size:clamp(28px,3.5vw,44px);font-weight:80
 .step-info{padding:14px}
 .step-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--ink);margin-bottom:5px}
 .step-desc{font-size:12px;color:var(--muted);line-height:1.55}
-
-/* Step 1 screen — file upload */
 .s1-dropzone{border:2px dashed #ccc;border-radius:6px;padding:14px 10px;text-align:center;margin-bottom:8px}
 .s1-dropzone .icon{font-size:24px;display:block;margin-bottom:4px}
 .s1-dropzone p{font-size:11px;color:var(--muted2);font-weight:500}
 .s1-formats{display:flex;gap:4px;flex-wrap:wrap}
 .fmt-tag{background:#f0f0f0;border-radius:3px;padding:2px 6px;font-size:10px;font-weight:600;color:var(--muted)}
-
-/* Step 2 screen — character upload */
 .s2-chars{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px}
 .s2-char{border:2px solid var(--border);border-radius:6px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:20px;background:#f9f9f9;overflow:hidden;position:relative}
 .s2-char.filled{background:#e8f5ee;border-color:#b8dfc8;border-style:solid}
 .s2-char.empty{border-style:dashed;font-size:18px;color:#ccc}
 .s2-char .char-label{position:absolute;bottom:2px;left:0;right:0;text-align:center;font-size:8px;font-weight:700;color:var(--muted)}
 .s2-tip{font-size:10px;color:var(--muted2);text-align:center}
-
-/* Step 3 screen — lyric editor */
 .s3-track-bar{display:flex;align-items:center;gap:6px;margin-bottom:10px}
 .s3-play-btn{width:26px;height:26px;background:var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .s3-play-btn svg{fill:var(--warm);width:10px;height:10px;margin-left:2px}
@@ -153,8 +143,6 @@ h2{font-family:'Syne',sans-serif;font-size:clamp(28px,3.5vw,44px);font-weight:80
 .s3-lyric-text{font-size:11px;color:var(--ink);flex:1;background:#f0f0f0;border-radius:3px;padding:3px 6px}
 .s3-lyric-text.active{background:var(--ink);color:var(--warm)}
 .s3-lyric-add{font-size:10px;color:var(--muted2);text-align:center;padding:3px;border:1px dashed #ccc;border-radius:3px;margin-top:4px}
-
-/* Step 4 screen — theme picker & export */
 .s4-themes{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:8px}
 .s4-theme{border:2px solid var(--border);border-radius:5px;aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;text-align:center;cursor:pointer;transition:border-color .15s;line-height:1.2;padding:3px}
 .s4-theme.active{border-color:var(--ink);border-width:2px;background:var(--ink);color:var(--warm)}
@@ -166,7 +154,7 @@ h2{font-family:'Syne',sans-serif;font-size:clamp(28px,3.5vw,44px);font-weight:80
 .s4-export-btn{flex:1;background:var(--ink);color:var(--warm);border:none;border-radius:5px;padding:8px 6px;font-size:11px;font-weight:700;text-align:center;cursor:pointer;font-family:'DM Sans',sans-serif}
 .s4-export-btn.outline{background:transparent;color:var(--ink);border:1.5px solid var(--ink)}
 
-/* ─── REAL OUTPUT PREVIEW ─── */
+/* ─── OUTPUT ─── */
 .output-section{background:var(--ink);color:var(--warm);padding:80px 40px}
 .output-inner{max-width:1100px;margin:0 auto}
 .output-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;margin-top:40px}
@@ -179,8 +167,6 @@ h2{font-family:'Syne',sans-serif;font-size:clamp(28px,3.5vw,44px);font-weight:80
 .out-cta{background:var(--warm);color:var(--ink);border:none;border-radius:8px;padding:14px 28px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Syne',sans-serif;transition:background .15s;display:inline-flex;align-items:center;gap:8px}
 .out-cta:hover{background:var(--warm2)}
 .out-note{font-size:12px;color:rgba(255,255,255,.35);margin-top:10px}
-
-/* Realistic video output mockup */
 .video-mockup{border:3px solid rgba(255,255,255,.15);border-radius:12px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5)}
 .vm-topbar{background:#111;padding:8px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(255,255,255,.08)}
 .vm-dots{display:flex;gap:5px}
@@ -188,22 +174,17 @@ h2{font-family:'Syne',sans-serif;font-size:clamp(28px,3.5vw,44px);font-weight:80
 .vm-site{flex:1;background:rgba(255,255,255,.07);border-radius:4px;padding:3px 10px;font-size:10px;color:rgba(255,255,255,.35);text-align:center;font-family:monospace}
 .vm-screen{position:relative;background:#050508;aspect-ratio:16/9;overflow:hidden}
 .vm-bg-gradient{position:absolute;inset:0;background:radial-gradient(ellipse at 60% 40%,rgba(80,20,160,.5),transparent 70%),linear-gradient(180deg,transparent 50%,rgba(0,0,0,.8))}
-/* Fake waveform bars in video */
 .vm-bars{position:absolute;bottom:40px;left:0;right:0;display:flex;gap:2px;align-items:flex-end;padding:0 20px;height:70px}
 .vm-bar{flex:1;border-radius:2px 2px 0 0;background:rgba(150,80,255,.7)}
-/* Fake lyric overlay in video */
 .vm-lyric{position:absolute;bottom:20px;left:0;right:0;text-align:center;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:#fff;text-shadow:0 0 20px rgba(150,80,255,.8);letter-spacing:.5px}
-/* Fake character in video */
 .vm-char{position:absolute;bottom:50px;left:50%;transform:translateX(-50%);text-align:center}
 .vm-char-body{width:40px;height:60px;background:rgba(130,60,240,.8);border-radius:8px 8px 4px 4px;position:relative;margin:0 auto}
 .vm-char-head{width:28px;height:28px;background:rgba(150,80,255,.9);border-radius:50%;position:absolute;top:-20px;left:50%;transform:translateX(-50%);box-shadow:0 0 20px rgba(150,80,255,.6)}
-/* Artist info in video */
 .vm-artist{position:absolute;top:16px;left:20px;font-family:'DM Sans',sans-serif;font-size:13px;color:rgba(255,255,255,.8);font-weight:600;letter-spacing:.3px}
 .vm-playing-tag{position:absolute;top:14px;right:16px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:3px 10px;font-size:10px;color:rgba(255,255,255,.6);font-weight:600;display:flex;align-items:center;gap:5px}
 .vm-playing-dot{width:6px;height:6px;background:#22c55e;border-radius:50%;animation:blink 1.2s infinite}
 .vm-progress{position:absolute;bottom:0;left:0;right:0;height:3px;background:rgba(255,255,255,.1)}
 .vm-progress-fill{height:100%;width:42%;background:linear-gradient(90deg,#7c3aed,#22d3ee)}
-/* Download button overlay */
 .vm-controls{background:#111;padding:12px 16px;display:flex;align-items:center;gap:12px;border-top:1px solid rgba(255,255,255,.08)}
 .vm-ctrl-btn{background:rgba(255,255,255,.1);border:none;border-radius:5px;padding:6px 12px;font-size:11px;font-weight:600;color:rgba(255,255,255,.6);cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:5px}
 .vm-ctrl-btn.dl{background:#7c3aed;color:#fff}
@@ -403,7 +384,7 @@ footer{background:var(--ink2);border-top:2px solid var(--border-dark);padding:48
 <nav id="nav">
   <div class="nav-logo">
     <div class="logo-sq">
-      <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13M9 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12 0c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2z"/></svg>
+      <img src="https://lh3.google.com/u/0/d/1Z-jNnrm70KGkCtkVB1M6W3g4gwl0jHD8" alt="BeatViz logo">
     </div>
     BeatViz
   </div>
@@ -451,7 +432,6 @@ footer{background:var(--ink2);border-top:2px solid var(--border-dark);padding:48
       </div>
     </div>
 
-    <!-- HERO SCREENSHOT — realistic upload screen -->
     <div class="hero-right">
       <div class="screenshot-stack">
         <div class="ss-main">
@@ -465,7 +445,6 @@ footer{background:var(--ink2);border-top:2px solid var(--border-dark);padding:48
           </div>
           <div class="ss-body">
             <div class="ss-section-label">Step 1 — Upload your track</div>
-            <!-- Loaded file state -->
             <div class="ss-file-loaded">
               <div class="ss-file-icon">🎵</div>
               <div class="ss-file-info">
@@ -481,12 +460,10 @@ footer{background:var(--ink2);border-top:2px solid var(--border-dark);padding:48
             </div>
             <div class="ss-section-label" style="margin-top:12px">Detected beats</div>
             <div class="ss-waveform" id="waveformPreview">
-              <!-- bars injected by JS -->
             </div>
           </div>
         </div>
 
-        <!-- Floating status card -->
         <div class="ss-float-card">
           <div class="sfc-label">Beat analysis</div>
           <div class="sfc-title">248 beats found</div>
@@ -496,7 +473,6 @@ footer{background:var(--ink2);border-top:2px solid var(--border-dark);padding:48
       </div>
     </div>
   </div>
-  <!-- Social proof bar -->
   <div style="display:flex;align-items:center;gap:24px;padding:24px 0;border-top:1px solid var(--border);margin-top:48px;flex-wrap:wrap">
     <div style="display:flex">
       <div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#f472b6,#7c3aed);border:2px solid var(--warm);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;margin-left:-8px;z-index:4">RK</div>
@@ -517,7 +493,6 @@ footer{background:var(--ink2);border-top:2px solid var(--border-dark);padding:48
     <h2>4 steps. 10 minutes. Done.</h2>
     <div class="steps-row">
 
-      <!-- Step 1 — Upload audio -->
       <div class="step-card">
         <div class="step-card-head">
           <span class="step-num">STEP 01</span>
@@ -543,7 +518,6 @@ footer{background:var(--ink2);border-top:2px solid var(--border-dark);padding:48
         </div>
       </div>
 
-      <!-- Step 2 — Add photos -->
       <div class="step-card">
         <div class="step-card-head">
           <span class="step-num">STEP 02</span>
@@ -574,7 +548,6 @@ footer{background:var(--ink2);border-top:2px solid var(--border-dark);padding:48
         </div>
       </div>
 
-      <!-- Step 3 — Write lyrics -->
       <div class="step-card">
         <div class="step-card-head">
           <span class="step-num">STEP 03</span>
@@ -613,7 +586,6 @@ footer{background:var(--ink2);border-top:2px solid var(--border-dark);padding:48
         </div>
       </div>
 
-      <!-- Step 4 — Export -->
       <div class="step-card">
         <div class="step-card-head">
           <span class="step-num">STEP 04</span>
@@ -665,7 +637,6 @@ footer{background:var(--ink2);border-top:2px solid var(--border-dark);padding:48
         <p class="out-note">No credit card · No watermark on first video · Cancel anytime</p>
       </div>
 
-      <!-- Realistic video preview mockup -->
       <div>
         <div class="video-mockup">
           <div class="vm-topbar">
@@ -677,10 +648,8 @@ footer{background:var(--ink2);border-top:2px solid var(--border-dark);padding:48
             <div class="vm-site">BeatViz Studio — Neon Synthwave</div>
           </div>
 
-          <!-- The actual simulated video screen -->
           <div class="vm-screen">
             <div class="vm-bg-gradient"></div>
-            <!-- Grid lines like synthwave -->
             <canvas id="outputCanvas" width="600" height="338" style="position:absolute;inset:0;width:100%;height:100%"></canvas>
             <div class="vm-artist" id="vmArtistName">Ranjeet K. — Tera Naam</div>
             <div class="vm-playing-tag">
@@ -697,7 +666,6 @@ footer{background:var(--ink2);border-top:2px solid var(--border-dark);padding:48
           </div>
         </div>
 
-        <!-- Labels pointing to features -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px">
           <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:10px 12px">
             <div style="font-size:11px;font-weight:700;color:#fbbf24;margin-bottom:2px">BEAT BARS</div>
@@ -971,7 +939,9 @@ footer{background:var(--ink2);border-top:2px solid var(--border-dark);padding:48
     <div class="footer-top">
       <div class="footer-brand">
         <div class="nav-logo" style="color:var(--warm);margin-bottom:10px">
-             <img src="https://lh3.google.com/u/0/d/1Z-jNnrm70KGkCtkVB1M6W3g4gwl0jHD8" alt="BeatViz logo" class="nav-logo-mark">
+          <div class="logo-sq">
+            <img src="https://lh3.google.com/u/0/d/1Z-jNnrm70KGkCtkVB1M6W3g4gwl0jHD8" alt="BeatViz logo">
+          </div>
           BeatViz
         </div>
         <p>Beat-synced music videos in your browser. Built for Indian artists. ₹49/month unlimited.</p>
@@ -1042,7 +1012,6 @@ footer{background:var(--ink2);border-top:2px solid var(--border-dark);padding:48
 </div>
 
 <script>
-// ─── WAVEFORM BARS (hero screenshot) ───
 (function(){
   const container = document.getElementById('waveformPreview');
   if(!container) return;
@@ -1054,7 +1023,6 @@ footer{background:var(--ink2);border-top:2px solid var(--border-dark);padding:48
     bar.style.cssText = `height:${h}%;background:${isHigh ? '#7c3aed' : '#bba8f0'};`;
     container.appendChild(bar);
   });
-  // Animate
   let t = 0;
   setInterval(() => {
     container.querySelectorAll('.ss-bar').forEach((b, i) => {
@@ -1065,7 +1033,6 @@ footer{background:var(--ink2);border-top:2px solid var(--border-dark);padding:48
   }, 60);
 })();
 
-// ─── OUTPUT CANVAS (realistic video preview) ───
 (function(){
   const c = document.getElementById('outputCanvas');
   if(!c) return;
@@ -1074,7 +1041,6 @@ footer{background:var(--ink2);border-top:2px solid var(--border-dark);padding:48
   let t = 0;
   let currentArtist = 'Ranjeet K.';
 
-  // Update artist name from input
   const input = document.getElementById('artistInput');
   if(input) {
     input.addEventListener('input', () => {
@@ -1096,11 +1062,9 @@ footer{background:var(--ink2);border-top:2px solid var(--border-dark);padding:48
   let currentLyric = 0;
 
   function draw(){
-    // Background
     ctx.fillStyle = 'rgba(5,5,16,.25)';
     ctx.fillRect(0,0,W,H);
 
-    // Synthwave grid
     ctx.strokeStyle = 'rgba(124,58,237,.06)';
     ctx.lineWidth = 1;
     const horizon = H * 0.55;
@@ -1115,7 +1079,6 @@ footer{background:var(--ink2);border-top:2px solid var(--border-dark);padding:48
       ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
     }
 
-    // Bars
     const bars = 40, bw = W / bars;
     for(let i = 0; i < bars; i++){
       const e = (Math.sin(i*0.4+t*0.06)+1)*0.5*(Math.sin(t*0.04)*0.5+0.5);
@@ -1131,33 +1094,26 @@ footer{background:var(--ink2);border-top:2px solid var(--border-dark);padding:48
       ctx.fill();
     }
 
-    // Character
     const cx = W*0.5, cy = H*0.35, bob = Math.sin(t*0.07)*5;
     ctx.save(); ctx.translate(cx, cy+bob);
-    // Glow
     const g = ctx.createRadialGradient(0,0,0,0,0,50);
     g.addColorStop(0,'rgba(157,99,245,.2)'); g.addColorStop(1,'transparent');
     ctx.fillStyle=g; ctx.fillRect(-50,-70,100,100);
-    // Head
     ctx.fillStyle='rgba(157,99,245,.9)'; ctx.shadowBlur=16; ctx.shadowColor='#7c3aed';
     ctx.beginPath(); ctx.arc(0,-44,14,0,Math.PI*2); ctx.fill();
-    // Body
     ctx.fillStyle='rgba(124,58,237,.8)';
     if(ctx.roundRect) ctx.roundRect(-12,-30,24,34,4); else ctx.rect(-12,-30,24,34);
     ctx.fill();
-    // Arms
     const arm = Math.sin(t*0.07)*16;
     ctx.strokeStyle='rgba(124,58,237,.9)'; ctx.lineWidth=6; ctx.lineCap='round';
     ctx.shadowBlur=0;
     ctx.beginPath(); ctx.moveTo(-12,-24); ctx.lineTo(-25+arm*0.4,-6+arm*0.3); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(12,-24); ctx.lineTo(25-arm*0.4,-6-arm*0.3); ctx.stroke();
-    // Legs
     const leg = Math.sin(t*0.07)*12;
     ctx.beginPath(); ctx.moveTo(-5,4); ctx.lineTo(-10+leg,24); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(5,4); ctx.lineTo(10-leg,24); ctx.stroke();
     ctx.restore();
 
-    // Lyric overlay
     if(Math.floor(t/100) !== currentLyric) currentLyric = Math.floor(t/100) % lyrics.length;
     const lyricA = Math.min(1, (t%100)/15) * Math.max(0, 1-(t%100-80)/20);
     ctx.save();
@@ -1168,7 +1124,6 @@ footer{background:var(--ink2);border-top:2px solid var(--border-dark);padding:48
     ctx.fillText(lyrics[currentLyric], W/2, H*0.82);
     ctx.restore();
 
-    // Particles
     particles.forEach(p => {
       p.x+=p.vx; p.y+=p.vy;
       if(p.x<0||p.x>W) p.vx*=-1;
@@ -1177,7 +1132,6 @@ footer{background:var(--ink2);border-top:2px solid var(--border-dark);padding:48
       ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
     });
 
-    // Progress
     const prog = (t%400)/400;
     document.getElementById('vmProgressFill').style.width = (prog*100)+'%';
 
@@ -1186,10 +1140,8 @@ footer{background:var(--ink2);border-top:2px solid var(--border-dark);padding:48
   draw();
 })();
 
-// ─── NAV SCROLL ───
 window.addEventListener('scroll', () => handleSticky());
 
-// ─── STICKY BAR ───
 let stickyClosed = false;
 function handleSticky(){
   if(stickyClosed) return;
@@ -1201,7 +1153,6 @@ function dismissSticky(){
   document.getElementById('stickyBar').classList.remove('visible');
 }
 
-// ─── EXIT INTENT ───
 let exitShown = false;
 document.addEventListener('mouseleave', e => {
   if(exitShown || e.clientY > 10 || sessionStorage.getItem('bv_exit')) return;
@@ -1216,7 +1167,6 @@ function closeExit(){
 document.getElementById('exitOverlay').addEventListener('click', e => { if(e.target===document.getElementById('exitOverlay')) closeExit(); });
 document.addEventListener('keydown', e => { if(e.key==='Escape') closeExit(); });
 
-// ─── FAQ ───
 function toggleFaq(btn){
   const item = btn.closest('.faq-item');
   const open = item.classList.contains('open');

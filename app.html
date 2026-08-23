@@ -2713,6 +2713,7 @@ let beatIntensity=0,bassAvg=0,lastBeat=0,beatTimestamps=[];
 let camX=0,camY=0,transitionAlpha=0,lastTransitionTime=0,energyHistory=[];
 let isPlaying=false,isPaused=false,recorder=null,chunks=[],recordedBlob=null,rafId=null,playStart=0,recordingStatusText='';
 let pendingLyricTime=null,selectedLyricIdx=-1;
+let _selectedIdxSet = new Set(); // multi-select set
 const STYLES=['stage','neon','space','forest','ocean','retro'];
 const STYLE_COLORS={stage:'#8b5cf6',space:'#a5b4fc',retro:'#00ff64',neon:'#f472b6',forest:'#34d399',ocean:'#22d3ee'};
 const RING_COLS={stage:['#8b5cf6','#22d3ee'],space:['#a5b4fc','#fde68a'],retro:['#00ff64','#00cc50'],neon:['#f472b6','#a78bfa'],forest:['#34d399','#fde68a'],ocean:['#22d3ee','#818cf8']};
@@ -2971,7 +2972,7 @@ function renderLyrics(){
     const isSel=i===selectedLyricIdx;
     const endT=l.endTime||l.time+4;
     return `<div class="lr${isSel?' sel':''}" id="lr${i}"
-      onclick="selectLyric(${i})"
+      onclick="event.ctrlKey||event.metaKey ? mlToggleSel(${i}) : selectLyric(${i})"
       oncontextmenu="event.preventDefault();selectedLyricIdx=${i};renderLyrics();showLyricContextMenu(event.clientX,event.clientY,${i})">
       <div class="lr-top">
         <div class="lt-badge">
@@ -2989,6 +2990,15 @@ function renderLyrics(){
   document.getElementById('lyricsList').innerHTML=html;
   document.getElementById('lyricsListM').innerHTML=html;
   document.getElementById('lr'+selectedLyricIdx)?.scrollIntoView({block:'nearest',behavior:'smooth'});
+}
+
+  function mlToggleSel(i){
+  if(_selectedIdxSet.has(i)) _selectedIdxSet.delete(i);
+  else _selectedIdxSet.add(i);
+  // visually mark selected rows
+  document.querySelectorAll('.lr').forEach((r,ri)=>{
+    r.classList.toggle('sel', _selectedIdxSet.has(ri) || ri===selectedLyricIdx);
+  });
 }
 
 
@@ -3047,6 +3057,19 @@ document.addEventListener('click', e => {
 document.addEventListener('keydown', e => {
   if(e.key==='Escape') hideLyricContextMenu();
   // Ctrl+V = universal paste at playhead (lyrics, images, audio)
+  // Ctrl+C — copy selected lyrics
+if((e.ctrlKey||e.metaKey) && e.key==='c' && !e.target.matches('input,textarea,[contenteditable]')){
+  const toCopy = _selectedIdxSet.size > 0
+    ? [..._selectedIdxSet].map(i=>lyrics[i]).filter(Boolean)
+    : selectedLyricIdx>=0 ? [lyrics[selectedLyricIdx]] : [];
+  if(!toCopy.length) return;
+  e.preventDefault();
+  _copiedLyric = {...toCopy[0]};
+  _copiedLyricIdx = lyrics.indexOf(toCopy[0]);
+  tlCopy('lyric', _copiedLyric);
+  window._multiCopied = toCopy.map(l=>({...l}));
+  toast(`⎘ Copied ${toCopy.length} lyric${toCopy.length>1?'s':''} — left-click timeline to paste`);
+}
   if((e.ctrlKey||e.metaKey) && e.key==='v' && (_tlClipboard||_copiedLyric) && !e.target.matches('input,textarea,[contenteditable]')){
     e.preventDefault();
     if(_tlClipboard) tlPaste(pvOffset||0);
@@ -4366,15 +4389,29 @@ const TL={
     }
 
     // Priority 3: click empty space → open lyric add input
-    if(audioDuration > 0){
-      const t = this.x2t(mx);
-      // Check if clicking the paste zone (shown after copy)
-      if(_copiedLyric && _pasteZoneX >= 0 && Math.abs(mx - _pasteZoneX) < 28){
-        pasteAfterCopied();
-      } else {
-        openTlFloat(t);
-      }
-    }
+// Priority 3: click empty space → paste if copied, else open add input
+if(audioDuration > 0){
+  const t = this.x2t(mx);
+  if(_copiedLyric){
+    // Left-click on empty timeline = paste at that exact time
+    const multi = window._multiCopied || [_copiedLyric];
+    let offset = 0;
+    multi.forEach(src=>{
+      const dur = (src.endTime||src.time+4) - src.time;
+      const newT = Math.max(0, Math.min(audioDuration-dur, t+offset));
+      lyrics.push({text:src.text, time:+newT.toFixed(2), endTime:+(newT+dur).toFixed(2),
+        ds:{beatCount:0,jumpAmt:0,spinAng:0,spinDir:1,phase:Math.random()*Math.PI*2}});
+      offset += dur + 0.2;
+    });
+    lyrics.sort((a,b)=>a.time-b.time);
+    _copiedLyric=null; _copiedLyricIdx=-1; _pasteZoneX=-1;
+    window._multiCopied=null; _selectedIdxSet.clear();
+    renderLyrics(); TL.draw(pvOffset||0);
+    toast(`⎙ Pasted at ${fmt(t)}`);
+  } else {
+    openTlFloat(t);
+  }
+}
     selectedLyricIdx = -1;
     renderLyrics();
   },

@@ -5272,17 +5272,37 @@
 
         const Q_BITRATE = { hd: 6000000, fhd: 10000000, uhd: 28000000 };
 
-        function stopAll() {
-            isPlaying = false;
-            isPaused = false;
-            pauseVideoLayers();
-            try { srcNode?.stop(); } catch (e) {}
-            if (recorder?.state !== 'inactive') recorder?.stop();
-            ['genBtn', 'genBtnMob'].forEach(id => { const b = document.getElementById(id); if (b) { b.textContent =
-                        '▶ Generate Video';
-                    b.classList.remove('stop'); } });
-            showPauseUI(false);
-        }
+function stopAll() {
+  isPlaying = false;
+  isPaused = false;
+  pauseVideoLayers();
+
+  // Stop audio source
+  try { srcNode?.stop(); } catch (e) {}
+  
+  // Stop recording
+  if (recorder?.state !== 'inactive') recorder?.stop();
+
+  // ⭐ Suspend the main audio context
+  if (audioCtx && audioCtx.state === 'running') {
+    audioCtx.suspend().catch(() => {});
+  }
+
+  // ⭐ Also stop preview audio if it's playing
+  if (pvPlaying) pausePreview();
+
+  // Reset UI
+  ['genBtn', 'genBtnMob'].forEach(id => {
+    const b = document.getElementById(id);
+    if (b) {
+      b.textContent = '▶ Generate Video';
+      b.classList.remove('stop');
+    }
+  });
+  showPauseUI(false);
+  document.getElementById('dot').className = 'dot';
+  document.getElementById('statusTxt').textContent = 'Stopped';
+}
 
         function showPauseUI(show) {
             ['pauseBtn', 'pauseBtnMob'].forEach(id => { const b = document.getElementById(id); if (!b) return;
@@ -6562,7 +6582,7 @@
         let currentProjectId = null;
         let projectList = [];
 
-        function getProjectData() {
+async function getProjectData(){
             return {
                 version: '1.1',
                 name: currentProjectName,
@@ -6698,7 +6718,7 @@
         // ── SAVE PROJECT ──
         async function saveProject() {
             if (!token) { toast('⚠ Please log in first'); return; }
-            const data = getProjectData();
+const data = await getProjectData();
             if (currentProjectName === 'Untitled Project') {
                 const name = prompt('Project name:', 'My Video');
                 if (name) currentProjectName = name;
@@ -6882,6 +6902,29 @@
             document.querySelectorAll('.mn-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('sheetOv').classList.remove('show');
         }
+
+        // Compress an image data URL to a thumbnail
+function compressImage(dataUrl, maxSize) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      let w = img.width, h = img.height;
+      if (w > h) {
+        if (w > maxSize) { h = h * maxSize / w; w = maxSize; }
+      } else {
+        if (h > maxSize) { w = w * maxSize / h; h = maxSize; }
+      }
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL('image/jpeg', 0.7)); // JPEG with 70% quality
+    };
+    img.onerror = () => resolve(dataUrl); // fallback to original
+    img.src = dataUrl;
+  });
+}
 
         // ── DRAG & DROP ──
         function initDnD() {

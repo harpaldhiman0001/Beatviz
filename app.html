@@ -154,9 +154,6 @@
             text-overflow: ellipsis;
             white-space: nowrap;
         }
-        .topbar-project-name.active {
-            color: var(--text-primary);
-        }
         .topbar-badge {
             font-size: 9px;
             font-weight: 700;
@@ -1842,114 +1839,6 @@
         }
 
         /* ============================================================
-                   PROJECT MANAGEMENT — NEW
-                   ============================================================ */
-        .project-panel {
-            border-bottom: 1px solid var(--border-subtle);
-            padding: 6px 10px 10px;
-            background: var(--bg-primary);
-        }
-        .project-panel .pp-row {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-        .project-panel .pp-row .pp-btn {
-            padding: 5px 12px;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border-subtle);
-            background: var(--bg-card);
-            color: var(--text-muted);
-            font-family: var(--font);
-            font-size: 9px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            white-space: nowrap;
-        }
-        .project-panel .pp-row .pp-btn:hover {
-            border-color: var(--text-muted);
-            color: var(--text-secondary);
-        }
-        .project-panel .pp-row .pp-btn.primary {
-            border-color: var(--accent);
-            background: rgba(124, 58, 237, 0.08);
-            color: #a78bfa;
-        }
-        .project-panel .pp-row .pp-btn.primary:hover {
-            background: rgba(124, 58, 237, 0.16);
-        }
-        .project-panel .pp-row .pp-btn.danger {
-            border-color: var(--red);
-            color: var(--red);
-        }
-        .project-panel .pp-row .pp-btn.danger:hover {
-            background: var(--red-dim);
-        }
-        .project-panel .pp-row .pp-btn.green {
-            border-color: var(--green);
-            color: var(--green);
-        }
-        .project-panel .pp-row .pp-btn.green:hover {
-            background: var(--green-dim);
-        }
-        .project-panel .pp-divider {
-            width: 1px;
-            height: 20px;
-            background: var(--border-subtle);
-        }
-        .project-panel .pp-projects {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 4px;
-            margin-top: 6px;
-            padding-top: 6px;
-            border-top: 1px solid var(--border-subtle);
-        }
-        .project-panel .pp-projects .pp-proj {
-            padding: 3px 10px;
-            border-radius: 100px;
-            border: 1px solid var(--border-subtle);
-            background: var(--bg-card);
-            font-size: 9px;
-            font-weight: 600;
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            white-space: nowrap;
-        }
-        .project-panel .pp-projects .pp-proj:hover {
-            border-color: var(--accent);
-            color: var(--text-secondary);
-        }
-        .project-panel .pp-projects .pp-proj.active {
-            border-color: var(--accent);
-            background: rgba(124, 58, 237, 0.08);
-            color: #a78bfa;
-        }
-        .project-panel .pp-projects .pp-proj .del {
-            font-size: 8px;
-            color: var(--text-muted);
-            cursor: pointer;
-            padding: 0 2px;
-        }
-        .project-panel .pp-projects .pp-proj .del:hover {
-            color: var(--red);
-        }
-        .project-panel .pp-empty {
-            font-size: 10px;
-            color: var(--text-muted);
-            padding: 4px 0;
-        }
-
-        /* ============================================================
                    TOAST
                    ============================================================ */
         .toast {
@@ -2444,23 +2333,11 @@
                 <button class="sidebar-tab" data-pane="style" onclick="showPane('style',this)"><span class="ti">✨</span>Style</button>
                 <button class="sidebar-tab" data-pane="lyrics" onclick="showPane('lyrics',this)"><span class="ti">🎤</span>Lyrics</button>
                 <button class="sidebar-tab" data-pane="motion" onclick="showPane('motion',this)"><span class="ti">💃</span>Motion</button>
-                <button class="sidebar-tab" data-pane="project" onclick="showPane('project',this)"><span class="ti">💾</span>Project</button>
             </div>
 
             <div class="sidebar-panes" id="sidebarPanes">
                 <!-- ========== UPLOAD PANE ========== -->
                 <div class="sidebar-pane active" id="pane-upload">
-                    <!-- Project panel (quick save/load) -->
-                    <div class="project-panel">
-                        <div class="pp-row">
-                            <button class="pp-btn primary" onclick="saveProject()">💾 Save</button>
-                            <button class="pp-btn" onclick="loadProjectList()">📂 Load</button>
-                            <button class="pp-btn" onclick="exportProject()">📤 Export</button>
-                            <button class="pp-btn danger" onclick="deleteCurrentProject()">🗑</button>
-                        </div>
-                        <div id="projectList" class="pp-projects"></div>
-                    </div>
-
                     <!-- Video Clips -->
                     <div>
                         <div class="sec-head">Video Clips <span class="sec-badge">split · PiP · overlay</span></div>
@@ -2506,7 +2383,7 @@
                                 <button class="cf-btn" data-cf="cool" onclick="setCamFilter('cool',this)" style="padding:2px 6px;border:1px solid var(--border-subtle);background:var(--bg-card);color:var(--text-muted);font-family:var(--font);font-size:7px;font-weight:700;cursor:pointer;border-radius:3px;transition:var(--transition)">Cool</button>
                                 <button class="cf-btn" data-cf="vivid" onclick="setCamFilter('vivid',this)" style="padding:2px 6px;border:1px solid var(--border-subtle);background:var(--bg-card);color:var(--text-muted);font-family:var(--font);font-size:7px;font-weight:700;cursor:pointer;border-radius:3px;transition:var(--transition)">Vivid</button>
                                 <button class="cf-btn" data-cf="vintage" onclick="setCamFilter('vintage',this)" style="padding:2px 6px;border:1px solid var(--border-subtle);background:var(--bg-card);color:var(--text-muted);font-family:var(--font);font-size:7px;font-weight:700;cursor:pointer;border-radius:3px;transition:var(--transition)">Vintage</button>
-                                <button class="cf-btn" data-cf="bw" onclick="setCamFilter('bw',this)" style="padding:2px 6px;border:1px solid var(--border-subtle);background:var(--bg-card);color:var(--text-muted);font-family:var(--font);font-size:7px;font-weight:700;cursor:pointer;border-radius:3px;transition:var(--transition)">B&W</button>
+                                <button class="cf-btn" data-cf="bw" onclick="setCamFilter('bw',this)" style="padding:2px 6px;border:1px solid var(--border-subtle);background:var(--bg-card);color:var(--text-muted);font-family:var(--font);font-size:7px;font-weight:700;cursor:pointer;border-radius:3px;transition:var(--transition)">B&amp;W</button>
                             </div>
                         </div>
                         <!-- Split layout -->
@@ -2779,54 +2656,6 @@
                         <div style="font-size:8px;color:var(--text-muted);padding:4px 10px 8px;line-height:1.5">Auto dance cycles all moves every 22s. Shake triggers on beats &gt;60%.</div>
                     </div>
                 </div>
-
-                <!-- ========== PROJECT PANE ========== -->
-                <div class="sidebar-pane" id="pane-project">
-                    <div>
-                        <div class="sec-head">Project Management <span class="sec-badge">Google Drive</span></div>
-                        <div style="padding:8px 10px 10px;display:flex;flex-direction:column;gap:6px">
-                            <div style="display:flex;gap:5px;flex-wrap:wrap">
-                                <button onclick="saveProject()" style="flex:1;padding:8px;border-radius:var(--radius-sm);border:none;background:linear-gradient(135deg,#7c3aed,#5b21b6);color:#fff;font-family:var(--font);font-size:10px;font-weight:700;cursor:pointer;transition:var(--transition)">💾 Save Project</button>
-                                <button onclick="loadProjectList()" style="flex:1;padding:8px;border-radius:var(--radius-sm);border:1px solid var(--border-subtle);background:var(--bg-card);color:var(--text-secondary);font-family:var(--font);font-size:10px;font-weight:700;cursor:pointer;transition:var(--transition)">📂 Load</button>
-                            </div>
-                            <div style="display:flex;gap:5px;flex-wrap:wrap">
-                                <button onclick="exportProject()" style="flex:1;padding:6px;border-radius:var(--radius-sm);border:1px solid var(--cyan);background:var(--cyan-dim);color:var(--cyan);font-family:var(--font);font-size:9px;font-weight:600;cursor:pointer;transition:var(--transition)">📤 Export JSON</button>
-                                <button onclick="importProject()" style="flex:1;padding:6px;border-radius:var(--radius-sm);border:1px solid var(--border-subtle);background:var(--bg-card);color:var(--text-muted);font-family:var(--font);font-size:9px;font-weight:600;cursor:pointer;transition:var(--transition)">📥 Import JSON</button>
-                                <button onclick="deleteCurrentProject()" style="padding:6px 12px;border-radius:var(--radius-sm);border:1px solid var(--red);background:var(--red-dim);color:var(--red);font-family:var(--font);font-size:9px;font-weight:600;cursor:pointer;transition:var(--transition)">🗑 Delete</button>
-                            </div>
-                            <div style="font-size:8px;color:var(--text-muted);padding:4px 0;border-top:1px solid var(--border-subtle);margin-top:4px">
-                                <span id="projectStatus">💾 Projects saved to your Google Drive folder</span>
-                            </div>
-                            <div id="projectListFull" style="display:flex;flex-direction:column;gap:3px;margin-top:4px;max-height:160px;overflow-y:auto"></div>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="sec-head">Text Overlay</div>
-                        <div style="padding:4px 8px 8px;display:flex;flex-direction:column;gap:4px">
-                            <input type="text" id="txtArtist" placeholder="Artist name" style="width:100%;background:var(--bg-card);border:1.5px solid var(--border-subtle);border-radius:var(--radius-sm);color:var(--text-secondary);font-family:var(--font);font-size:12px;padding:7px 10px;outline:none" oninput="updateTextPreview()">
-                            <input type="text" id="txtSong" placeholder="Song title" style="width:100%;background:var(--bg-card);border:1.5px solid var(--border-subtle);border-radius:var(--radius-sm);color:var(--text-secondary);font-family:var(--font);font-size:12px;padding:7px 10px;outline:none" oninput="updateTextPreview()">
-                            <div class="prop-row"><span class="prop-label">Color</span><input type="color" id="txtColor" value="#ffffff" oninput="updateTextPreview()"></div>
-                            <div class="prop-row"><span class="prop-label">Size</span>
-                                <select id="txtSize" class="cs" style="background:var(--bg-primary);border:1.5px solid var(--border-subtle);color:var(--text-secondary);font-family:var(--font);font-size:10px;padding:4px 8px;border-radius:var(--radius-sm);outline:none" onchange="updateTextPreview()">
-                                    <option value="small">Small</option>
-                                    <option value="medium" selected>Medium</option>
-                                    <option value="large">Large</option>
-                                </select>
-                            </div>
-                            <div class="prop-row"><span class="prop-label">Position</span>
-                                <select id="txtPos" class="cs" style="background:var(--bg-primary);border:1.5px solid var(--border-subtle);color:var(--text-secondary);font-family:var(--font);font-size:10px;padding:4px 8px;border-radius:var(--radius-sm);outline:none" onchange="updateTextPreview()">
-                                    <option value="topleft">Top Left</option>
-                                    <option value="topcenter">Top Center</option>
-                                    <option value="topright">Top Right</option>
-                                    <option value="bottomleft">Bottom Left</option>
-                                    <option value="bottomcenter" selected>Bottom Center</option>
-                                </select>
-                            </div>
-                            <button onclick="clearTextOverlay()" style="padding:6px;border-radius:var(--radius-sm);border:1.5px dashed var(--border-subtle);background:none;color:var(--text-muted);font-family:var(--font);font-size:9px;font-weight:600;cursor:pointer;transition:var(--transition)">🚫 Remove text overlay</button>
-                            <div style="font-size:8px;color:var(--text-muted);text-align:center;padding:2px 0" id="txtPreviewLabel">Type artist &amp; song name above</div>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <!-- ACTIONS -->
@@ -2842,7 +2671,6 @@
                     <button onclick="setPreviewDur(0,this)">Full</button>
                 </div>
                 <button class="pause-btn" id="pauseBtn" onclick="togglePause()">⏸ Pause</button>
-                <button class="pause-btn" id="rerecordBtn" onclick="reRecordFromPlayhead()" style="display:none;background:rgba(239,68,68,0.06);border-color:var(--red);color:var(--red)">🔄 Re-record</button>
                 <button class="gen-btn" id="genBtn" onclick="handleGenerate()" disabled><span class="btn-text">▶ Generate Video</span><div class="spinner"></div></button>
                 <div class="exp-row">
                     <a class="exp-btn webm" id="dlWebm" download="beatviz.webm" style="display:none">⬇ WebM</a>
@@ -3007,9 +2835,6 @@
         </button>
         <button class="mn-btn" id="mn-motion" onclick="openSheet('motion',this)">
             <span class="ni">💃</span>Motion
-        </button>
-        <button class="mn-btn" id="mn-project" onclick="openSheet('project',this)">
-            <span class="ni">💾</span>Project
         </button>
     </nav>
 
@@ -3265,29 +3090,10 @@
             </div>
         </div>
     </div>
-    <!-- Project -->
-    <div class="sheet" id="bs-project">
-        <div class="sheet-handle"></div>
-        <div class="sheet-head"><span class="sheet-title">💾 Project</span><button class="sheet-close" onclick="closeSheet()">✕</button></div>
-        <div class="sheet-body">
-            <div style="display:flex;gap:6px;flex-wrap:wrap">
-                <button onclick="saveProject()" style="flex:1;padding:12px;border-radius:var(--radius-sm);border:none;background:linear-gradient(135deg,#7c3aed,#5b21b6);color:#fff;font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer">💾 Save Project</button>
-                <button onclick="loadProjectList()" style="flex:1;padding:12px;border-radius:var(--radius-sm);border:1px solid var(--border-subtle);background:var(--bg-card);color:var(--text-secondary);font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer">📂 Load</button>
-            </div>
-            <div style="display:flex;gap:6px;flex-wrap:wrap">
-                <button onclick="exportProject()" style="flex:1;padding:8px;border-radius:var(--radius-sm);border:1px solid var(--cyan);background:var(--cyan-dim);color:var(--cyan);font-family:var(--font);font-size:11px;font-weight:600;cursor:pointer">📤 Export JSON</button>
-                <button onclick="importProject()" style="flex:1;padding:8px;border-radius:var(--radius-sm);border:1px solid var(--border-subtle);background:var(--bg-card);color:var(--text-muted);font-family:var(--font);font-size:11px;font-weight:600;cursor:pointer">📥 Import JSON</button>
-                <button onclick="deleteCurrentProject()" style="padding:8px 14px;border-radius:var(--radius-sm);border:1px solid var(--red);background:var(--red-dim);color:var(--red);font-family:var(--font);font-size:11px;font-weight:600;cursor:pointer">🗑 Delete</button>
-            </div>
-            <div style="font-size:9px;color:var(--text-muted);padding:6px 0;border-top:1px solid var(--border-subtle)" id="projectStatusM">💾 Projects saved to your Google Drive</div>
-            <div id="projectListFullM" style="display:flex;flex-direction:column;gap:4px;max-height:200px;overflow-y:auto;margin-top:4px"></div>
-        </div>
-    </div>
 
     <!-- MOBILE GENERATE BAR -->
     <div class="mob-gen" id="mobGenBar">
         <button class="mob-pause-btn" id="pauseBtnMob" onclick="togglePause()">⏸ Pause</button>
-        <button class="mob-pause-btn" id="rerecordBtnMob" onclick="reRecordFromPlayhead()" style="display:none;background:rgba(239,68,68,0.06);border:1px solid var(--red);color:var(--red)">🔄 Re-record</button>
         <button class="mob-gen-btn" id="genBtnMob" onclick="handleGenerate()" disabled>▶ Generate</button>
         <div class="mob-exp">
             <a class="exp-btn webm" id="dlWebmMob" download="beatviz.webm" style="display:none">⬇ WebM</a>
@@ -3365,11 +3171,11 @@
     <div class="toast" id="toast"></div>
 
     <!-- ============================================================
-    SCRIPTS
+    SCRIPTS (Cleaned — No Save/Load)
     ============================================================ -->
     <script>
         // ════════════════════════════════════════════════════════════════
-        //  BEATVIZ — MAIN APPLICATION SCRIPT
+        //  BEATVIZ — MAIN APPLICATION SCRIPT (CLEANED)
         //  ════════════════════════════════════════════════════════════════
 
         // ── CONFIG ──
@@ -3572,7 +3378,6 @@
                     if (b.dataset.pane === name) b.classList.add('active');
                 });
             }
-            if (name === 'project') loadProjectList();
         }
 
         // ── ASPECT RATIO ──
@@ -3985,11 +3790,9 @@
             ctx.restore();
         }
 
-        // ── CHARACTERS (with segment support) ──
+        // ── CHARACTERS ──
         function drawCharacters(beat, elapsed) {
             if (!chars.length) return;
-
-            // Find which character is active at this time based on imgSegments
             let activeIdx = -1;
             for (const seg of imgSegments) {
                 if (elapsed >= seg.start && elapsed < seg.start + seg.dur) {
@@ -3997,16 +3800,12 @@
                     break;
                 }
             }
-            // If no active segment, draw nothing (or fallback to all? No — user said "if no then no one play")
             if (activeIdx < 0 || activeIdx >= chars.length) {
-                // But if there are no segments at all, draw all characters (legacy behavior)
                 if (imgSegments.length === 0) {
                     drawAllCharacters(beat, elapsed);
                 }
                 return;
             }
-
-            // Draw only the active character
             const c = chars[activeIdx];
             drawSingleCharacter(c, beat, elapsed, activeIdx);
         }
@@ -4447,7 +4246,6 @@
             const dur = video.duration || 10;
             videoLayers.push({ el: video, name, url, mode: 'full', opacity: 1, aspect, audioEnabled: false,
             filter: 'none' });
-            // Auto-create a video segment for this clip
             const lastEnd = videoSegments.length > 0 ? videoSegments[videoSegments.length - 1].start + videoSegments[
                 videoSegments.length - 1].dur : 0;
             videoSegments.push({ vidIdx: videoLayers.length - 1, start: lastEnd, dur: dur });
@@ -4491,9 +4289,7 @@
         function removeVideoLayer(idx) { if (videoLayers[idx]) { try { videoLayers[idx].el.pause(); } catch (e) {} if (
                     videoLayers[idx].url) URL.revokeObjectURL(videoLayers[idx].url); }
             videoLayers.splice(idx, 1);
-            // Also remove video segments referencing this layer
             videoSegments = videoSegments.filter(s => s.vidIdx !== idx);
-            // Fix indices in remaining segments
             videoSegments.forEach(s => { if (s.vidIdx > idx) s.vidIdx--; });
             renderVideoLayerList();
             renderMultiTracks();
@@ -4522,20 +4318,14 @@
             document.querySelectorAll('.split-btn').forEach(b => { b.classList.toggle('active', b.dataset.split ===
                     videoLayers[idx]?.mode); }); }
 
-        // ── VIDEO LAYER DRAW (with segment support) ──
         function drawVideoLayers(elapsed) {
             if (!videoLayers.length) return;
-
-            // Find active video segments at this time
             const activeSegs = videoSegments.filter(seg =>
                 elapsed >= seg.start && elapsed < seg.start + seg.dur
             );
-
-            // Also include any video that has no segment (legacy full-track mode)
             const hasSegments = videoSegments.length > 0;
             const videosToDraw = hasSegments ? activeSegs.map(s => ({ v: videoLayers[s.vidIdx], seg: s })) :
                 videoLayers.map(v => ({ v, seg: null }));
-
             videosToDraw.forEach(({ v, seg }) => {
                 if (!v || !v.el) return;
                 try {
@@ -4544,15 +4334,11 @@
                     ctx.filter = (v.filter && v.filter !== 'none') ? VIDEO_FILTERS[v.filter] || 'none' : 'none';
                     const ps = W * (v._pipPct || 0.32),
                         ph2 = ps / (v.aspect || 1.78);
-                    // For segmented videos, we need to draw the correct frame
-                    // We use currentTime but for segmented we need to offset
                     let drawTime = elapsed;
                     if (seg) {
                         drawTime = elapsed - seg.start;
-                        // Clamp to segment duration
                         if (drawTime < 0) drawTime = 0;
                         if (drawTime > seg.dur) drawTime = seg.dur;
-                        // Update video current time if it's not already there
                         try {
                             if (Math.abs(v.el.currentTime - drawTime) > 0.05) {
                                 v.el.currentTime = drawTime;
@@ -4613,7 +4399,6 @@
 
             function durPct(d) { return totalDur > 0 ? ((d / totalDur) * 100).toFixed(4) + '%' : '0%'; }
 
-            // Video tracks
             const vidArea = document.getElementById('videoTrackRows');
             if (vidArea) {
                 if (videoLayers.length > 0 && videoSegments.length > 0) {
@@ -4645,7 +4430,6 @@
                 } else { vidArea.innerHTML = ''; }
             }
 
-            // Image tracks
             const imgArea = document.getElementById('imgTrackRows');
             if (imgArea) {
                 if (chars.length > 0 && imgSegments.length > 0) {
@@ -4666,7 +4450,6 @@
                 } else { imgArea.innerHTML = ''; }
             }
 
-            // Audio tracks
             const audArea = document.getElementById('audioTrackRows');
             if (audArea) {
                 if (audioTracks.length > 0 && audioSegments.length > 0) {
@@ -5111,7 +4894,7 @@
             } catch (e) { toast('⚠ Mic access denied'); }
         }
 
-        // ── GENERATE (with segment support) ──
+        // ── GENERATE ──
         async function handleGenerate() {
             const canGenerate = sub.isActive || sub.trialActive || (sub.trialDaysLeft > 0);
             if (!canGenerate) { showPaywall(); return; }
@@ -5140,9 +4923,7 @@
             freqData = new Uint8Array(analyser.frequencyBinCount);
             const mDest = audioCtx.createMediaStreamDestination();
 
-            // Use audio segments for scheduling
             if (audioTracks.length > 0 && audioSegments.length > 0) {
-                // If we have segments, use them
                 audioSegments.forEach(seg => {
                     const track = audioTracks[seg.trackIdx];
                     if (!track || track.muted) return;
@@ -5164,10 +4945,7 @@
                         }
                     }
                 });
-                // Also play the main audio track if it has no segment? No — we use segments exclusively.
-                // But if there are no segments, fallback to playing the first track.
             } else if (audioTracks.length > 0) {
-                // Fallback: play first track from start
                 const track = audioTracks[0];
                 if (track && !track.muted) {
                     const s = audioCtx.createBufferSource();
@@ -5182,7 +4960,6 @@
                 }
             }
 
-            // If no audio tracks but we have video with audio, handle that
             if (audioTracks.length === 0 && videoLayers.length > 0 && videoLayers[0].el) {
                 const rawDur = videoLayers[0].el.duration;
                 const safeDur = isFinite(rawDur) && rawDur > 0 ? rawDur : 600;
@@ -5243,7 +5020,6 @@
             recorder.onstop = finalize;
             const rerecordFrom = window._rerecordFromTime || 0;
             window._rerecordFromTime = null;
-            // Video segments: we don't need to schedule them separately, drawVideoLayers handles it
             playStart = audioCtx.currentTime - rerecordFrom;
             startVideoLayers(rerecordFrom);
             recorder.start(100);
@@ -5272,45 +5048,33 @@
 
         const Q_BITRATE = { hd: 6000000, fhd: 10000000, uhd: 28000000 };
 
-function stopAll() {
-  isPlaying = false;
-  isPaused = false;
-  pauseVideoLayers();
-
-  // Stop audio source
-  try { srcNode?.stop(); } catch (e) {}
-  
-  // Stop recording
-  if (recorder?.state !== 'inactive') recorder?.stop();
-
-  // ⭐ Suspend the main audio context
-  if (audioCtx && audioCtx.state === 'running') {
-    audioCtx.suspend().catch(() => {});
-  }
-
-  // ⭐ Also stop preview audio if it's playing
-  if (pvPlaying) pausePreview();
-
-  // Reset UI
-  ['genBtn', 'genBtnMob'].forEach(id => {
-    const b = document.getElementById(id);
-    if (b) {
-      b.textContent = '▶ Generate Video';
-      b.classList.remove('stop');
-    }
-  });
-  showPauseUI(false);
-  document.getElementById('dot').className = 'dot';
-  document.getElementById('statusTxt').textContent = 'Stopped';
-}
+        function stopAll() {
+            isPlaying = false;
+            isPaused = false;
+            pauseVideoLayers();
+            try { srcNode?.stop(); } catch (e) {}
+            if (recorder?.state !== 'inactive') recorder?.stop();
+            if (audioCtx && audioCtx.state === 'running') {
+                audioCtx.suspend().catch(() => {});
+            }
+            if (pvPlaying) pausePreview();
+            ['genBtn', 'genBtnMob'].forEach(id => {
+                const b = document.getElementById(id);
+                if (b) {
+                    b.textContent = '▶ Generate Video';
+                    b.classList.remove('stop');
+                }
+            });
+            showPauseUI(false);
+            document.getElementById('dot').className = 'dot';
+            document.getElementById('statusTxt').textContent = 'Stopped';
+        }
 
         function showPauseUI(show) {
             ['pauseBtn', 'pauseBtnMob'].forEach(id => { const b = document.getElementById(id); if (!b) return;
                 b.style.display = show ? 'inline-block' : 'none';
                 b.textContent = '⏸ Pause';
                 b.classList.remove('paused'); });
-            ['rerecordBtn', 'rerecordBtnMob'].forEach(id => { const b = document.getElementById(id); if (b) b.style
-                    .display = 'none'; });
         }
 
         function togglePause() {
@@ -5323,16 +5087,12 @@ function stopAll() {
                 try { if (recorder.state === 'recording') recorder.pause(); } catch (e) {}
                 try { audioCtx?.suspend(); } catch (e) {}
                 document.getElementById('dot').className = 'dot paused';
-                ['rerecordBtn', 'rerecordBtnMob'].forEach(id => { const b = document.getElementById(id); if (b) { b
-                            .style.display = 'inline-block';
-                        b.textContent = '🔄 Re-record'; } });
                 ['pauseBtn', 'pauseBtnMob'].forEach(id => { const b = document.getElementById(id); if (b) { b
                             .textContent = '▶ Resume';
                         b.classList.add('paused'); } });
                 const recTime = audioCtx ? audioCtx.currentTime - playStart : 0;
-                document.getElementById('statusTxt').textContent = '⏸ Paused at ' + fmt(recTime) +
-                    ' — drag ◆ to set cut point, click Re-record';
-                toast('⏸ Paused — drag the ◆ playhead to re-record from a different point');
+                document.getElementById('statusTxt').textContent = '⏸ Paused at ' + fmt(recTime);
+                toast('⏸ Paused');
             } else {
                 isPaused = false;
                 resumeVideoLayers();
@@ -5343,29 +5103,8 @@ function stopAll() {
                 ['pauseBtn', 'pauseBtnMob'].forEach(id => { const b = document.getElementById(id); if (b) { b
                             .textContent = '⏸ Pause';
                         b.classList.remove('paused'); } });
-                ['rerecordBtn', 'rerecordBtnMob'].forEach(id => { const b = document.getElementById(id); if (b) b
-                        .style.display = 'none'; });
-                toast('▶ Resumed — recording continues');
+                toast('▶ Resumed');
             }
-        }
-
-        function reRecordFromPlayhead() {
-            const cutTime = pvOffset || 0;
-            if (cutTime <= 0) { toast('⚠ Drag the ◆ playhead back to where you want to re-record from'); return; }
-            isPlaying = false;
-            isPaused = false;
-            try { srcNode?.stop(); } catch (e) {}
-            if (recorder?.state !== 'inactive') { recorder.onstop = () => {};
-                recorder.stop(); }
-            showPauseUI(false);
-            ['genBtn', 'genBtnMob'].forEach(id => { const b = document.getElementById(id); if (b) { b.textContent =
-                        '▶ Generate Video';
-                    b.classList.remove('stop'); } });
-            document.getElementById('dot').className = 'dot';
-            window._rerecordFromTime = cutTime;
-            document.getElementById('statusTxt').textContent = '✂ Cut at ' + fmt(cutTime) +
-                ' — fix what you need, then click Generate';
-            toast('✂ Good — now click ▶ Generate Video to re-record from ' + fmt(cutTime));
         }
 
         function finalize() {
@@ -6274,18 +6013,6 @@ function stopAll() {
                 const r = this.c.getBoundingClientRect(),
                     mx = e.clientX - r.left,
                     my = e.clientY - r.top;
-                if (isPaused) {
-                    const t = Math.max(0, Math.min(audioDuration, this.x2t(mx)));
-                    pvOffset = t;
-                    seekPreview(t);
-                    document.getElementById('statusTxt').textContent = '✂ Re-record from ' + fmt(t) +
-                        ' — click 🔄 Re-record';
-                    const tt = document.getElementById('tlTip');
-                    if (tt) { tt.style.display = 'block';
-                        tt.style.left = Math.min(this.W - 50, Math.max(30, mx)) + 'px';
-                        tt.textContent = '✂ ' + fmt(t); }
-                    return;
-                }
                 if (audioDuration > 0 && my < 26) {
                     const curT = (pvPlaying || pvOffset > 0) ? getPvTime() : pvOffset;
                     const px = this.t2x(curT);
@@ -6345,15 +6072,6 @@ function stopAll() {
                 const r = this.c.getBoundingClientRect(),
                     mx = e.clientX - r.left,
                     my = e.clientY - r.top;
-                if (isPaused) {
-                    this.c.style.cursor = 'col-resize';
-                    const t = Math.max(0, Math.min(audioDuration, this.x2t(mx)));
-                    const tt = document.getElementById('tlTip');
-                    if (tt) { tt.style.display = 'block';
-                        tt.style.left = Math.min(this.W - 70, Math.max(40, mx)) + 'px';
-                        tt.textContent = '✂ Re-record from ' + fmt(t); }
-                    return;
-                }
                 if (this.dragging?.handle === 'playhead') {
                     const t = Math.max(0, Math.min(audioDuration, this.x2t(mx)));
                     seekPreview(t);
@@ -6577,311 +6295,6 @@ function stopAll() {
             }
         };
 
-        // ── PROJECT MANAGEMENT ──────────────────────────────────────────
-        let currentProjectName = 'Untitled Project';
-        let currentProjectId = null;
-        let projectList = [];
-
-async function getProjectData(){
-            return {
-                version: '1.1',
-                name: currentProjectName,
-                id: currentProjectId || 'project_' + Date.now(),
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-                userEmail: user.email || 'unknown',
-                audio: audioTracks.map(t => ({ name: t.name, duration: t.buffer.duration })),
-                audioSegments: audioSegments,
-                chars: chars.map(c => ({ url: c.url, userPlaced: c.userPlaced, px: c.px, py: c.py, pw: c.pw, ph: c
-                        .ph })),
-                imgSegments: imgSegments,
-                lyrics: lyrics.map(l => ({ ...l })),
-                videoLayers: videoLayers.map(v => ({ name: v.name, mode: v.mode, opacity: v.opacity, filter: v
-                        .filter, audioEnabled: v.audioEnabled })),
-                videoSegments: videoSegments,
-                settings: {
-                    style,
-                    lyricsStyle,
-                    danceMode,
-                    mode3D,
-                    camShakeOn,
-                    autoTransition,
-                    activeFilter,
-                    activeFX: [...activeFX],
-                    transitionStyle,
-                    playbackSpeed,
-                    imgTransitionType,
-                    beat: +document.getElementById('sBeat').value,
-                    glow: +document.getElementById('sGlow').value,
-                    particles: +document.getElementById('sParticle').value,
-                    scale: +document.getElementById('sScale').value,
-                    lyricColor: document.getElementById('lyricColor').value,
-                    lyricSize: +document.getElementById('sLyricSz').value,
-                    lyricPos: parseFloat(document.getElementById('lyricPos').value),
-                    txtArtist: document.getElementById('txtArtist').value || '',
-                    txtSong: document.getElementById('txtSong').value || '',
-                    txtColor: document.getElementById('txtColor').value || '#ffffff',
-                    txtSize: document.getElementById('txtSize').value || 'medium',
-                    txtPos: document.getElementById('txtPos').value || 'bottomcenter',
-                    aspectRatio: currentAR,
-                    exportQuality: exportQuality,
-                },
-                aiBackground: aiBackground ? 'generated' : null,
-            };
-        }
-
-        function loadProjectData(data) {
-            if (!data) return;
-            if (data.settings) {
-                const s = data.settings;
-                if (s.style) pickStyle(s.style, null);
-                if (s.lyricsStyle) pickLS(s.lyricsStyle, null);
-                if (s.danceMode) pickDance(s.danceMode, null);
-                if (s.mode3D) pick3D(s.mode3D, null);
-                if (s.camShakeOn !== undefined) { camShakeOn = s.camShakeOn;
-                    document.getElementById('swShake')?.classList.toggle('on', camShakeOn); }
-                if (s.autoTransition !== undefined) { autoTransition = s.autoTransition;
-                    document.getElementById('swScene')?.classList.toggle('on', autoTransition); }
-                if (s.activeFilter) setFilter(s.activeFilter, null);
-                if (s.activeFX) { activeFX = new Set(s.activeFX);
-                    document.querySelectorAll('[data-fx]').forEach(b => { b.classList.toggle('active', activeFX
-                            .has(b.dataset.fx)); }); }
-                if (s.transitionStyle) pickTrans(s.transitionStyle, null);
-                if (s.playbackSpeed) pickSpeed(s.playbackSpeed, null);
-                if (s.imgTransitionType) pickImgTransition(s.imgTransitionType, null);
-                if (s.beat) { document.getElementById('sBeat').value = s.beat;
-                    document.getElementById('vBeat').textContent = s.beat.toFixed(1); }
-                if (s.glow) { document.getElementById('sGlow').value = s.glow;
-                    document.getElementById('vGlow').textContent = s.glow.toFixed(1); }
-                if (s.particles) { document.getElementById('sParticle').value = s.particles;
-                    document.getElementById('vParticle').textContent = s.particles; }
-                if (s.scale) { document.getElementById('sScale').value = s.scale;
-                    document.getElementById('vScale').textContent = s.scale.toFixed(2); }
-                if (s.lyricColor) document.getElementById('lyricColor').value = s.lyricColor;
-                if (s.lyricSize) { document.getElementById('sLyricSz').value = s.lyricSize;
-                    document.getElementById('vLyricSz').textContent = s.lyricSize + 'px'; }
-                if (s.lyricPos !== undefined) document.getElementById('lyricPos').value = s.lyricPos;
-                if (s.txtArtist) document.getElementById('txtArtist').value = s.txtArtist;
-                if (s.txtSong) document.getElementById('txtSong').value = s.txtSong;
-                if (s.txtColor) document.getElementById('txtColor').value = s.txtColor;
-                if (s.txtSize) document.getElementById('txtSize').value = s.txtSize;
-                if (s.txtPos) document.getElementById('txtPos').value = s.txtPos;
-                if (s.aspectRatio) setAspectRatio(s.aspectRatio, null);
-                if (s.exportQuality) setQuality(s.exportQuality, null);
-                updateTextPreview();
-            }
-            if (data.chars && data.chars.length) {
-                data.chars.forEach((cData, i) => {
-                    const img = new Image();
-                    img.src = cData.url;
-                    img.onload = () => {
-                        const c = { img, url: cData.url, ds: { beatCount: 0, jumpAmt: 0, spinAng: 0,
-                                spinDir: 1, phase: Math.random() * Math.PI * 2 }, userPlaced: cData
-                                .userPlaced || false };
-                        if (c.userPlaced) { c.px = cData.px;
-                            c.py = cData.py;
-                            c.pw = cData.pw;
-                            c.ph = cData.ph; }
-                        if (i < chars.length) chars[i] = c;
-                        else chars.push(c);
-                        if (i === data.chars.length - 1) { renderCG();
-                            checkReady();
-                            drawIdle(); }
-                    };
-                });
-            }
-            if (data.lyrics) { lyrics = data.lyrics.map(l => ({ ...l, ds: l.ds || { beatCount: 0, jumpAmt: 0,
-                            spinAng: 0, spinDir: 1, phase: Math.random() * Math.PI * 2 } }));
-                renderLyrics(); }
-            if (data.imgSegments) { imgSegments = data.imgSegments;
-                renderMultiTracks(); }
-            if (data.audioSegments) { audioSegments = data.audioSegments;
-                renderMultiTracks(); }
-            if (data.videoSegments) { videoSegments = data.videoSegments;
-                renderMultiTracks(); }
-            if (data.videoLayers) {
-                toast('ℹ️ Video clips need to be re-uploaded manually after loading a project.');
-            }
-            if (data.aiBackground) {
-                toast('ℹ️ AI background needs to be regenerated after loading.');
-            }
-            if (data.audio && data.audio.length) {
-                toast('ℹ️ Audio tracks need to be re-uploaded after loading a project.');
-            }
-            currentProjectName = data.name || 'Untitled Project';
-            currentProjectId = data.id || null;
-            document.getElementById('projectName').textContent = currentProjectName;
-            toast('✅ Project "' + currentProjectName + '" loaded!');
-            if (typeof TL !== 'undefined') TL.draw(0);
-        }
-
-        // ── SAVE PROJECT ──
-        async function saveProject() {
-            if (!token) { toast('⚠ Please log in first'); return; }
-const data = await getProjectData();
-            if (currentProjectName === 'Untitled Project') {
-                const name = prompt('Project name:', 'My Video');
-                if (name) currentProjectName = name;
-                else return;
-            }
-            data.name = currentProjectName;
-            data.id = currentProjectId || 'project_' + Date.now();
-            data.updatedAt = new Date().toISOString();
-            data.audioFiles = audioTracks.map(t => ({ name: t.name, duration: t.buffer.duration }));
-            const btn = document.getElementById('saveBtn') || document.querySelector('[onclick="saveProject()"]');
-            if (btn) { btn.textContent = '💾 Saving…';
-                btn.disabled = true; }
-            try {
-                const res = await callAPI({
-                    action: 'saveProject',
-                    token,
-                    projectId: data.id,
-                    projectName: data.name,
-                    data: data
-                });
-                if (res && res.success) {
-                    toast('✅ Project "' + data.name + '" saved!');
-                    currentProjectId = data.id;
-                    document.getElementById('projectName').textContent = data.name;
-                    await loadProjectList();
-                } else {
-                    toast('❌ Save failed: ' + (res?.error || 'Unknown error'));
-                }
-            } catch (e) {
-                toast('❌ Save failed: ' + e.message);
-            }
-            if (btn) { btn.textContent = '💾 Save';
-                btn.disabled = false; }
-        }
-
-        // ── LOAD PROJECT LIST ──
-        async function loadProjectList() {
-            if (!token) { toast('⚠ Please log in first'); return; }
-            try {
-                const res = await callAPI({ action: 'listProjects', token });
-                if (res && res.success) {
-                    projectList = res.projects || [];
-                    renderProjectList();
-                    toast('📂 ' + projectList.length + ' project(s) found');
-                } else {
-                    toast('❌ Failed to load projects: ' + (res?.error || 'Unknown error'));
-                }
-            } catch (e) {
-                toast('❌ Failed to load projects: ' + e.message);
-            }
-        }
-
-        function renderProjectList() {
-            const containers = ['projectList', 'projectListFull', 'projectListFullM'];
-            containers.forEach(id => {
-                const el = document.getElementById(id);
-                if (!el) return;
-                if (!projectList.length) {
-                    el.innerHTML = '<div class="pp-empty">No saved projects yet.</div>';
-                    return;
-                }
-                el.innerHTML = projectList.map(p =>
-                    `<div class="pp-proj ${p.id === currentProjectId ? 'active' : ''}" onclick="loadProject('${p.id}')">
-                    ${p.name || 'Untitled'}
-                    <span class="del" onclick="event.stopPropagation();deleteProject('${p.id}')">✕</span>
-                  </div>`
-                ).join('');
-            });
-            const status = document.getElementById('projectStatus');
-            if (status) status.textContent = '📂 ' + projectList.length + ' project(s) in your Drive';
-            const statusM = document.getElementById('projectStatusM');
-            if (statusM) statusM.textContent = '📂 ' + projectList.length + ' project(s) in your Drive';
-        }
-
-        // ── LOAD PROJECT ──
-        async function loadProject(projectId) {
-            if (!token) { toast('⚠ Please log in first'); return; }
-            try {
-                const res = await callAPI({ action: 'loadProject', token, projectId });
-                if (res && res.success && res.data) {
-                    const data = res.data;
-                    currentProjectId = projectId;
-                    currentProjectName = data.name || 'Untitled';
-                    document.getElementById('projectName').textContent = currentProjectName;
-                    loadProjectData(data);
-                    await loadProjectList();
-                    toast('✅ Project loaded: ' + currentProjectName);
-                } else {
-                    toast('❌ Failed to load project: ' + (res?.error || 'Unknown error'));
-                }
-            } catch (e) {
-                toast('❌ Failed to load project: ' + e.message);
-            }
-        }
-
-        // ── DELETE PROJECT ──
-        async function deleteProject(projectId) {
-            if (!token) { toast('⚠ Please log in first'); return; }
-            if (!confirm('Delete this project permanently?')) return;
-            try {
-                const res = await callAPI({ action: 'deleteProject', token, projectId });
-                if (res && res.success) {
-                    toast('🗑 Project deleted');
-                    if (projectId === currentProjectId) {
-                        currentProjectId = null;
-                        currentProjectName = 'Untitled Project';
-                        document.getElementById('projectName').textContent = currentProjectName;
-                    }
-                    await loadProjectList();
-                } else {
-                    toast('❌ Delete failed: ' + (res?.error || 'Unknown error'));
-                }
-            } catch (e) {
-                toast('❌ Delete failed: ' + e.message);
-            }
-        }
-
-        function deleteCurrentProject() {
-            if (!currentProjectId) { toast('⚠ No project loaded to delete'); return; }
-            deleteProject(currentProjectId);
-        }
-
-        // ── EXPORT / IMPORT JSON ──
-        function exportProject() {
-            const data = getProjectData();
-            data.name = currentProjectName;
-            data.id = currentProjectId || 'project_' + Date.now();
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = (currentProjectName || 'project') + '.beatviz.json';
-            a.click();
-            URL.revokeObjectURL(url);
-            toast('📤 Project exported as JSON');
-        }
-
-        function importProject() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.json,.beatviz.json';
-            input.onchange = (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = (ev) => {
-                    try {
-                        const data = JSON.parse(ev.target.result);
-                        if (data.version && data.chars) {
-                            loadProjectData(data);
-                            toast('📥 Project imported successfully!');
-                        } else {
-                            toast('❌ Invalid project file');
-                        }
-                    } catch (err) {
-                        toast('❌ Failed to parse JSON: ' + err.message);
-                    }
-                };
-                reader.readAsText(file);
-            };
-            input.click();
-        }
-
         // ── MOBILE SHEETS ──
         let activeSheet = null;
 
@@ -6893,7 +6306,6 @@ const data = await getProjectData();
             if (btn) btn.classList.add('active');
             document.getElementById('bs-' + name).classList.add('open');
             document.getElementById('sheetOv').classList.add('show');
-            if (name === 'project') loadProjectList();
         }
 
         function closeSheet() {
@@ -6902,29 +6314,6 @@ const data = await getProjectData();
             document.querySelectorAll('.mn-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('sheetOv').classList.remove('show');
         }
-
-        // Compress an image data URL to a thumbnail
-function compressImage(dataUrl, maxSize) {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      let w = img.width, h = img.height;
-      if (w > h) {
-        if (w > maxSize) { h = h * maxSize / w; w = maxSize; }
-      } else {
-        if (h > maxSize) { w = w * maxSize / h; h = maxSize; }
-      }
-      canvas.width = w;
-      canvas.height = h;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, w, h);
-      resolve(canvas.toDataURL('image/jpeg', 0.7)); // JPEG with 70% quality
-    };
-    img.onerror = () => resolve(dataUrl); // fallback to original
-    img.src = dataUrl;
-  });
-}
 
         // ── DRAG & DROP ──
         function initDnD() {
@@ -6969,20 +6358,12 @@ function compressImage(dataUrl, maxSize) {
             renderAudioTrackList();
             updateQualityLabel();
             setAspectRatio('16:9', document.querySelector('[data-ar="16:9"]'));
-            const params = new URLSearchParams(location.search);
-            const loadId = params.get('project');
-            if (loadId) {
-                setTimeout(() => loadProject(loadId), 500);
-            }
             drawIdle();
-            // Log that segment support is active
-            console.log('🎬 BeatViz timeline segment support active: audio, video, and images now play sequentially based on segments.');
+            console.log('🎬 BeatViz Pro ready (save/load removed)');
         }
 
-        // ── START ──
         if (document.readyState === 'complete') init();
         else window.addEventListener('load', init);
     </script>
-
 </body>
 </html>

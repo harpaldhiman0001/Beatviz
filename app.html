@@ -3000,6 +3000,22 @@
     <!-- ============================================================
     SCRIPTS — FULL CLIENT-SIDE LOGIC
     ============================================================ -->
+
+    function toast(m) {
+    let t = document.getElementById('toast');
+    if (!t) {
+        // Create the toast element if missing
+        t = document.createElement('div');
+        t.className = 'toast';
+        t.id = 'toast';
+        document.body.appendChild(t);
+    }
+    t.textContent = m;
+    t.classList.add('show');
+    clearTimeout(t._t);
+    t._t = setTimeout(() => t.classList.remove('show'), 3800);
+}
+    
     <script>
         // ─── CONFIG (no backend, everything free) ───
         const HF_TOKEN = 'hf_YOUR_FREE_TOKEN'; // Get one at huggingface.co/settings/tokens

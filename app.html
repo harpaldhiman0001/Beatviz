@@ -420,7 +420,6 @@
             border-bottom: none;
         }
 
-        /* Section header */
         .sec-head {
             font-size: 9px;
             font-weight: 700;
@@ -442,8 +441,6 @@
             padding: 1px 8px;
             border-radius: 100px;
         }
-
-        /* Property rows */
         .prop-row {
             display: flex;
             align-items: center;
@@ -519,8 +516,6 @@
         .prop-row select:focus {
             border-color: var(--accent);
         }
-
-        /* Toggle switch */
         .toggle-wrap {
             display: flex;
             align-items: center;
@@ -567,10 +562,6 @@
             left: 18px;
             background: #fff;
         }
-
-        /* ============================================================
-                   BUTTON GRIDS (style pickers)
-                   ============================================================ */
         .btn-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
@@ -613,10 +604,6 @@
         .btn-grid .opt.active span {
             filter: drop-shadow(0 0 6px var(--accent-glow));
         }
-
-        /* ============================================================
-                   DROP ZONE
-                   ============================================================ */
         .drop-zone {
             border: 2px dashed var(--border-subtle);
             border-radius: var(--radius-md);
@@ -652,10 +639,6 @@
         .drop-zone input {
             display: none;
         }
-
-        /* ============================================================
-                   CHARACTER GRID
-                   ============================================================ */
         .char-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -696,10 +679,6 @@
         .char-grid .char-item:hover .del {
             opacity: 1;
         }
-
-        /* ============================================================
-                   LYRICS
-                   ============================================================ */
         .lyric-list {
             display: flex;
             flex-direction: column;
@@ -835,10 +814,6 @@
         .lyric-empty strong {
             color: var(--text-secondary);
         }
-
-        /* ============================================================
-                   PREVIEW / CANVAS
-                   ============================================================ */
         .preview-area {
             display: flex;
             flex-direction: column;
@@ -904,7 +879,6 @@
             pointer-events: none;
             z-index: 5;
         }
-        /* Image controls overlay */
         .img-ctrl {
             position: absolute;
             top: 10px;
@@ -985,10 +959,6 @@
         .img-ctrl .ic-lock.active {
             color: var(--cyan);
         }
-
-        /* ============================================================
-                   TIMELINE
-                   ============================================================ */
         .timeline-wrap {
             background: var(--bg-secondary);
             border-top: 1px solid var(--border-subtle);
@@ -1085,8 +1055,6 @@
             z-index: 10;
             display: none;
         }
-
-        /* Multi-track rows above timeline */
         .mt-area {
             background: var(--bg-secondary);
             border-bottom: 1px solid var(--border-subtle);
@@ -1203,10 +1171,6 @@
             height: 1px;
             background: var(--border-subtle);
         }
-
-        /* ============================================================
-                   STATUS BAR
-                   ============================================================ */
         .status-bar {
             padding: 4px 14px;
             border-top: 1px solid var(--border-subtle);
@@ -1270,10 +1234,6 @@
             white-space: nowrap;
             font-family: 'Inter', monospace;
         }
-
-        /* ============================================================
-                   PLAYER (mini)
-                   ============================================================ */
         .mini-player {
             background: var(--bg-card);
             border-radius: var(--radius-md);
@@ -1335,10 +1295,6 @@
             white-space: nowrap;
             font-family: 'Inter', monospace;
         }
-
-        /* ============================================================
-                   ACTIONS (generate, export)
-                   ============================================================ */
         .actions-panel {
             padding: 10px 12px 12px;
             border-top: 1px solid var(--border-subtle);
@@ -1478,10 +1434,6 @@
             text-align: center;
             min-height: 16px;
         }
-
-        /* ============================================================
-                   PREVIEW DURATION PICKER
-                   ============================================================ */
         .preview-dur {
             display: flex;
             gap: 3px;
@@ -1537,10 +1489,6 @@
             background: var(--red-dim);
             color: var(--red);
         }
-
-        /* ============================================================
-                   RIGHT PANEL (fx, etc)
-                   ============================================================ */
         .right-panel {
             background: var(--bg-secondary);
             border-left: 1px solid var(--border-subtle);
@@ -1561,8 +1509,6 @@
         .right-panel .rp-scroll>div:last-child {
             border-bottom: none;
         }
-
-        /* Filter grid */
         .filter-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -1611,10 +1557,6 @@
         .filter-grid .filter-opt.none-active span {
             color: var(--accent);
         }
-
-        /* ============================================================
-                   MOBILE BOTTOM NAV
-                   ============================================================ */
         .mob-nav {
             display: none;
             position: fixed;
@@ -1675,8 +1617,6 @@
             align-items: center;
             justify-content: center;
         }
-
-        /* Mobile generate bar */
         .mob-gen {
             display: none;
             position: fixed;
@@ -1763,10 +1703,6 @@
             background: rgba(124, 58, 237, 0.06);
             color: #a78bfa;
         }
-
-        /* ============================================================
-                   MOBILE BOTTOM SHEETS
-                   ============================================================ */
         .sheet-overlay {
             display: none;
             position: fixed;
@@ -1840,10 +1776,6 @@
             flex: 1;
             overflow-y: auto;
         }
-
-        /* ============================================================
-                   PROJECT MANAGEMENT — NEW
-                   ============================================================ */
         .project-panel {
             border-bottom: 1px solid var(--border-subtle);
             padding: 6px 10px 10px;
@@ -1948,10 +1880,6 @@
             color: var(--text-muted);
             padding: 4px 0;
         }
-
-        /* ============================================================
-                   TOAST
-                   ============================================================ */
         .toast {
             position: fixed;
             bottom: 24px;
@@ -1977,10 +1905,6 @@
             opacity: 1;
             pointer-events: auto;
         }
-
-        /* ============================================================
-                   PAYWALL
-                   ============================================================ */
         .paywall {
             position: fixed;
             inset: 0;
@@ -2132,10 +2056,6 @@
             color: var(--text-muted);
             text-align: center;
         }
-
-        /* ============================================================
-                   RESPONSIVE
-                   ============================================================ */
         @media (max-width: 1024px) {
             .app-main {
                 grid-template-columns: 40px 200px 1fr 180px;
@@ -2188,14 +2108,12 @@
             .mt-area {
                 display: none !important;
             }
-
             .mob-nav {
                 display: flex !important;
             }
             .mob-gen {
                 display: flex !important;
             }
-
             .topbar-project-name {
                 max-width: 100px !important;
                 font-size: 11px !important;
@@ -2211,7 +2129,6 @@
                 font-size: 7px !important;
                 padding: 1px 6px !important;
             }
-
             .sheet .sheet-body .btn-grid {
                 grid-template-columns: repeat(auto-fill, minmax(48px, 1fr)) !important;
             }
@@ -2227,14 +2144,12 @@
             .sheet .sheet-body .drop-zone .dz-title {
                 font-size: 11px !important;
             }
-
             .toast {
                 bottom: calc(var(--nav-h) + 80px) !important;
                 font-size: 11px !important;
                 padding: 8px 14px !important;
                 max-width: 92% !important;
             }
-
             .img-ctrl {
                 top: 6px !important;
                 padding: 4px 8px !important;
@@ -2288,10 +2203,6 @@
                 font-size: 13px !important;
             }
         }
-
-        /* ============================================================
-                   UTILITY
-                   ============================================================ */
         .hidden {
             display: none !important;
         }
@@ -2367,12 +2278,10 @@
             </div>
         </div>
         <div class="topbar-right">
-            <!-- Mode Switcher -->
             <div class="mode-switcher">
                 <button id="modeChar" class="active" onclick="setAppMode('character')">🎭 Character</button>
                 <button id="modePromo" onclick="setAppMode('promo')">📢 Promo</button>
             </div>
-            <!-- User -->
             <div class="topbar-user">
                 <div class="topbar-avatar" id="userAvatar">?</div>
                 <span class="topbar-username" id="userName">User</span>
@@ -2389,7 +2298,6 @@
         <!-- LEFT TOOLBAR -->
         <div class="left-toolbar" id="leftToolbar">
             <div class="lt-group-label">Tools</div>
-
             <button class="ltool active" id="lt-select" onclick="setTool('select',this)" title="Select (V)">
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 0l16 12-7 1-4 8z"/></svg>
                 <span>Select</span>
@@ -2403,7 +2311,6 @@
                 <span>Trim</span>
             </button>
             <div class="ltool-divider"></div>
-
             <button class="ltool" id="lt-text" onclick="setTool('text',this);showPane('lyrics')" title="Text/Lyric">
                 <span style="font-size:15px;font-weight:900;font-family:serif">T</span>
                 <span>Text</span>
@@ -2421,7 +2328,6 @@
                 <span>Motion</span>
             </button>
             <div class="ltool-divider"></div>
-
             <button class="ltool" onclick="TL.zoomBy(1.5)" title="Zoom In">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
                 <span>Zoom+</span>
@@ -2438,7 +2344,6 @@
 
         <!-- SIDEBAR -->
         <aside class="sidebar" id="sidebar">
-            <!-- Tabs -->
             <div class="sidebar-tabs" id="sidebarTabs">
                 <button class="sidebar-tab active" data-pane="upload" onclick="showPane('upload',this)"><span class="ti">📁</span>Upload</button>
                 <button class="sidebar-tab" data-pane="style" onclick="showPane('style',this)"><span class="ti">✨</span>Style</button>
@@ -2450,7 +2355,6 @@
             <div class="sidebar-panes" id="sidebarPanes">
                 <!-- ========== UPLOAD PANE ========== -->
                 <div class="sidebar-pane active" id="pane-upload">
-                    <!-- Project panel (quick save/load) -->
                     <div class="project-panel">
                         <div class="pp-row">
                             <button class="pp-btn primary" onclick="saveProject()">💾 Save</button>
@@ -2471,7 +2375,6 @@
                             <div class="dz-title">Add video clip</div>
                             <div class="dz-sub">MP4 · WebM · MOV · AVI</div>
                         </div>
-                        <!-- Record buttons -->
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px 8px">
                             <button id="screenRecBtn" onclick="toggleScreenRecord()" style="padding:8px 6px;background:rgba(124,58,237,0.08);border:1px solid var(--accent);color:var(--accent);font-family:var(--font);font-size:9px;font-weight:700;cursor:pointer;border-radius:var(--radius-sm);display:flex;flex-direction:column;align-items:center;gap:2px;transition:var(--transition)">
                                 <span style="font-size:18px">🖥</span>
@@ -2482,11 +2385,9 @@
                                 <span id="camRecLabel">Record Camera</span>
                             </button>
                         </div>
-                        <!-- Camera preview -->
                         <button onclick="toggleCameraPreviewOnly()" style="width:calc(100% - 16px);margin:0 8px 4px;padding:6px;background:rgba(16,185,129,0.06);border:1px solid var(--green);color:var(--green);font-family:var(--font);font-size:9px;font-weight:700;cursor:pointer;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;gap:6px;transition:var(--transition)">
                             <span>👁</span><span id="previewCamLabel">Preview Camera</span>
                         </button>
-                        <!-- Mic -->
                         <button id="micBtn" onclick="toggleMic()" style="width:calc(100% - 16px);margin:0 8px 4px;padding:6px;background:var(--bg-card);border:1px solid var(--border-subtle);color:var(--text-muted);font-family:var(--font);font-size:9px;font-weight:700;cursor:pointer;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;gap:6px;transition:var(--transition)">
                             <span>🎙</span><span id="micLabel">Voice Off</span>
                         </button>
@@ -2497,7 +2398,6 @@
                             <button onclick="stopActiveRecord()" style="padding:2px 8px;background:var(--red);border:none;color:#fff;font-family:var(--font);font-size:8px;font-weight:700;cursor:pointer;border-radius:var(--radius-sm)">■</button>
                         </div>
                         <video id="cameraPreview" autoplay muted playsinline style="display:none;width:calc(100% - 16px);margin:0 8px;max-height:80px;object-fit:cover;border:1px solid var(--cyan);border-radius:var(--radius-sm);background:#000"></video>
-                        <!-- Camera filters -->
                         <div id="camFilterBar" style="display:none;flex-direction:column;gap:4px;padding:4px 8px">
                             <div style="font-size:7px;font-weight:700;color:var(--cyan);text-transform:uppercase;letter-spacing:0.4px">Camera Filter</div>
                             <div style="display:flex;flex-wrap:wrap;gap:2px">
@@ -2509,7 +2409,6 @@
                                 <button class="cf-btn" data-cf="bw" onclick="setCamFilter('bw',this)" style="padding:2px 6px;border:1px solid var(--border-subtle);background:var(--bg-card);color:var(--text-muted);font-family:var(--font);font-size:7px;font-weight:700;cursor:pointer;border-radius:3px;transition:var(--transition)">B&W</button>
                             </div>
                         </div>
-                        <!-- Split layout -->
                         <div id="splitModePicker" style="display:none;flex-direction:column;gap:4px;padding:4px 8px">
                             <div style="font-size:7px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.4px">Layout</div>
                             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px">
@@ -2522,7 +2421,6 @@
                             </div>
                             <div class="prop-row"><span class="prop-label">Opacity</span><input type="range" id="videoOpacity" min="0" max="100" value="100" oninput="setVideoOpacity(+this.value/100)"><span class="prop-value" id="vVideoOp">100%</span></div>
                         </div>
-                        <!-- Background picker -->
                         <div id="recBgPicker" style="display:none;flex-direction:column;gap:4px;padding:4px 8px">
                             <div style="font-size:7px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.4px">Background</div>
                             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:2px">
@@ -2616,7 +2514,6 @@
 
                 <!-- ========== STYLE PANE ========== -->
                 <div class="sidebar-pane" id="pane-style">
-                    <!-- Templates -->
                     <div>
                         <div class="sec-head">Quick Templates <span class="sec-badge">one click</span></div>
                         <div class="btn-grid" style="grid-template-columns:repeat(3,1fr)">
@@ -2629,7 +2526,6 @@
                         </div>
                         <button onclick="clearTemplate()" style="width:calc(100% - 16px);margin:4px 8px 8px;padding:6px;border-radius:var(--radius-sm);border:1.5px dashed var(--border-subtle);background:none;color:var(--text-muted);font-family:var(--font);font-size:9px;font-weight:600;cursor:pointer;transition:var(--transition)">🚫 None — clear template</button>
                     </div>
-                    <!-- Visual Scene -->
                     <div>
                         <div class="sec-head">Visual Scene</div>
                         <div class="btn-grid">
@@ -2642,7 +2538,6 @@
                             <button class="opt active" data-style="none" onclick="pickStyle('none',this)"><span>⬛</span>None</button>
                         </div>
                     </div>
-                    <!-- Image Transition -->
                     <div>
                         <div class="sec-head">Image Transition</div>
                         <div class="btn-grid">
@@ -2653,7 +2548,6 @@
                             <button class="opt" data-imgtrans="irisOpen" onclick="pickImgTransition('irisOpen',this)"><span>⊙</span>Iris</button>
                         </div>
                     </div>
-                    <!-- Sliders -->
                     <div>
                         <div class="sec-head">Options</div>
                         <div class="prop-row"><span class="prop-label">Beat sens</span><input type="range" id="sBeat" min="0.6" max="2.2" step="0.1" value="1.3" oninput="document.getElementById('vBeat').textContent=parseFloat(this.value).toFixed(1)"><span class="prop-value" id="vBeat">1.3</span></div>
@@ -2665,7 +2559,6 @@
 
                 <!-- ========== LYRICS PANE ========== -->
                 <div class="sidebar-pane" id="pane-lyrics">
-                    <!-- Player -->
                     <div>
                         <div class="sec-head">Preview Player</div>
                         <div class="mini-player">
@@ -2678,7 +2571,6 @@
                             <div style="font-size:8px;color:var(--text-muted);text-align:center">Space = play/pause · click timeline to add lyrics</div>
                         </div>
                     </div>
-                    <!-- Add lyric -->
                     <div>
                         <div class="sec-head">Add Lyric <span class="sec-badge">L key</span></div>
                         <div style="padding:4px 8px 8px;display:flex;flex-direction:column;gap:5px">
@@ -2696,12 +2588,10 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Lyric list -->
                     <div>
                         <div class="sec-head">Timeline <span id="lyricCount" style="font-weight:400;color:var(--text-muted);font-size:9px;text-transform:none;letter-spacing:0"></span></div>
                         <div class="lyric-list" id="lyricsList"><div class="lyric-empty">Play audio then tap <strong>+ Add lyric</strong>.<br>The timeline below shows bars — drag to adjust.</div></div>
                     </div>
-                    <!-- Lyric style -->
                     <div>
                         <div class="sec-head">Lyric Style</div>
                         <div class="btn-grid">
@@ -3803,6 +3693,15 @@
                             const each = audioDuration / chars.length;
                             imgSegments = chars.map((_, i) => ({ charIdx: i, start: i * each, dur: each }));
                             renderMultiTracks();
+                        } else {
+                            // If no audio, create default segments
+                            const each = 5; // 5 seconds per image
+                            imgSegments = chars.map((_, i) => ({ charIdx: i, start: i * each, dur: each }));
+                            renderMultiTracks();
+                            // Set a default audio duration for timeline
+                            if (!audioDuration && chars.length > 0) {
+                                audioDuration = chars.length * each;
+                            }
                         }
                         toast('✓ Image added — click on canvas to move · drag corners to resize');
                     };
@@ -3938,11 +3837,12 @@
             s = Math.max(0, +s || 0); const m = Math.floor(s / 60),
                 sc = Math.floor(s % 60); return `${m}:${sc.toString().padStart(2,'0')}`; }
 
-        // ── CHECK READY ──
+        // ── CHECK READY ── ⭐ UPDATED to allow visual-only generation
         function checkReady() {
             const hasVisual = chars.length > 0 || aiBackground !== null || videoLayers.length > 0;
-            const hasAudioOrVideo = audioBuffer || videoLayers.length > 0;
-            const ok = hasAudioOrVideo && hasVisual;
+            const hasAudio = audioBuffer !== null || audioTracks.length > 0;
+            const ok = hasVisual; // Allow generation with images or video even without audio
+
             document.getElementById('genBtn').disabled = !ok;
             document.getElementById('genBtnMob').disabled = !ok;
             const lbl = document.getElementById('readyLbl');
@@ -3951,6 +3851,9 @@
                 if (ok) {
                     if (chars.length > 0 && aiBackground) lbl.textContent = '✓ AI background + character ready';
                     else if (aiBackground) lbl.textContent = '✓ AI background ready — no character needed';
+                    else if (chars.length > 0 && !hasAudio) lbl.textContent = '✓ Images ready — audio optional';
+                    else if (videoLayers.length > 0 && !hasAudio) lbl.textContent = '✓ Video ready — audio optional';
+                    else if (chars.length > 0) lbl.textContent = '✓ Ready to generate';
                     else lbl.textContent = '✓ Ready to generate';
                 }
             }
@@ -3997,16 +3900,12 @@
                     break;
                 }
             }
-            // If no active segment, draw nothing (or fallback to all? No — user said "if no then no one play")
             if (activeIdx < 0 || activeIdx >= chars.length) {
-                // But if there are no segments at all, draw all characters (legacy behavior)
                 if (imgSegments.length === 0) {
                     drawAllCharacters(beat, elapsed);
                 }
                 return;
             }
-
-            // Draw only the active character
             const c = chars[activeIdx];
             drawSingleCharacter(c, beat, elapsed, activeIdx);
         }
@@ -4115,7 +4014,7 @@
 
         // ── LYRICS ──
         function stampLyric() {
-            if (!audioBuffer) { toast('Load audio first'); return; }
+            if (!audioBuffer) { toast('Load audio first or add lyrics manually'); return; }
             const t = getPvTime();
             if (pvPlaying) pausePreview();
             document.getElementById('lyricInputWrap').style.display = 'flex';
@@ -4132,7 +4031,7 @@
             if (text) {
                 const t = getPvTime();
                 const nxt = lyrics.find(l => l.time > t + 0.05);
-                const end = Math.min(audioDuration, nxt ? Math.min(nxt.time, t + 4) : t + 4);
+                const end = Math.min(audioDuration || 30, nxt ? Math.min(nxt.time, t + 4) : t + 4);
                 const idx = lyrics.findIndex(l => Math.abs(l.time - t) < 0.3);
                 if (idx >= 0) { lyrics[idx].text = text;
                     lyrics[idx].endTime = end; } else { lyrics.push({ time: t, endTime: end, text,
@@ -4245,7 +4144,7 @@
             if (!_copiedLyric) { toast('⚠ Nothing copied — right-click a lyric → Copy first'); return; }
             const refEnd = lyrics[afterIdx].endTime || lyrics[afterIdx].time + 4;
             const dur = (_copiedLyric.endTime || _copiedLyric.time + 4) - _copiedLyric.time;
-            const newStart = Math.min(audioDuration - dur, refEnd + 0.5);
+            const newStart = Math.min((audioDuration || 30) - dur, refEnd + 0.5);
             lyrics.splice(afterIdx + 1, 0, { text: _copiedLyric.text || '', time: +newStart.toFixed(2),
                 endTime: +(newStart + dur).toFixed(2), ds: { beatCount: 0, jumpAmt: 0, spinAng: 0, spinDir: 1,
                     phase: Math.random() * Math.PI * 2 } });
@@ -4261,7 +4160,7 @@
             if (!_copiedLyric) { toast('⚠ Nothing copied'); return; }
             const t = pvOffset || 0;
             const dur = (_copiedLyric.endTime || _copiedLyric.time + 4) - _copiedLyric.time;
-            const newStart = Math.max(0, Math.min(audioDuration - dur, t));
+            const newStart = Math.max(0, Math.min((audioDuration || 30) - dur, t));
             lyrics.push({ text: _copiedLyric.text, time: +newStart.toFixed(2), endTime: +(newStart + dur).toFixed(2),
                 ds: { beatCount: 0, jumpAmt: 0, spinAng: 0, spinDir: 1, phase: Math.random() * Math.PI * 2 } });
             lyrics.sort((a, b) => a.time - b.time);
@@ -4296,7 +4195,7 @@
             let newTime = 0;
             if (raw.includes(':')) { const parts = raw.split(':'); newTime = (parseInt(parts[0]) || 0) * 60 + (parseFloat(
                     parts[1]) || 0); } else { newTime = parseFloat(raw) || 0; }
-            newTime = Math.max(0, Math.min(audioDuration - 0.3, newTime));
+            newTime = Math.max(0, Math.min((audioDuration || 30) - 0.3, newTime));
             const l = lyrics[_moveTargetIdx];
             const dur = Math.max(0.5, (l.endTime || l.time + 4) - l.time);
             l.time = +newTime.toFixed(2);
@@ -4354,19 +4253,81 @@
             ctx.restore();
         }
 
-        // ── PREVIEW PLAYER ──
+        // ── PREVIEW PLAYER ── ⭐ UPDATED to work without audio (visual-only)
         let pvCtx = null,
             pvAnalyser = null,
             pvSrc = null,
             pvStartAt = 0;
 
-        function getPvTime() { if (!pvCtx) return 0; return pvPlaying ? pvOffset + (pvCtx.currentTime - pvStartAt) :
-                pvOffset; }
+        function getPvTime() {
+            if (pvPlaying && pvCtx) return pvOffset + (pvCtx.currentTime - pvStartAt);
+            return pvOffset;
+        }
 
-        async function togglePreview() { if (!audioBuffer) { toast('Load audio first'); return; }
-            pvPlaying ? pausePreview() : await playPreview(); }
+        async function togglePreview() {
+            // If there's audio, use audio preview
+            if (audioBuffer) {
+                pvPlaying ? pausePreview() : await playPreview();
+                return;
+            }
+            // No audio: toggle visual-only preview (slideshow)
+            if (videoLayers.length > 0 || chars.length > 0) {
+                pvPlaying ? pausePreviewVisual() : playPreviewVisual();
+            } else {
+                toast('Upload an image or video first');
+            }
+        }
 
+        // Visual-only preview (slideshow / video playback)
+        let _visualPreviewTimer = null;
+
+        function playPreviewVisual() {
+            if (pvPlaying) return;
+            pvPlaying = true;
+            pvOffset = 0;
+            const totalDur = Math.max(audioDuration || 5, ...imgSegments.map(s => s.start + s.dur), ...videoSegments.map(
+                s => s.start + s.dur));
+            const dur = totalDur > 0 ? totalDur : 10;
+            // Use video layers if available
+            if (videoLayers.length > 0) {
+                videoLayers.forEach(v => { if (v.el) { try { v.el.currentTime = 0;
+                            v.el.play(); } catch (e) {} } });
+            }
+            const startTime = Date.now();
+            _visualPreviewTimer = setInterval(() => {
+                const elapsed = (Date.now() - startTime) / 1000;
+                pvOffset = Math.min(elapsed, dur);
+                if (pvOffset >= dur) { pausePreviewVisual(); return; }
+                updatePvUI();
+                drawIdleWithElapsed(pvOffset);
+                TL.draw(pvOffset);
+            }, 33);
+            updatePvUI();
+            toast('👁 Visual preview');
+        }
+
+        function pausePreviewVisual() {
+            pvPlaying = false;
+            if (_visualPreviewTimer) { clearInterval(_visualPreviewTimer);
+                _visualPreviewTimer = null; }
+            if (videoLayers.length > 0) videoLayers.forEach(v => { if (v.el) v.el.pause(); });
+            updatePvUI();
+            drawIdle();
+        }
+
+        function drawIdleWithElapsed(t) {
+            ctx.fillStyle = style === 'none' ? '#000000' : '#04040e';
+            ctx.fillRect(0, 0, W, H);
+            if (aiBackground) ctx.drawImage(aiBackground, 0, 0, W, H);
+            drawVideoLayers(t);
+            if (chars.length) drawCharacters(0, t);
+            if (lyrics.length) drawLyricsOverlay(t, 0);
+            drawWatermark();
+        }
+
+        // Regular audio preview
         async function playPreview() {
+            if (!audioBuffer) { playPreviewVisual(); return; }
             if (!pvCtx || pvCtx.state === 'closed') { pvCtx = new(window.AudioContext || window.webkitAudioContext)();
                 pvAnalyser = pvCtx.createAnalyser();
                 pvAnalyser.fftSize = 2048; }
@@ -4389,22 +4350,37 @@
             updatePvUI();
         }
 
-        function pausePreview() { pvOffset = Math.min(getPvTime(), audioDuration); try { pvSrc?.stop(); } catch (e) {}
+        function pausePreview() {
+            if (pvPlaying && pvCtx) {
+                pvOffset = Math.min(getPvTime(), audioDuration || 30);
+                try { pvSrc?.stop(); } catch (e) {}
+            }
             pvPlaying = false;
             pauseVideoLayers();
-            updatePvUI(); }
+            if (_visualPreviewTimer) { clearInterval(_visualPreviewTimer);
+                _visualPreviewTimer = null; }
+            updatePvUI();
+        }
 
-        function seekPreview(t) { const was = pvPlaying; if (pvPlaying) pausePreview();
-            pvOffset = Math.max(0, Math.min(audioDuration, t)); if (was) playPreview(); else updatePvUI(); }
+        function seekPreview(t) {
+            const was = pvPlaying;
+            if (pvPlaying) pausePreview();
+            pvOffset = Math.max(0, Math.min((audioDuration || 30), t));
+            if (was) {
+                if (audioBuffer) playPreview();
+                else playPreviewVisual();
+            } else updatePvUI();
+        }
 
         function updatePvUI() {
             const t = getPvTime(),
-                pct = audioDuration ? t / audioDuration * 100 : 0;
+                total = Math.max(audioDuration || 1, 1);
+            const pct = total ? t / total * 100 : 0;
             ['pvBtn', 'pvBtnM'].forEach(id => { const b = document.getElementById(id); if (b) { b.textContent = pvPlaying ?
                         '⏸' : '▶';
                     b.classList.toggle('playing', pvPlaying); } });
             ['pvTime', 'pvTimeM'].forEach(id => { const e = document.getElementById(id); if (e) e.textContent = fmt(t) +
-                    ' / ' + fmt(audioDuration); });
+                    ' / ' + fmt(total); });
             ['pvFill', 'pvFillM'].forEach(id => { const e = document.getElementById(id); if (e) e.style.width = pct +
                 '%'; });
             const sl = document.getElementById('stampLabel');
@@ -4413,12 +4389,12 @@
             if (slm) slm.textContent = fmt(t);
         }
 
-        document.getElementById('pvBar').addEventListener('click', function(e) { if (!audioDuration) return; const r = this
-                .getBoundingClientRect();
-            seekPreview((e.clientX - r.left) / r.width * audioDuration); });
-        document.getElementById('pvBarM').addEventListener('click', function(e) { if (!audioDuration) return; const r = this
-                .getBoundingClientRect();
-            seekPreview((e.clientX - r.left) / r.width * audioDuration); });
+        document.getElementById('pvBar').addEventListener('click', function(e) { const total = Math.max(audioDuration ||
+                1, 1); const r = this.getBoundingClientRect();
+            seekPreview((e.clientX - r.left) / r.width * total); });
+        document.getElementById('pvBarM').addEventListener('click', function(e) { const total = Math.max(audioDuration ||
+                1, 1); const r = this.getBoundingClientRect();
+            seekPreview((e.clientX - r.left) / r.width * total); });
         document.addEventListener('keydown', e => { if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' ||
                 e.target.contentEditable === 'true') return; if (e.code === 'Space') { e.preventDefault();
                 togglePreview(); } });
@@ -4447,7 +4423,6 @@
             const dur = video.duration || 10;
             videoLayers.push({ el: video, name, url, mode: 'full', opacity: 1, aspect, audioEnabled: false,
             filter: 'none' });
-            // Auto-create a video segment for this clip
             const lastEnd = videoSegments.length > 0 ? videoSegments[videoSegments.length - 1].start + videoSegments[
                 videoSegments.length - 1].dur : 0;
             videoSegments.push({ vidIdx: videoLayers.length - 1, start: lastEnd, dur: dur });
@@ -4491,9 +4466,7 @@
         function removeVideoLayer(idx) { if (videoLayers[idx]) { try { videoLayers[idx].el.pause(); } catch (e) {} if (
                     videoLayers[idx].url) URL.revokeObjectURL(videoLayers[idx].url); }
             videoLayers.splice(idx, 1);
-            // Also remove video segments referencing this layer
             videoSegments = videoSegments.filter(s => s.vidIdx !== idx);
-            // Fix indices in remaining segments
             videoSegments.forEach(s => { if (s.vidIdx > idx) s.vidIdx--; });
             renderVideoLayerList();
             renderMultiTracks();
@@ -4522,16 +4495,12 @@
             document.querySelectorAll('.split-btn').forEach(b => { b.classList.toggle('active', b.dataset.split ===
                     videoLayers[idx]?.mode); }); }
 
-        // ── VIDEO LAYER DRAW (with segment support) ──
+        // ── VIDEO LAYER DRAW ──
         function drawVideoLayers(elapsed) {
             if (!videoLayers.length) return;
-
-            // Find active video segments at this time
             const activeSegs = videoSegments.filter(seg =>
                 elapsed >= seg.start && elapsed < seg.start + seg.dur
             );
-
-            // Also include any video that has no segment (legacy full-track mode)
             const hasSegments = videoSegments.length > 0;
             const videosToDraw = hasSegments ? activeSegs.map(s => ({ v: videoLayers[s.vidIdx], seg: s })) :
                 videoLayers.map(v => ({ v, seg: null }));
@@ -4544,15 +4513,11 @@
                     ctx.filter = (v.filter && v.filter !== 'none') ? VIDEO_FILTERS[v.filter] || 'none' : 'none';
                     const ps = W * (v._pipPct || 0.32),
                         ph2 = ps / (v.aspect || 1.78);
-                    // For segmented videos, we need to draw the correct frame
-                    // We use currentTime but for segmented we need to offset
                     let drawTime = elapsed;
                     if (seg) {
                         drawTime = elapsed - seg.start;
-                        // Clamp to segment duration
                         if (drawTime < 0) drawTime = 0;
                         if (drawTime > seg.dur) drawTime = seg.dur;
-                        // Update video current time if it's not already there
                         try {
                             if (Math.abs(v.el.currentTime - drawTime) > 0.05) {
                                 v.el.currentTime = drawTime;
@@ -5111,7 +5076,7 @@
             } catch (e) { toast('⚠ Mic access denied'); }
         }
 
-        // ── GENERATE (with segment support) ──
+        // ── GENERATE ── ⭐ UPDATED to support visual-only generation
         async function handleGenerate() {
             const canGenerate = sub.isActive || sub.trialActive || (sub.trialDaysLeft > 0);
             if (!canGenerate) { showPaywall(); return; }
@@ -5121,16 +5086,17 @@
                     toast('⚠ Trial allows 1 video only. Subscribe for unlimited!'); return; }
             }
             if (isPlaying) { stopAll(); return; }
-            const hasVideoForGen = videoLayers.length > 0;
-            if (!audioBuffer && !hasVideoForGen) { toast('Add audio or upload a video first.'); return; }
-            if (!chars.length && !aiBackground && !hasVideoForGen) { toast('Add an image, video, or AI background first.');
-                return; }
+
+            const hasVisual = chars.length > 0 || aiBackground !== null || videoLayers.length > 0;
+            if (!hasVisual) { toast('Add an image, video, or AI background first.'); return; }
+
             if (pvPlaying) pausePreview();
             if (loopPreviewActive) stopLoopPreview();
             document.getElementById('dlWebm').style.display = 'none';
             document.getElementById('dlMp4').style.display = 'none';
             document.getElementById('dlWebmMob').style.display = 'none';
             document.getElementById('dlMp4Mob').style.display = 'none';
+
             if (audioCtx) try { await audioCtx.close(); } catch (e) {}
             audioCtx = new(window.AudioContext || window.webkitAudioContext)();
             if (audioCtx.state === 'suspended') await audioCtx.resume();
@@ -5140,9 +5106,10 @@
             freqData = new Uint8Array(analyser.frequencyBinCount);
             const mDest = audioCtx.createMediaStreamDestination();
 
-            // Use audio segments for scheduling
+            let hasAnyAudio = false;
+
+            // Check if we have audio tracks with segments
             if (audioTracks.length > 0 && audioSegments.length > 0) {
-                // If we have segments, use them
                 audioSegments.forEach(seg => {
                     const track = audioTracks[seg.trackIdx];
                     if (!track || track.muted) return;
@@ -5161,13 +5128,11 @@
                         const duration = Math.min(seg.dur - offset, seg.dur);
                         if (duration > 0.01) {
                             s.start(audioCtx.currentTime + actualStart, offset, duration);
+                            hasAnyAudio = true;
                         }
                     }
                 });
-                // Also play the main audio track if it has no segment? No — we use segments exclusively.
-                // But if there are no segments, fallback to playing the first track.
             } else if (audioTracks.length > 0) {
-                // Fallback: play first track from start
                 const track = audioTracks[0];
                 if (track && !track.muted) {
                     const s = audioCtx.createBufferSource();
@@ -5179,26 +5144,67 @@
                     g.connect(audioCtx.destination);
                     track.gainNode = g;
                     s.start(0, window._rerecordFromTime || 0);
+                    hasAnyAudio = true;
                 }
             }
 
-            // If no audio tracks but we have video with audio, handle that
-            if (audioTracks.length === 0 && videoLayers.length > 0 && videoLayers[0].el) {
+            // If no audio but we have video with audio, use that
+            if (!hasAnyAudio && videoLayers.length > 0 && videoLayers[0].el) {
                 const rawDur = videoLayers[0].el.duration;
-                const safeDur = isFinite(rawDur) && rawDur > 0 ? rawDur : 600;
-                audioDuration = safeDur;
-                const frameCount = Math.max(1, Math.ceil(safeDur * audioCtx.sampleRate));
+                const safeDur = isFinite(rawDur) && rawDur > 0 ? rawDur : 30;
+                // Try to capture video audio
+                videoLayers.forEach(v => {
+                    try {
+                        const stream = v.el.captureStream?.() || v.el.mozCaptureStream?.();
+                        if (stream && stream.getAudioTracks().length > 0) {
+                            const vSrc = audioCtx.createMediaStreamSource(stream);
+                            const vGain = audioCtx.createGain();
+                            vGain.gain.value = 0.8;
+                            vSrc.connect(vGain);
+                            vGain.connect(mDest);
+                            vGain.connect(analyser);
+                            hasAnyAudio = true;
+                        }
+                    } catch (e) {}
+                });
+                if (!hasAnyAudio && chars.length > 0) {
+                    // No audio from video, create silent track
+                    const dur = Math.max(5, safeDur);
+                    const frameCount = Math.max(1, Math.ceil(dur * audioCtx.sampleRate));
+                    const silentBuf = audioCtx.createBuffer(1, frameCount, audioCtx.sampleRate);
+                    const s = audioCtx.createBufferSource();
+                    s.buffer = silentBuf;
+                    s.connect(analyser);
+                    analyser.connect(audioCtx.destination);
+                    analyser.connect(mDest);
+                    s.start(0);
+                    toast('🔇 Silent audio track created — video will play without sound');
+                }
+            }
+
+            // If still no audio, create silent track (for images-only)
+            if (!hasAnyAudio) {
+                const dur = Math.max(5, audioDuration || (chars.length > 0 ? chars.length * 5 : 30));
+                const frameCount = Math.max(1, Math.ceil(dur * audioCtx.sampleRate));
                 const silentBuf = audioCtx.createBuffer(1, frameCount, audioCtx.sampleRate);
                 const s = audioCtx.createBufferSource();
                 s.buffer = silentBuf;
                 s.connect(analyser);
                 analyser.connect(audioCtx.destination);
                 analyser.connect(mDest);
-                videoLayers.forEach(v => {
-                    try { const stream = v.el.captureStream?.() || v.el.mozCaptureStream?.(); if (stream)
-                            stream.getAudioTracks().forEach(t => mDest.stream.addTrack?.(t)); } catch (e) {}
-                });
-                toast('🎬 Video-only mode — recording with its audio');
+                s.start(0);
+                if (!audioDuration) audioDuration = dur;
+                toast('🔇 No audio found — generating silent video');
+            }
+
+            if (_micEnabled && _micStream) {
+                try {
+                    const micSrc = audioCtx.createMediaStreamSource(_micStream);
+                    const micGain = audioCtx.createGain();
+                    micGain.gain.value = 1.0;
+                    micSrc.connect(micGain);
+                    micGain.connect(mDest);
+                } catch (e) {}
             }
 
             initParticles();
@@ -5209,30 +5215,11 @@
             await new Promise(r => setTimeout(r, 50));
             const cvStr = canvas.captureStream(30),
                 audTr = mDest.stream.getAudioTracks();
-            videoLayers.forEach(v => {
-                if (v.audioEnabled && !v.isLive && !v._previewOnly && v.el) {
-                    try {
-                        v.el.muted = false;
-                        const vs = v.el.captureStream?.() || v.el.mozCaptureStream?.();
-                        if (vs && vs.getAudioTracks().length > 0) {
-                            const vSrc = audioCtx.createMediaStreamSource(vs);
-                            const vGain = audioCtx.createGain();
-                            vGain.gain.value = 0.8;
-                            vSrc.connect(vGain);
-                            vGain.connect(mDest);
-                            vGain.connect(analyser);
-                        }
-                    } catch (e) { console.warn('Video audio route failed:', e); }
-                }
-            });
-            if (_micEnabled && _micStream) {
-                try {
-                    const micSrc = audioCtx.createMediaStreamSource(_micStream);
-                    const micGain = audioCtx.createGain();
-                    micGain.gain.value = 1.0;
-                    micSrc.connect(micGain);
-                    micGain.connect(mDest);
-                } catch (e) {}
+            // Add audio tracks to combined stream
+            if (audTr.length > 0) {
+                audTr.forEach(t => {
+                    try { cvStr.addTrack(t); } catch (e) {}
+                });
             }
             const combined = new MediaStream([...cvStr.getVideoTracks(), ...mDest.stream.getAudioTracks()]);
             const picked = pickRecorderMime();
@@ -5243,7 +5230,6 @@
             recorder.onstop = finalize;
             const rerecordFrom = window._rerecordFromTime || 0;
             window._rerecordFromTime = null;
-            // Video segments: we don't need to schedule them separately, drawVideoLayers handles it
             playStart = audioCtx.currentTime - rerecordFrom;
             startVideoLayers(rerecordFrom);
             recorder.start(100);
@@ -5272,37 +5258,27 @@
 
         const Q_BITRATE = { hd: 6000000, fhd: 10000000, uhd: 28000000 };
 
-function stopAll() {
-  isPlaying = false;
-  isPaused = false;
-  pauseVideoLayers();
-
-  // Stop audio source
-  try { srcNode?.stop(); } catch (e) {}
-  
-  // Stop recording
-  if (recorder?.state !== 'inactive') recorder?.stop();
-
-  // ⭐ Suspend the main audio context
-  if (audioCtx && audioCtx.state === 'running') {
-    audioCtx.suspend().catch(() => {});
-  }
-
-  // ⭐ Also stop preview audio if it's playing
-  if (pvPlaying) pausePreview();
-
-  // Reset UI
-  ['genBtn', 'genBtnMob'].forEach(id => {
-    const b = document.getElementById(id);
-    if (b) {
-      b.textContent = '▶ Generate Video';
-      b.classList.remove('stop');
-    }
-  });
-  showPauseUI(false);
-  document.getElementById('dot').className = 'dot';
-  document.getElementById('statusTxt').textContent = 'Stopped';
-}
+        function stopAll() {
+            isPlaying = false;
+            isPaused = false;
+            pauseVideoLayers();
+            try { srcNode?.stop(); } catch (e) {}
+            if (recorder?.state !== 'inactive') recorder?.stop();
+            if (audioCtx && audioCtx.state === 'running') {
+                audioCtx.suspend().catch(() => {});
+            }
+            if (pvPlaying) pausePreview();
+            ['genBtn', 'genBtnMob'].forEach(id => {
+                const b = document.getElementById(id);
+                if (b) {
+                    b.textContent = '▶ Generate Video';
+                    b.classList.remove('stop');
+                }
+            });
+            showPauseUI(false);
+            document.getElementById('dot').className = 'dot';
+            document.getElementById('statusTxt').textContent = 'Stopped';
+        }
 
         function showPauseUI(show) {
             ['pauseBtn', 'pauseBtnMob'].forEach(id => { const b = document.getElementById(id); if (!b) return;
@@ -5474,14 +5450,16 @@ function stopAll() {
 
         async function toggleLoopPreview() {
             if (loopPreviewActive) { stopLoopPreview(); return; }
-            if (!audioBuffer || !chars.length) { toast('Upload audio & characters first'); return; }
+            if (!chars.length && !videoLayers.length && !aiBackground) { toast('Upload images, video, or AI background first');
+                return; }
             if (isPlaying) { toast('Stop recording first'); return; }
             loopPreviewActive = true;
             const btn = document.getElementById('loopPreviewBtn');
             const label = document.getElementById('loopPreviewLabel');
             btn.classList.add('stop');
             if (label) label.textContent = 'Stop Preview';
-            await playPreview();
+            if (audioBuffer) await playPreview();
+            else playPreviewVisual();
             toast('👁 Previewing ' + (loopPreviewDur > 0 ? loopPreviewDur + 's' : 'full track'));
             if (loopPreviewDur > 0) { loopPreviewTimer = setTimeout(() => stopLoopPreview(), loopPreviewDur * 1000); }
         }
@@ -5542,10 +5520,10 @@ function stopAll() {
             if (pvPlaying) updatePvUI();
             if (isPlaying && audioCtx) {
                 const e2 = audioCtx.currentTime - playStart,
-                    pct = Math.min(100, e2 / audioDuration * 100);
+                    pct = Math.min(100, e2 / (audioDuration || 1) * 100);
                 document.getElementById('progFill').style.width = pct + '%';
-                document.getElementById('timeDisp').textContent = fmt(e2) + ' / ' + fmt(audioDuration);
-                if (e2 >= audioDuration) stopAll();
+                document.getElementById('timeDisp').textContent = fmt(e2) + ' / ' + fmt(audioDuration || 0);
+                if (e2 >= (audioDuration || 0)) stopAll();
             }
         }
         let camX = 0,
@@ -6179,7 +6157,7 @@ function stopAll() {
             toast('↺ Size reset to auto');
         }
 
-        // ── TIMELINE ──
+        // ── TIMELINE ── ⭐ UPDATED to work without audio
         const TL = {
             c: null,
             x: null,
@@ -6214,8 +6192,8 @@ function stopAll() {
                         selectedLyricIdx = h.idx;
                         renderLyrics();
                         showLyricContextMenu(e.clientX, e.clientY, h.idx);
-                    } else if (_copiedLyric && audioDuration > 0) {
-                        const t = Math.max(0, Math.min(audioDuration, this.x2t(mx)));
+                    } else if (_copiedLyric && (audioDuration || 1) > 0) {
+                        const t = Math.max(0, Math.min((audioDuration || 30), this.x2t(mx)));
                         pvOffset = t;
                         seekPreview(t);
                         pasteAtPlayhead();
@@ -6227,7 +6205,7 @@ function stopAll() {
                     this.onMove(e.touches[0]); }, { passive: false });
                 this.c.addEventListener('touchend', () => this.onUp(), { passive: false });
                 this.wrap.addEventListener('wheel', e => {
-                    if (!audioDuration) return;
+                    const total = Math.max(audioDuration || 1, 1);
                     if (e.ctrlKey || e.metaKey) { e.preventDefault();
                         this.zoomBy(e.deltaY < 0 ? 1.18 : 0.85); }
                 }, { passive: false });
@@ -6244,7 +6222,7 @@ function stopAll() {
             zoomBy(f) { this.setZoom(this.zoom * f); },
             zoomFit() { this.setZoom(1); },
             setZoom(z) {
-                if (!audioDuration) return;
+                const total = Math.max(audioDuration || 1, 1);
                 const wrap = this.wrap;
                 const centerT = this.x2t(wrap.scrollLeft + wrap.clientWidth / 2);
                 this.zoom = Math.max(this.minZoom, Math.min(this.maxZoom, z));
@@ -6255,8 +6233,14 @@ function stopAll() {
                 if (lbl) lbl.textContent = this.zoom <= 1 ? 'Fit' : Math.round(this.zoom * 100) + '%';
                 this.draw(this.lastT);
             },
-            t2x(t) { return audioDuration ? t / audioDuration * this.W : 0; },
-            x2t(x) { return audioDuration ? Math.max(0, Math.min(audioDuration, x / this.W * audioDuration)) : 0; },
+            t2x(t) {
+                const total = Math.max(audioDuration || 1, 1);
+                return t / total * this.W;
+            },
+            x2t(x) {
+                const total = Math.max(audioDuration || 1, 1);
+                return Math.max(0, Math.min(total, x / this.W * total));
+            },
             hit(mx, my) {
                 if (!lyrics.length || my < 18) return null;
                 for (let i = lyrics.length - 1; i >= 0; i--) {
@@ -6274,8 +6258,9 @@ function stopAll() {
                 const r = this.c.getBoundingClientRect(),
                     mx = e.clientX - r.left,
                     my = e.clientY - r.top;
+                const total = Math.max(audioDuration || 1, 1);
                 if (isPaused) {
-                    const t = Math.max(0, Math.min(audioDuration, this.x2t(mx)));
+                    const t = Math.max(0, Math.min(total, this.x2t(mx)));
                     pvOffset = t;
                     seekPreview(t);
                     document.getElementById('statusTxt').textContent = '✂ Re-record from ' + fmt(t) +
@@ -6286,7 +6271,7 @@ function stopAll() {
                         tt.textContent = '✂ ' + fmt(t); }
                     return;
                 }
-                if (audioDuration > 0 && my < 26) {
+                if (total > 0 && my < 26) {
                     const curT = (pvPlaying || pvOffset > 0) ? getPvTime() : pvOffset;
                     const px = this.t2x(curT);
                     if (Math.abs(mx - px) < 14) {
@@ -6312,11 +6297,11 @@ function stopAll() {
                     }
                     return;
                 }
-                if (audioDuration > 0) {
+                if (total > 0) {
                     const t = this.x2t(mx);
                     if (_copiedLyric) {
                         const dur = (_copiedLyric.endTime || _copiedLyric.time + 4) - _copiedLyric.time;
-                        const newT = Math.max(0, Math.min(audioDuration - dur, t));
+                        const newT = Math.max(0, Math.min(total - dur, t));
                         lyrics.push({ text: _copiedLyric.text, time: +newT.toFixed(2),
                             endTime: +(newT + dur).toFixed(2), ds: { beatCount: 0, jumpAmt: 0, spinAng: 0,
                                 spinDir: 1, phase: Math.random() * Math.PI * 2 } });
@@ -6345,9 +6330,10 @@ function stopAll() {
                 const r = this.c.getBoundingClientRect(),
                     mx = e.clientX - r.left,
                     my = e.clientY - r.top;
+                const total = Math.max(audioDuration || 1, 1);
                 if (isPaused) {
                     this.c.style.cursor = 'col-resize';
-                    const t = Math.max(0, Math.min(audioDuration, this.x2t(mx)));
+                    const t = Math.max(0, Math.min(total, this.x2t(mx)));
                     const tt = document.getElementById('tlTip');
                     if (tt) { tt.style.display = 'block';
                         tt.style.left = Math.min(this.W - 70, Math.max(40, mx)) + 'px';
@@ -6355,7 +6341,7 @@ function stopAll() {
                     return;
                 }
                 if (this.dragging?.handle === 'playhead') {
-                    const t = Math.max(0, Math.min(audioDuration, this.x2t(mx)));
+                    const t = Math.max(0, Math.min(total, this.x2t(mx)));
                     seekPreview(t);
                     const tt = document.getElementById('tlTip');
                     if (tt) { tt.style.display = 'block';
@@ -6365,19 +6351,19 @@ function stopAll() {
                     return;
                 }
                 if (this.dragging && this.dragging.handle !== 'playhead') {
-                    const visibleDur = audioDuration / (typeof tlZoom !== 'undefined' ? tlZoom : 1);
+                    const visibleDur = total / (typeof tlZoom !== 'undefined' ? tlZoom : 1);
                     const dt = (mx - this.dragging.startX) / this.W * visibleDur;
                     const l = lyrics[this.dragging.idx];
                     if (!l) return;
                     if (this.dragging.handle === 'body') {
                         const dur = this.dragging.origEnd - this.dragging.origStart;
-                        l.time = Math.max(0, Math.min(audioDuration - dur, this.dragging.origStart + dt));
+                        l.time = Math.max(0, Math.min(total - dur, this.dragging.origStart + dt));
                         l.endTime = l.time + dur;
                     } else if (this.dragging.handle === 'left') {
                         l.time = Math.max(0, Math.min(this.dragging.origEnd - 0.3, this.dragging.origStart + dt));
                     } else if (this.dragging.handle === 'right') {
-                        l.endTime = Math.max(this.dragging.origStart + 0.3, Math.min(audioDuration, this
-                            .dragging.origEnd + dt));
+                        l.endTime = Math.max(this.dragging.origStart + 0.3, Math.min(total, this.dragging
+                            .origEnd + dt));
                     }
                     const tt = document.getElementById('tlTip');
                     tt.style.display = 'block';
@@ -6386,7 +6372,7 @@ function stopAll() {
                     renderLyrics();
                     return;
                 }
-                if (!this.dragging && audioDuration > 0 && my < 26) {
+                if (!this.dragging && total > 0 && my < 26) {
                     const curT = getPvTime ? getPvTime() : pvOffset;
                     const px = this.t2x(curT);
                     if (Math.abs(mx - px) < 14) { this.c.style.cursor = 'col-resize';
@@ -6414,6 +6400,7 @@ function stopAll() {
             draw(currentTime) {
                 if (!this.c || !this.W) return;
                 this.lastT = currentTime || 0;
+                const total = Math.max(audioDuration || 1, 1);
                 if (this.zoom > 1 && (isPlaying || pvPlaying) && this.wrap) {
                     const px = this.t2x(currentTime || 0),
                         margin = this.viewportW * .15;
@@ -6430,11 +6417,11 @@ function stopAll() {
                 c.fillRect(0, 18, CW, CH - 18);
                 c.fillStyle = '#07071a';
                 c.fillRect(0, 0, CW, 18);
-                if (!audioDuration) { c.fillStyle = '#1c1c42';
+                if (!total || total < 0.1) { c.fillStyle = '#1c1c42';
                     c.font = '10px Inter, sans-serif';
                     c.textAlign = 'center';
-                    c.fillText('Load audio to enable timeline', CW / 2, 42); return; }
-                const ts = Math.ceil(audioDuration);
+                    c.fillText('Load audio or images to enable timeline', CW / 2, 42); return; }
+                const ts = Math.ceil(total);
                 let step = 5;
                 if (ts > 300) step = 60;
                 else if (ts > 120) step = 30;
@@ -6445,7 +6432,7 @@ function stopAll() {
                 c.fillStyle = '#64748b';
                 c.font = '9px Inter, sans-serif';
                 c.textAlign = 'center';
-                for (let t = 0; t <= audioDuration; t += step) { const x = this.t2x(t);
+                for (let t = 0; t <= total; t += step) { const x = this.t2x(t);
                     c.globalAlpha = .55;
                     c.beginPath();
                     c.moveTo(x, 0);
@@ -6456,7 +6443,7 @@ function stopAll() {
                 const TL_COLS = ['#7c3aed', '#06b6d4', '#f472b6', '#10b981', '#f59e0b', '#a78bfa', '#34d399', '#fb923c'];
                 lyrics.forEach((l, i) => {
                     const x1 = this.t2x(l.time),
-                        x2 = this.t2x(l.endTime || Math.min(audioDuration, l.time + 4)),
+                        x2 = this.t2x(l.endTime || Math.min(total, l.time + 4)),
                         bw = Math.max(5, x2 - x1),
                         col = TL_COLS[i % TL_COLS.length],
                         isSel = i === selectedLyricIdx,
@@ -6512,7 +6499,7 @@ function stopAll() {
                     c.textAlign = 'center';
                     c.fillText(fmt(currentTime), Math.min(CW - 20, Math.max(20, px)), 20);
                 }
-                if (this._ghostX > 0 && !this.dragging && audioDuration > 0) {
+                if (this._ghostX > 0 && !this.dragging && total > 0) {
                     const gx = this._ghostX,
                         gt = this._ghostT;
                     c.save();
@@ -6577,12 +6564,12 @@ function stopAll() {
             }
         };
 
-        // ── PROJECT MANAGEMENT ──────────────────────────────────────────
+        // ── PROJECT MANAGEMENT ──
         let currentProjectName = 'Untitled Project';
         let currentProjectId = null;
         let projectList = [];
 
-async function getProjectData(){
+        async function getProjectData() {
             return {
                 version: '1.1',
                 name: currentProjectName,
@@ -6718,7 +6705,7 @@ async function getProjectData(){
         // ── SAVE PROJECT ──
         async function saveProject() {
             if (!token) { toast('⚠ Please log in first'); return; }
-const data = await getProjectData();
+            const data = await getProjectData();
             if (currentProjectName === 'Untitled Project') {
                 const name = prompt('Project name:', 'My Video');
                 if (name) currentProjectName = name;
@@ -6903,28 +6890,31 @@ const data = await getProjectData();
             document.getElementById('sheetOv').classList.remove('show');
         }
 
-        // Compress an image data URL to a thumbnail
-function compressImage(dataUrl, maxSize) {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      let w = img.width, h = img.height;
-      if (w > h) {
-        if (w > maxSize) { h = h * maxSize / w; w = maxSize; }
-      } else {
-        if (h > maxSize) { w = w * maxSize / h; h = maxSize; }
-      }
-      canvas.width = w;
-      canvas.height = h;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, w, h);
-      resolve(canvas.toDataURL('image/jpeg', 0.7)); // JPEG with 70% quality
-    };
-    img.onerror = () => resolve(dataUrl); // fallback to original
-    img.src = dataUrl;
-  });
-}
+        // ── COMPRESS IMAGE ──
+        function compressImage(dataUrl, maxSize) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let w = img.width,
+                        h = img.height;
+                    if (w > h) {
+                        if (w > maxSize) { h = h * maxSize / w;
+                            w = maxSize; }
+                    } else {
+                        if (h > maxSize) { w = w * maxSize / h;
+                            h = maxSize; }
+                    }
+                    canvas.width = w;
+                    canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, w, h);
+                    resolve(canvas.toDataURL('image/jpeg', 0.7));
+                };
+                img.onerror = () => resolve(dataUrl);
+                img.src = dataUrl;
+            });
+        }
 
         // ── DRAG & DROP ──
         function initDnD() {
@@ -6975,8 +6965,7 @@ function compressImage(dataUrl, maxSize) {
                 setTimeout(() => loadProject(loadId), 500);
             }
             drawIdle();
-            // Log that segment support is active
-            console.log('🎬 BeatViz timeline segment support active: audio, video, and images now play sequentially based on segments.');
+            console.log('🎬 BeatViz — visual-only generation enabled: images and videos work without audio.');
         }
 
         // ── START ──

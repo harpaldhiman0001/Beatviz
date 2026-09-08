@@ -323,9 +323,31 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
 }
 
 
-/* VIDEO PLAYBACK FIX: active video audio control */
-.video-audio-toggle { min-width:30px; color:#67e8f9 !important; font-size:12px !important; }
-.video-audio-toggle.muted { color:#f0525c !important; }
+/* ================= PROFESSIONAL CREATOR TOOLKIT PATCH ================= */
+.creator-toolbar { display:flex; flex-wrap:wrap; gap:6px; padding:8px 10px; border-bottom:1px solid var(--border); background:var(--bg-panel); }
+.creator-toolbar button { flex:1; min-width:74px; padding:7px 8px; border:1px solid var(--border-strong); border-radius:var(--radius-sm); background:var(--bg-card); color:var(--text-2); font:700 10px var(--font); cursor:pointer; }
+.creator-toolbar button:hover { border-color:var(--accent); color:#c3baff; }
+.creator-toolbar button:disabled { opacity:.35; cursor:not-allowed; }
+.paste-lyrics-box { padding:10px; border-bottom:1px solid var(--border); }
+.paste-lyrics-box textarea { width:100%; min-height:106px; resize:vertical; background:var(--bg-card); border:1.5px solid var(--border-strong); border-radius:var(--radius-sm); padding:9px; color:var(--text-1); font:12px/1.45 var(--font); outline:0; }
+.paste-lyrics-box textarea:focus { border-color:var(--accent); }
+.paste-lyrics-actions { display:flex; gap:6px; margin-top:7px; }
+.paste-lyrics-actions button { flex:1; padding:8px; border-radius:var(--radius-sm); border:1px solid var(--border-strong); background:var(--bg-card); color:var(--text-2); font:700 10px var(--font); cursor:pointer; }
+.paste-lyrics-actions button.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+.caption-template-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:5px; padding:8px 10px; }
+.caption-template-grid button { min-height:54px; border:1px solid var(--border-strong); border-radius:var(--radius-sm); background:var(--bg-card); color:var(--text-2); font:700 10px var(--font); cursor:pointer; }
+.caption-template-grid button.active { border-color:var(--accent); color:#c3baff; background:var(--accent-soft); }
+.caption-template-grid button strong { display:block; font-size:15px; margin-bottom:3px; }
+.waveform-wrap { margin:8px 10px; height:52px; border:1px solid var(--border-strong); border-radius:var(--radius-sm); overflow:hidden; background:var(--bg-card); position:relative; }
+#waveformCanvas { width:100%; height:100%; display:block; cursor:crosshair; }
+.waveform-help { position:absolute; right:6px; top:4px; color:var(--text-3); font:700 8px var(--font); background:rgba(0,0,0,.5); padding:2px 5px; border-radius:4px; pointer-events:none; }
+.brand-kit { padding:10px; display:flex; flex-direction:column; gap:7px; }
+.brand-kit input[type=text] { width:100%; padding:8px 9px; border:1px solid var(--border-strong); border-radius:var(--radius-sm); background:var(--bg-card); color:var(--text-1); font:12px var(--font); outline:0; }
+.brand-kit .brand-row { display:flex; gap:7px; align-items:center; }.brand-kit .brand-row label{font-size:10px;color:var(--text-3);min-width:60px}.brand-kit input[type=color]{width:38px;height:28px;border:1px solid var(--border-strong);border-radius:5px;background:var(--bg-card)}
+.brand-kit button { padding:8px; border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text-2);font:700 10px var(--font);cursor:pointer; }.brand-kit button.primary{border-color:var(--accent);background:var(--accent-soft);color:#c3baff}
+.ai-config-note { margin:8px 10px; padding:9px; border:1px solid rgba(34,211,238,.25); background:rgba(34,211,238,.06); border-radius:var(--radius-sm); color:#9deef8; font:10px/1.5 var(--font); }
+.ai-config-note code { color:#67e8f9; font-size:9px; }
+.beat-marker-list { padding:5px 10px 10px; display:flex; gap:4px; flex-wrap:wrap; }.beat-marker { padding:3px 7px;border:1px solid rgba(242,181,68,.35);border-radius:100px;background:var(--gold-soft);color:#ffd166;font:700 9px monospace;cursor:pointer; }
 
 </style>
 </head>
@@ -513,6 +535,42 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
             </div>
 
             <div class="sidebar-pane" id="pane-lyrics">
+
+<!-- CREATOR TOOLKIT UI -->
+<div id="creatorToolkit" style="display:none">
+  <div class="creator-toolbar" id="creatorToolbar">
+    <button onclick="bvUndo()" id="undoBtn" disabled>↶ Undo</button>
+    <button onclick="bvRedo()" id="redoBtn" disabled>↷ Redo</button>
+    <button onclick="exportSRT()">⇩ Export SRT</button>
+    <button onclick="document.getElementById('srtIn').click()">⇧ Import SRT</button>
+    <input id="srtIn" type="file" accept=".srt,text/plain" style="display:none" onchange="importSRT(event)">
+  </div>
+  <div class="paste-lyrics-box" id="pasteLyricsUI">
+    <div class="sec-head" style="padding:0 0 7px">Paste Full Lyrics <span class="sec-badge">one line = one block</span></div>
+    <textarea id="pasteLyricsText" placeholder="Paste lyrics here — one line per subtitle&#10;&#10;Tere bina jeena mushkil hai&#10;Dil mera tujhe hi chahta hai&#10;Aaj phir se tum yaad aaye"></textarea>
+    <div class="paste-lyrics-actions">
+      <button onclick="pasteLyricsToBlocks('even')">Evenly spread</button>
+      <button class="primary" onclick="pasteLyricsToBlocks('replace')">Create lyric blocks</button>
+    </div>
+  </div>
+  <div id="captionTemplatesUI">
+    <div class="sec-head">Caption Templates <span class="sec-badge">apply all</span></div>
+    <div class="caption-template-grid">
+      <button data-cap="clean" onclick="applyCaptionTemplate('clean',this)"><strong style="font-family:Inter">Aa</strong>Clean</button>
+      <button data-cap="karaoke" onclick="applyCaptionTemplate('karaoke',this)"><strong style="color:#fbbf24">Aa</strong>Karaoke</button>
+      <button data-cap="neon" onclick="applyCaptionTemplate('neon',this)"><strong style="color:#f472b6;text-shadow:0 0 8px #f472b6">Aa</strong>Neon</button>
+      <button data-cap="hiphop" onclick="applyCaptionTemplate('hiphop',this)"><strong style="font-family:Impact">Aa</strong>Hip-Hop</button>
+      <button data-cap="romantic" onclick="applyCaptionTemplate('romantic',this)"><strong style="font-family:Georgia;color:#f9a8d4">Aa</strong>Romantic</button>
+      <button data-cap="bold" onclick="applyCaptionTemplate('bold',this)"><strong style="font-weight:900">Aa</strong>Bold</button>
+    </div>
+  </div>
+  <div id="waveformUI">
+    <div class="sec-head">Waveform & Beat Markers <span class="sec-badge">tap waveform</span></div>
+    <div class="waveform-wrap"><canvas id="waveformCanvas"></canvas><span class="waveform-help">Tap waveform to add beat marker</span></div>
+    <div class="beat-marker-list" id="beatMarkerList"></div>
+  </div>
+</div>
+
                 <div>
                     <div class="sec-head">Preview Player</div>
                     <div class="mini-player">
@@ -958,20 +1016,14 @@ function drawImageLayer(layer, beat, elapsed) {
     ctx.shadowBlur=0; ctx.restore();
 }
 function drawVideoLayerItem(layer, elapsed) {
-    const v = videoLayers[layer.refIdx];
-    if (!v || !v.el || v.hidden) return;
-    if (v.px === undefined) initVideoPlace(v);
-    const seg = videoSegments.find(function(s){ return s.vidIdx === layer.refIdx; });
-    if (seg && (elapsed < seg.start || elapsed >= seg.start + seg.dur)) return;
-
-    // IMPORTANT: do NOT set video.currentTime every render frame.
-    // Repeated seeking is what makes HTML video playback stutter.
-    // startVideoLayers() seeks once, calls play(), and the browser then advances decoded frames smoothly.
-    ctx.save();
-    ctx.globalAlpha = v.opacity ?? 1;
-    if (v.el.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
-        ctx.drawImage(v.el, v.px-v.pw/2, v.py-v.ph/2, v.pw, v.ph);
-    }
+    const v = videoLayers[layer.refIdx]; if (!v || !v.el) return;
+    if (v.px===undefined) initVideoPlace(v);
+    const seg = videoSegments.find(s=>s.vidIdx===layer.refIdx);
+    let drawTime = elapsed; if (seg) { if (elapsed<seg.start || elapsed>=seg.start+seg.dur) return; drawTime = elapsed-seg.start; }
+    if (drawTime<0) drawTime=0;
+    try { if (Math.abs(v.el.currentTime-drawTime)>0.05) v.el.currentTime=drawTime; } catch(e){}
+    ctx.save(); ctx.globalAlpha = v.opacity ?? 1;
+    ctx.drawImage(v.el, v.px-v.pw/2, v.py-v.ph/2, v.pw, v.ph);
     ctx.restore();
 }
 function drawTextLayerItem(layer, elapsed) {
@@ -1125,7 +1177,7 @@ async function addVideoLayer(file) {
     const video=document.createElement('video'); video.src=url; video.muted=true; video.preload='auto';
     await new Promise((res,rej)=>{ video.onloadedmetadata=res; video.onerror=rej; setTimeout(res,3000); });
     const aspect=(video.videoWidth/video.videoHeight)||16/9; const dur=video.duration||10;
-    videoLayers.push({el:video,name,url,aspect,audioEnabled:true,opacity:1,hidden:false,fileSize:file.size,_fingerprint:{name:file.name,size:file.size}});
+    videoLayers.push({el:video,name,url,aspect,audioEnabled:false,opacity:1,hidden:false,fileSize:file.size,_fingerprint:{name:file.name,size:file.size}});
     const lastEnd = videoSegments.length ? videoSegments[videoSegments.length-1].start+videoSegments[videoSegments.length-1].dur : 0;
     videoSegments.push({vidIdx:videoLayers.length-1,start:lastEnd,dur});
     renderVideoLayerList();
@@ -1478,13 +1530,11 @@ async function playPreview() {
     pvSrc=pvCtx.createBufferSource(); pvSrc.buffer=buf;
     pvSrc.connect(pvGainNode); pvGainNode.connect(pvAnalyser); pvAnalyser.connect(pvCtx.destination);
     pvOffset=Math.min(pvOffset,audioDuration-.1); pvSrc.start(0,pvOffset); pvStartAt=pvCtx.currentTime; pvPlaying=true;
-    // Keep video clips playing smoothly alongside audio preview.
-    if (typeof startVideoLayers === 'function') startVideoLayers(pvOffset);
     pvSrc.onended = () => { if (pvPlaying) { pvPlaying=false; pvOffset=0; updatePvUI(); if (tapCatchActive) stopTapCatch(); if (autoCapActive) stopAutoCaption(); document.getElementById('audioMeter').classList.remove('show'); } };
     updatePvUI(); tickPreview();
     document.getElementById('audioMeter').classList.add('show'); initAudioMeterBars();
 }
-function pausePreview() { pvOffset=Math.min(getPvTime(),audioDuration); try { pvSrc?.stop(); } catch(e){} if (typeof pauseVideoLayers === 'function') pauseVideoLayers(); pvPlaying=false; updatePvUI(); document.getElementById('audioMeter').classList.remove('show'); }
+function pausePreview() { pvOffset=Math.min(getPvTime(),audioDuration); try { pvSrc?.stop(); } catch(e){} pvPlaying=false; updatePvUI(); document.getElementById('audioMeter').classList.remove('show'); }
 function seekPreview(t) { const was=pvPlaying; if (pvPlaying) pausePreview(); pvOffset=Math.max(0,Math.min(audioDuration,t)); if (was) playPreview(); else updatePvUI(); TL.draw(pvOffset); drawIdle(); }
 function updatePvUI() {
     const t=getPvTime(), pct=audioDuration?(t/audioDuration)*100:0;
@@ -1715,26 +1765,6 @@ async function handleGenerate() {
     analyser=genAudioCtx.createAnalyser(); analyser.fftSize=2048; analyser.smoothingTimeConstant=.82;
     freqData=new Uint8Array(analyser.frequencyBinCount);
     const mDest=genAudioCtx.createMediaStreamDestination();
-    // Mix audio from video clips into the recorder stream. The GainNode keeps the clip audible
-    // during preview/export while also routing the same PCM signal to the MediaRecorder output.
-    videoLayers.forEach(function(v) {
-        if (!v || !v.el || !v.audioEnabled || v._audioGraphAttached) return;
-        try {
-            const source = genAudioCtx.createMediaElementSource(v.el);
-            const gain = genAudioCtx.createGain();
-            gain.gain.value = 1;
-            source.connect(gain);
-            gain.connect(mDest);
-            gain.connect(genAudioCtx.destination);
-            v._audioGraphAttached = true;
-            v._audioSource = source;
-            v._audioGain = gain;
-            // Once routed through AudioContext, the element itself must not be muted.
-            v.el.muted = false;
-        } catch (videoAudioError) {
-            console.warn('Could not attach video audio to export stream', videoAudioError);
-        }
-    });
 
     if (audioTracks.length && audioSegments.length) {
         audioSegments.forEach(seg=>{ const track=audioTracks[seg.trackIdx]; if (!track||track.muted) return;
@@ -1770,17 +1800,7 @@ async function handleGenerate() {
     const gb=document.getElementById('genBtn'); gb.textContent='Stop'; gb.classList.add('stop');
     showPauseUI(true);
 }
-function startVideoLayers(offset) {
-    videoLayers.forEach(function(v, index) {
-        if (!v.el || v.hidden) return;
-        const seg = videoSegments.find(function(s){ return s.vidIdx === index; });
-        const clipOffset = seg ? Math.max(0, offset - seg.start) : offset;
-        try { v.el.currentTime = clipOffset; } catch (e) {}
-        v.el.muted = !v.audioEnabled;
-        v.el.playbackRate = 1;
-        v.el.play().catch(function(error){ console.warn('Video playback blocked', error); });
-    });
-}
+function startVideoLayers(offset) { videoLayers.forEach(v=>{ if (!v.el) return; try{v.el.currentTime=offset;}catch(e){} v.el.muted=!v.audioEnabled; v.el.play().catch(()=>{}); }); }
 function pauseVideoLayers() { videoLayers.forEach(v=>v.el&&v.el.pause()); }
 function resumeVideoLayers() { videoLayers.forEach(v=>v.el&&v.el.play().catch(()=>{})); }
 function pickRecorderMime() {
@@ -1836,30 +1856,112 @@ drawIdle();
 
 
 
-/* UI control for individual video sound. */
-const __bvRenderVideoListOriginal = renderVideoLayerList;
-renderVideoLayerList = function() {
-  const list = document.getElementById('videoLayerList');
-  if (!list) return;
-  list.innerHTML = videoLayers.map(function(v, i) {
-    const selected = selectedLayer && selectedLayer.type === 'video' && selectedLayer.refIdx === i;
-    const sound = v.audioEnabled ? '🔊' : '🔇';
-    return '<div class="track-item '+(selected?'selected ':'')+(v.hidden?'hidden-layer':'')+'" onclick="selectLayer({type:\'video\',refIdx:'+i+'})">' +
-      '<span style="flex:1;overflow:hidden;text-overflow:ellipsis">🎬 '+v.name+'</span>' +
-      '<button class="video-audio-toggle '+(v.audioEnabled?'':'muted')+'" onclick="event.stopPropagation();toggleVideoAudio('+i+')">'+sound+'</button>' +
-      '<button onclick="event.stopPropagation();videoLayers['+i+'].hidden=!videoLayers['+i+'].hidden;renderVideoLayerList();drawIdle()">'+(v.hidden?'🚫':'👁')+'</button>' +
-      '<button onclick="event.stopPropagation();removeVideoLayer('+i+')">✕</button></div>';
-  }).join('');
+/* ================= BEATVIZ CREATOR TOOLKIT =================
+   Browser-only features: history, autosave, paste lyrics, SRT, waveform,
+   beat markers, caption templates, brand presets.
+   Server AI endpoints are intentionally configurable; no fake AI claims. */
+const BV_AUTOSAVE_KEY = 'beatviz_editor_autosave_v1';
+let bvHistory = [];
+let bvHistoryIndex = -1;
+let bvBeatMarkers = [];
+let bvCaptionTemplate = 'clean';
+const BV_AI_CONFIG = {
+  // Set these to your own secure backend URLs only after implementing them server-side.
+  transcriptionEndpoint: '',
+  backgroundRemovalEndpoint: '',
+  sceneTimingEndpoint: ''
 };
-function toggleVideoAudio(i) {
-  const v = videoLayers[i];
-  if (!v) return;
-  v.audioEnabled = !v.audioEnabled;
-  if (v.el && !v._audioGraphAttached) v.el.muted = !v.audioEnabled;
-  if (v._audioGain) v._audioGain.gain.value = v.audioEnabled ? 1 : 0;
-  renderVideoLayerList();
-  toast(v.audioEnabled ? 'Video sound enabled' : 'Video sound muted');
+function bvEditorSnapshot() {
+  return JSON.stringify({
+    lyrics: (typeof lyrics !== 'undefined' ? lyrics : []).map(l=>({time:l.time,endTime:l.endTime,text:l.text})),
+    textLayers: (typeof textLayers !== 'undefined' ? textLayers : []).map(t=>({content:t.content,font:t.font,color:t.color,size:t.size,bold:t.bold,shadow:t.shadow,opacity:t.opacity,hidden:t.hidden,px:t.px,py:t.py,pw:t.pw,ph:t.ph})),
+    textSegments: typeof textSegments !== 'undefined' ? textSegments : [],
+    imgSegments: typeof imgSegments !== 'undefined' ? imgSegments : [],
+    videoSegments: typeof videoSegments !== 'undefined' ? videoSegments : [],
+    audioSegments: typeof audioSegments !== 'undefined' ? audioSegments : [],
+    settings:{style:typeof style_!=='undefined'?style_:'none',lyricsStyle:typeof lyricsStyle!=='undefined'?lyricsStyle:'none',danceMode:typeof danceMode!=='undefined'?danceMode:'none',currentAR:typeof currentAR!=='undefined'?currentAR:'16:9',exportQuality:typeof exportQuality!=='undefined'?exportQuality:'hd'},
+    beatMarkers:bvBeatMarkers, captionTemplate:bvCaptionTemplate
+  });
 }
+function bvSaveHistory() {
+  const snap=bvEditorSnapshot();
+  if (bvHistoryIndex>=0 && bvHistory[bvHistoryIndex]===snap) return;
+  bvHistory=bvHistory.slice(0,bvHistoryIndex+1); bvHistory.push(snap);
+  if(bvHistory.length>50) bvHistory.shift();
+  bvHistoryIndex=bvHistory.length-1; bvUpdateHistoryButtons(); bvAutosave();
+}
+function bvApplySnapshot(snap) {
+  try {
+    const d=JSON.parse(snap);
+    if(typeof lyrics!=='undefined') lyrics=d.lyrics.map(l=>({...l,ds:{beatCount:0,jumpAmt:0,spinAng:0,spinDir:1,phase:Math.random()*Math.PI*2}}));
+    if(typeof textLayers!=='undefined') { textLayers.length=0; (d.textLayers||[]).forEach(x=>textLayers.push(x)); }
+    if(typeof textSegments!=='undefined') { textSegments.length=0; (d.textSegments||[]).forEach(x=>textSegments.push(x)); }
+    if(typeof imgSegments!=='undefined') { imgSegments=d.imgSegments||[]; }
+    if(typeof videoSegments!=='undefined') { videoSegments=d.videoSegments||[]; }
+    if(typeof audioSegments!=='undefined') { audioSegments=d.audioSegments||[]; }
+    bvBeatMarkers=d.beatMarkers||[]; bvCaptionTemplate=d.captionTemplate||'clean';
+    if(d.settings){ if(typeof pickStyle==='function')pickStyle(d.settings.style,document.querySelector('[data-style="'+d.settings.style+'"]')); if(typeof pickLS==='function')pickLS(d.settings.lyricsStyle,document.querySelector('[data-ls="'+d.settings.lyricsStyle+'"]')); }
+    if(typeof renderLyrics==='function')renderLyrics(); if(typeof renderTextLayerList==='function')renderTextLayerList(); if(typeof TL!=='undefined'&&TL.draw)TL.draw(typeof pvOffset!=='undefined'?pvOffset:0); if(typeof drawIdle==='function')drawIdle();
+    bvRenderMarkers(); bvUpdateHistoryButtons();
+  } catch(e){ console.error('Could not restore edit history',e); }
+}
+function bvUndo(){if(bvHistoryIndex<=0)return;bvHistoryIndex--;bvApplySnapshot(bvHistory[bvHistoryIndex]);}
+function bvRedo(){if(bvHistoryIndex>=bvHistory.length-1)return;bvHistoryIndex++;bvApplySnapshot(bvHistory[bvHistoryIndex]);}
+function bvUpdateHistoryButtons(){const u=document.getElementById('undoBtn'),r=document.getElementById('redoBtn');if(u)u.disabled=bvHistoryIndex<=0;if(r)r.disabled=bvHistoryIndex>=bvHistory.length-1;}
+function bvAutosave(){try{localStorage.setItem(BV_AUTOSAVE_KEY,bvEditorSnapshot());}catch(e){console.warn('Autosave unavailable',e);}}
+function bvRestoreAutosave(){try{const s=localStorage.getItem(BV_AUTOSAVE_KEY);if(s){bvHistory=[s];bvHistoryIndex=0;bvApplySnapshot(s);if(typeof toast==='function')toast('Previous edit settings restored from this browser');}}catch(e){}}
+
+function pasteLyricsToBlocks(mode){
+  if(!audioDuration){if(typeof toast==='function')toast('Upload audio first');return;}
+  const raw=(document.getElementById('pasteLyricsText').value||'').trim();
+  const lines=raw.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+  if(!lines.length){if(typeof toast==='function')toast('Paste one lyric line per row first');return;}
+  if(mode==='replace') lyrics.length=0;
+  const each=audioDuration/lines.length;
+  lines.forEach((text,i)=>lyrics.push({time:i*each,endTime:Math.min(audioDuration,(i+1)*each),text,ds:{beatCount:0,jumpAmt:0,spinAng:0,spinDir:1,phase:Math.random()*Math.PI*2}}));
+  lyrics.sort((a,b)=>a.time-b.time); selectedLyricIdx=0;
+  if(typeof renderLyrics==='function')renderLyrics(); if(typeof TL!=='undefined'&&TL.draw)TL.draw(0); bvSaveHistory();
+  if(typeof toast==='function')toast(lines.length+' lyric blocks created');
+}
+function secondsToSrt(t){const h=Math.floor(t/3600),m=Math.floor((t%3600)/60),s=Math.floor(t%60),ms=Math.round((t-Math.floor(t))*1000);return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')+','+String(ms).padStart(3,'0');}
+function exportSRT(){
+  if(!lyrics.length){if(typeof toast==='function')toast('Add lyrics before exporting SRT');return;}
+  const srt=lyrics.map((l,i)=>(i+1)+'\n'+secondsToSrt(l.time)+' --> '+secondsToSrt(l.endTime)+'\n'+l.text+'\n').join('\n');
+  const blob=new Blob([srt],{type:'text/plain'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='beatviz-lyrics.srt';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function parseSrtTime(v){const p=v.trim().replace(',', '.').split(':');return (+p[0])*3600+(+p[1])*60+parseFloat(p[2]);}
+function importSRT(event){
+  const f=event.target.files[0];if(!f)return;const reader=new FileReader();reader.onload=e=>{const blocks=e.target.result.trim().split(/\r?\n\r?\n/);const parsed=[];blocks.forEach(b=>{const rows=b.split(/\r?\n/);const timeRow=rows.find(x=>x.includes('-->'));if(!timeRow)return;const ts=timeRow.split('-->');const text=rows.slice(rows.indexOf(timeRow)+1).join(' ').trim();if(text)parsed.push({time:parseSrtTime(ts[0]),endTime:parseSrtTime(ts[1]),text,ds:{beatCount:0,jumpAmt:0,spinAng:0,spinDir:1,phase:Math.random()*Math.PI*2}});});if(parsed.length){lyrics=parsed;selectedLyricIdx=0;renderLyrics();TL.draw(0);bvSaveHistory();toast(parsed.length+' subtitle lines imported');}else toast('No SRT subtitle lines found');};reader.readAsText(f);event.target.value='';}
+
+const BV_CAPTIONS={clean:{style:'subtitle',color:'#ffffff',size:48,pos:.88},karaoke:{style:'karaoke',color:'#fbbf24',size:52,pos:.82},neon:{style:'neon',color:'#f472b6',size:52,pos:.84},hiphop:{style:'typewriter',color:'#00ff64',size:58,pos:.84},romantic:{style:'float',color:'#f9a8d4',size:48,pos:.84},bold:{style:'subtitle',color:'#ffffff',size:64,pos:.5}};
+function applyCaptionTemplate(key,btn){const t=BV_CAPTIONS[key];if(!t)return;bvCaptionTemplate=key;if(typeof pickLS==='function')pickLS(t.style,document.querySelector('[data-ls="'+t.style+'"]'));const c=document.getElementById('lyricColor'),s=document.getElementById('sLyricSz'),p=document.getElementById('lyricPos');if(c)c.value=t.color;if(s){s.value=t.size;const v=document.getElementById('vLyricSz');if(v)v.textContent=t.size+'px';}if(p)p.value=t.pos;document.querySelectorAll('[data-cap]').forEach(x=>x.classList.toggle('active',x===btn));if(typeof drawIdle==='function')drawIdle();bvSaveHistory();}
+
+function drawWaveform(){const cv=document.getElementById('waveformCanvas');if(!cv||!audioBuffer)return;const r=cv.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,2);cv.width=Math.max(1,Math.floor(r.width*dpr));cv.height=Math.max(1,Math.floor(r.height*dpr));const c=cv.getContext('2d');c.scale(dpr,dpr);const w=r.width,h=r.height;c.fillStyle='#171825';c.fillRect(0,0,w,h);const d=audioBuffer.getChannelData(0),step=Math.ceil(d.length/w),mid=h/2;c.strokeStyle='#8b7bff';c.lineWidth=1;c.beginPath();for(let x=0;x<w;x++){let lo=1,hi=-1;for(let j=0;j<step;j++){const v=d[x*step+j]||0;if(v<lo)lo=v;if(v>hi)hi=v;}c.moveTo(x,mid+lo*mid);c.lineTo(x,mid+hi*mid);}c.stroke();bvBeatMarkers.forEach(t=>{const x=t/audioDuration*w;c.strokeStyle='#f2b544';c.lineWidth=2;c.beginPath();c.moveTo(x,0);c.lineTo(x,h);c.stroke();});}
+function addBeatMarker(event){if(!audioDuration)return;const cv=event.currentTarget,r=cv.getBoundingClientRect(),t=Math.max(0,Math.min(audioDuration,(event.clientX-r.left)/r.width*audioDuration));bvBeatMarkers.push(t);bvBeatMarkers.sort((a,b)=>a-b);drawWaveform();bvRenderMarkers();bvSaveHistory();}
+function bvRenderMarkers(){const el=document.getElementById('beatMarkerList');if(!el)return;el.innerHTML=bvBeatMarkers.map((t,i)=>'<button class="beat-marker" onclick="seekPreview('+t+');bvBeatMarkers.splice('+i+',1);drawWaveform();bvRenderMarkers()">'+fmt(t)+' ×</button>').join('');}
+
+function addBrandKit(){
+  const pane=document.getElementById('pane-style');if(!pane||document.getElementById('brandKitUI'))return;
+  const el=document.createElement('div');el.id='brandKitUI';el.innerHTML='<div class="sec-head">Brand Kit <span class="sec-badge">saved here</span></div><div class="brand-kit"><input id="brandArtist" placeholder="Artist / brand name"><div class="brand-row"><label>Brand color</label><input id="brandColor" type="color" value="#6d5ef5"></div><button class="primary" onclick="saveBrandKit()">Save Brand Kit</button><button onclick="applyBrandKit()">Apply Brand Kit</button><div style="font-size:9px;color:var(--text-3);line-height:1.5">Stored in this browser. Use it for every release.</div></div>';
+  pane.appendChild(el);
+}
+function saveBrandKit(){const x={artist:document.getElementById('brandArtist').value,color:document.getElementById('brandColor').value,caption:bvCaptionTemplate};localStorage.setItem('beatviz_brandkit_v1',JSON.stringify(x));toast('Brand Kit saved in this browser');}
+function applyBrandKit(){try{const x=JSON.parse(localStorage.getItem('beatviz_brandkit_v1')||'{}');if(!x.artist&&!x.color){toast('Save your Brand Kit first');return;}if(x.color){const c=document.getElementById('lyricColor');if(c)c.value=x.color;}if(x.caption)applyCaptionTemplate(x.caption,document.querySelector('[data-cap="'+x.caption+'"]'));toast('Brand Kit applied');}catch(e){toast('Could not read Brand Kit');}}
+
+function addAiHooks(){
+  const pane=document.getElementById('pane-style');if(!pane||document.getElementById('aiHooksUI'))return;
+  const el=document.createElement('div');el.id='aiHooksUI';el.innerHTML='<div class="sec-head">AI Pro Tools <span class="sec-badge">backend required</span></div><div class="ai-config-note"><b>Reliable Hindi/Hinglish/Punjabi/Tamil/Telugu transcription and background removal require a secure server API.</b><br><br>Configure <code>BV_AI_CONFIG.transcriptionEndpoint</code>, <code>backgroundRemovalEndpoint</code>, and <code>sceneTimingEndpoint</code> in code before enabling these features for customers.</div>';
+  pane.appendChild(el);
+}
+function bvInitToolkit(){
+  const tk=document.getElementById('creatorToolkit');const pane=document.getElementById('pane-lyrics');
+  if(tk&&pane){tk.style.display='block';pane.insertBefore(tk,pane.firstChild);}
+  const wave=document.getElementById('waveformCanvas');if(wave)wave.addEventListener('click',addBeatMarker);
+  addBrandKit();addAiHooks();bvSaveHistory();setTimeout(bvRestoreAutosave,300);
+}
+window.addEventListener('load',bvInitToolkit);
+// Capture modifications made through the current editor controls so undo/autosave stay useful.
+document.addEventListener('change',function(e){if(e.target.closest('#pane-lyrics,#pane-text,#pane-style,#pane-layers'))setTimeout(bvSaveHistory,0);});
 
 </script>
 </body>

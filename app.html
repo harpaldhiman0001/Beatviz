@@ -2698,7 +2698,7 @@ async function startAudioFrom(offset = 0) {
         }
 ['click', 'touchstart', 'keydown'].forEach(evt => {
     document.addEventListener(evt, () => {
-        // Do not resume sound while explicitly paused or stopped.
+        // Do not resume sound after explicit Pause or Stop.
         if (playbackState !== 'playing') return;
 
         const c = getSharedAudioCtx();

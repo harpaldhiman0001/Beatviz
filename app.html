@@ -2518,7 +2518,13 @@ function pauseAllAudio() {
     if (playbackState !== 'playing') return;
 
     const audioCtx = getSharedAudioCtx();
-    pausedAt += Math.max(0, audioCtx.currentTime - playbackStartContextTime);
+
+    // playbackStartContextTime is set to the AudioContext time
+    // at the moment this play/resume session begins.
+    pausedAt = Math.max(
+        0,
+        pausedAt + (audioCtx.currentTime - playbackStartContextTime)
+    );
 
     activeAudioSources.forEach(source => {
         try {
@@ -2527,6 +2533,7 @@ function pauseAllAudio() {
             source.disconnect();
         } catch (err) {}
     });
+
     activeAudioSources.clear();
 
     activeMediaElements.forEach(media => {
@@ -2606,20 +2613,19 @@ function startAudioFrom(offset = 0) {
         audioCtx.resume().catch(() => {});
     }
 
+    // The start time for this fresh Play or Resume session.
     playbackStartContextTime = audioCtx.currentTime;
 
     audioTracks.forEach((track, trackIndex) => {
         if (!track || !track.buffer || track.muted) return;
 
         const segment = audioSegments.find(s => s.trackIdx === trackIndex);
-
         const trackStart = segment ? segment.start : 0;
         const trackDuration = segment ? segment.dur : track.buffer.duration;
 
-        // This track has not started yet.
+        // Track starts later in the timeline.
         if (offset < trackStart) {
             const delay = trackStart - offset;
-
             const source = audioCtx.createBufferSource();
             const gain = audioCtx.createGain();
 
@@ -2629,19 +2635,15 @@ function startAudioFrom(offset = 0) {
             source.connect(gain);
             gain.connect(audioCtx.destination);
 
-            source.onended = () => {
-                activeAudioSources.delete(source);
-            };
+            source.onended = () => activeAudioSources.delete(source);
 
             activeAudioSources.add(source);
             source.start(audioCtx.currentTime + delay, 0, trackDuration);
             return;
         }
 
-        // This track has already ended.
-        if (offset >= trackStart + trackDuration) {
-            return;
-        }
+        // Track finished before the requested position.
+        if (offset >= trackStart + trackDuration) return;
 
         const sourceOffset = offset - trackStart;
         const remainingDuration = trackDuration - sourceOffset;
@@ -2655,9 +2657,7 @@ function startAudioFrom(offset = 0) {
         source.connect(gain);
         gain.connect(audioCtx.destination);
 
-        source.onended = () => {
-            activeAudioSources.delete(source);
-        };
+        source.onended = () => activeAudioSources.delete(source);
 
         activeAudioSources.add(source);
         source.start(0, sourceOffset, remainingDuration);
@@ -4757,7 +4757,7 @@ function togglePause() {
         isPlaying = true;
         isPaused = false;
 
-        // This is the ONLY place where paused music resumes.
+        // Resume exactly from saved pausedAt time.
         startAudioFrom(pausedAt);
         startRenderLoop(pausedAt);
 
@@ -4796,15 +4796,15 @@ function togglePause() {
 }
 
 function handleGenerate() {
-    // STOP: works while playing or paused.
     if (playbackState === 'playing' || playbackState === 'paused') {
         stopAllAudio(true);
         drawIdle();
         return;
     }
 
-    // Fresh start after stopped.
     pausedAt = 0;
+    pvOffset = 0;
+
     playbackState = 'playing';
     isPlaying = true;
     isPaused = false;

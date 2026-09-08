@@ -2888,10 +2888,26 @@ function selectLayer(layer, autoFitImage = true) {
 
     if (!layer) { drawIdle(); return; }
 
-    // Only auto-refit on click if the image somehow isn't placed yet
-    // (normal case: it's already full-size from upload, so this is a no-op).
     if (layer.type === 'img' && autoFitImage && !chars[layer.refIdx]?.userPlaced) {
         fitLayerToFull(false);
+    }
+
+    // NEW: jump playhead to this image's segment so it's actually visible on screen.
+    if (layer.type === 'img' && playbackState !== 'playing') {
+        const seg = imgSegments.find(s => s.charIdx === layer.refIdx);
+        if (seg) {
+            pvOffset = seg.start;
+            TL.draw(pvOffset);
+            updatePvUI();
+        }
+    }
+    if (layer.type === 'video' && playbackState !== 'playing') {
+        const seg = videoSegments.find(s => s.vidIdx === layer.refIdx);
+        if (seg) {
+            pvOffset = seg.start;
+            TL.draw(pvOffset);
+            updatePvUI();
+        }
     }
 
     const r = layerRect(layer);
@@ -2914,7 +2930,7 @@ function selectLayer(layer, autoFitImage = true) {
     renderCG();
     renderVideoLayerList();
     renderTextLayerList();
-    drawIdle(); // ← this is what makes clicking "real-time" — canvas redraws instantly
+    drawIdle();
 }
 
 function toggleLayerVisibility() {
@@ -3086,43 +3102,61 @@ function toggleLayerVisibility() {
             });
         }
 
-        function drawImageLayer(layer, beat, elapsed) {
-            const c = chars[layer.refIdx];
-            if (!c) return;
-            if (!c.userPlaced) initCharPlace(c);
-            if (imgSegments.length) { const seg = imgSegments.find(s => s.charIdx === layer.refIdx); if (seg && !(elapsed >=
-                    seg.start && elapsed < seg.start + seg.dur)) return; }
-            const { dx, dy, rot, scx, scy } = getDance(c, beat, elapsed, layer.refIdx);
-            const floatY = danceMode === 'none' ? 0 : Math.sin(Date.now() * 0.0022 + layer.refIdx * 1.3) * 8;
-            const bs = danceMode === 'none' ? 1 : 1 + beatIntensity * 0.17;
-            const glow = parseFloat(document.getElementById('sGlow')?.value || 1);
-            ctx.save();
-            ctx.globalAlpha = c.opacity ?? 1;
-            ctx.translate(c.px + dx, c.py + dy + floatY);
-            ctx.rotate(rot);
-            ctx.scale(scx * bs, scy * bs);
-            if (beatIntensity > 0.08 && glow > 0) { ctx.shadowBlur = 32 * beatIntensity * glow;
-                ctx.shadowColor = STYLECOLORS[style_] || '#8b5cf6'; }
-            ctx.drawImage(c.img, -c.pw / 2, -c.ph / 2, c.pw, c.ph);
-            ctx.shadowBlur = 0;
-            ctx.restore();
-        }
+function drawImageLayer(layer, beat, elapsed) {
+    const c = chars[layer.refIdx];
+    if (!c) return;
+    if (!c.userPlaced) initCharPlace(c);
 
-        function drawVideoLayerItem(layer, elapsed) {
-            const v = videoLayers[layer.refIdx];
-            if (!v || !v.el) return;
-            if (v.px === undefined) initVideoPlace(v);
-            const seg = videoSegments.find(s => s.vidIdx === layer.refIdx);
-            let drawTime = elapsed;
-            if (seg) { if (elapsed < seg.start || elapsed >= seg.start + seg.dur) return;
-                drawTime = elapsed - seg.start; }
-            if (drawTime < 0) drawTime = 0;
-            try { if (Math.abs(v.el.currentTime - drawTime) > 0.05) v.el.currentTime = drawTime; } catch (e) {}
-            ctx.save();
-            ctx.globalAlpha = v.opacity ?? 1;
-            ctx.drawImage(v.el, v.px - v.pw / 2, v.py - v.ph / 2, v.pw, v.ph);
-            ctx.restore();
-        }
+    const isSelected = selectedLayer && selectedLayer.type === 'img' && selectedLayer.refIdx === layer.refIdx;
+    const editing = playbackState !== 'playing';
+
+    if (imgSegments.length && !(editing && isSelected)) {
+        const seg = imgSegments.find(s => s.charIdx === layer.refIdx);
+        if (seg && !(elapsed >= seg.start && elapsed < seg.start + seg.dur)) return;
+    }
+
+    const { dx, dy, rot, scx, scy } = getDance(c, beat, elapsed, layer.refIdx);
+    const floatY = danceMode === 'none' ? 0 : Math.sin(Date.now() * 0.0022 + layer.refIdx * 1.3) * 8;
+    const bs = danceMode === 'none' ? 1 : 1 + beatIntensity * 0.17;
+    const glow = parseFloat(document.getElementById('sGlow')?.value || 1);
+    ctx.save();
+    ctx.globalAlpha = c.opacity ?? 1;
+    ctx.translate(c.px + dx, c.py + dy + floatY);
+    ctx.rotate(rot);
+    ctx.scale(scx * bs, scy * bs);
+    if (beatIntensity > 0.08 && glow > 0) {
+        ctx.shadowBlur = 32 * beatIntensity * glow;
+        ctx.shadowColor = STYLECOLORS[style_] || '#8b5cf6';
+    }
+    ctx.drawImage(c.img, -c.pw / 2, -c.ph / 2, c.pw, c.ph);
+    ctx.shadowBlur = 0;
+    ctx.restore();
+}
+
+function drawVideoLayerItem(layer, elapsed) {
+    const v = videoLayers[layer.refIdx];
+    if (!v || !v.el) return;
+    if (v.px === undefined) initVideoPlace(v);
+
+    const isSelected = selectedLayer && selectedLayer.type === 'video' && selectedLayer.refIdx === layer.refIdx;
+    const editing = playbackState !== 'playing';
+
+    const seg = videoSegments.find(s => s.vidIdx === layer.refIdx);
+    let drawTime = elapsed;
+    if (seg && !(editing && isSelected)) {
+        if (elapsed < seg.start || elapsed >= seg.start + seg.dur) return;
+        drawTime = elapsed - seg.start;
+    } else if (seg && editing && isSelected) {
+        drawTime = Math.max(0, elapsed - seg.start);
+    }
+    if (drawTime < 0) drawTime = 0;
+
+    try { if (Math.abs(v.el.currentTime - drawTime) > 0.05) v.el.currentTime = drawTime; } catch (e) {}
+    ctx.save();
+    ctx.globalAlpha = v.opacity ?? 1;
+    ctx.drawImage(v.el, v.px - v.pw / 2, v.py - v.ph / 2, v.pw, v.ph);
+    ctx.restore();
+}
 
         function drawTextLayerItem(layer, elapsed) {
             const t = textLayers[layer.refIdx];
@@ -4954,7 +4988,6 @@ function finalize() {
     const mp4Btn = document.getElementById('dlMp4');
 
     if (recordingIsMp4) {
-        // True MP4 was recorded (Safari) — offer it directly.
         webmBtn.classList.remove('show');
         mp4Btn.classList.add('show');
         mp4Btn.textContent = '⬇ MP4 ' + Q_LABEL[exportQuality];
@@ -4965,11 +4998,9 @@ function finalize() {
             a.click();
         };
     } else {
-        // WebM recorded — this is the real, working download.
         webmBtn.href = url;
         webmBtn.download = 'beatviz-' + exportQuality + '.webm';
         webmBtn.classList.add('show');
-        // Offer MP4 only as an explicit "convert" action, not a fake download.
         mp4Btn.classList.add('show');
         mp4Btn.textContent = '⬇ Convert to MP4';
         mp4Btn.onclick = () => exportMP4();
@@ -4979,9 +5010,6 @@ function finalize() {
     document.getElementById('statusTxt').textContent = 'Done! Video ready.';
     document.getElementById('progFill').style.width = '100%';
     document.getElementById('readyLbl').classList.add('show');
-    document.getElementById('dlWebm').classList.remove('show');
-document.getElementById('dlMp4').classList.remove('show');
-document.getElementById('readyLbl').classList.remove('show');
     toast('Video ready! Download below.');
 
     if (!sub.isActive && sub.trialActive) {

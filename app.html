@@ -4904,41 +4904,72 @@ async function handleGenerate() {
             return { mime: 'video/webm', isMp4: false };
         }
 
-        function finalize() {
-            restorePreviewResolution();
-            const blobType = recordingIsMp4 ? 'video/mp4' : 'video/webm';
-            recordedBlob = new Blob(chunks, { type: blobType });
-            const url = URL.createObjectURL(recordedBlob);
-            if (blobType === 'video/mp4') { document.getElementById('dlWebm').style.display = 'none';
-                const b = document.getElementById('dlMp4');
-                b.style.display = 'flex';
-                b.textContent = 'MP4 ' + Q_LABEL[exportQuality]; } else { const a = document.getElementById('dlWebm');
-                a.href = url;
-                a.download = 'beatviz-' + exportQuality + '.webm';
-                a.style.display = 'flex';
-                const b = document.getElementById('dlMp4');
-                b.style.display = 'flex';
-                b.textContent = 'MP4 ' + Q_LABEL[exportQuality]; }
-            document.getElementById('statusDot').className = 'dot done';
-            document.getElementById('statusTxt').textContent = 'Done! Video ready.';
-            document.getElementById('progFill').style.width = '100%';
-            toast('Video ready! Download below.');
-            if (!sub.isActive && sub.trialActive) { const prev = parseInt(localStorage.getItem('bvtrialvids') || '0',
-                    10);
-                localStorage.setItem('bvtrialvids', prev + 1); }
-        }
+function finalize() {
+    restorePreviewResolution();
 
-        async function exportMP4() {
-            if (!recordedBlob) { toast('Generate a video first!'); return; }
-            const fname = 'beatviz-' + exportQuality + '.mp4';
-            if (recordedBlob.type === 'video/mp4') { const a = document.createElement('a');
-                a.href = URL.createObjectURL(recordedBlob);
-                a.download = fname;
-                a.click();
-                toast('MP4 saved!'); return; }
-            toast('Download WebM and convert free at cloudconvert.com');
-            setTimeout(() => window.open('https://cloudconvert.com/webm-to-mp4', '_blank'), 1200);
-        }
+    const blobType = recordingIsMp4 ? 'video/mp4' : 'video/webm';
+    recordedBlob = new Blob(chunks, { type: blobType });
+
+    if (!recordedBlob.size) {
+        toast('Recording failed — no data captured. Try again.');
+        document.getElementById('statusTxt').textContent = 'Failed';
+        return;
+    }
+
+    const url = URL.createObjectURL(recordedBlob);
+    const webmBtn = document.getElementById('dlWebm');
+    const mp4Btn = document.getElementById('dlMp4');
+
+    if (recordingIsMp4) {
+        // True MP4 was recorded (Safari) — offer it directly.
+        webmBtn.classList.remove('show');
+        mp4Btn.classList.add('show');
+        mp4Btn.textContent = '⬇ MP4 ' + Q_LABEL[exportQuality];
+        mp4Btn.onclick = () => {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'beatviz-' + exportQuality + '.mp4';
+            a.click();
+        };
+    } else {
+        // WebM recorded — this is the real, working download.
+        webmBtn.href = url;
+        webmBtn.download = 'beatviz-' + exportQuality + '.webm';
+        webmBtn.classList.add('show');
+        // Offer MP4 only as an explicit "convert" action, not a fake download.
+        mp4Btn.classList.add('show');
+        mp4Btn.textContent = '⬇ Convert to MP4';
+        mp4Btn.onclick = () => exportMP4();
+    }
+
+    document.getElementById('statusDot').className = 'dot done';
+    document.getElementById('statusTxt').textContent = 'Done! Video ready.';
+    document.getElementById('progFill').style.width = '100%';
+    document.getElementById('readyLbl').classList.add('show');
+    document.getElementById('dlWebm').classList.remove('show');
+document.getElementById('dlMp4').classList.remove('show');
+document.getElementById('readyLbl').classList.remove('show');
+    toast('Video ready! Download below.');
+
+    if (!sub.isActive && sub.trialActive) {
+        const prev = parseInt(localStorage.getItem('bvtrialvids') || '0', 10);
+        localStorage.setItem('bvtrialvids', prev + 1);
+    }
+}
+
+async function exportMP4() {
+    if (!recordedBlob) { toast('Generate a video first!'); return; }
+    if (recordedBlob.type === 'video/mp4') {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(recordedBlob);
+        a.download = 'beatviz-' + exportQuality + '.mp4';
+        a.click();
+        toast('MP4 saved!');
+        return;
+    }
+    toast('Your browser can only record WebM — opening a free converter for MP4…');
+    setTimeout(() => window.open('https://cloudconvert.com/webm-to-mp4', '_blank'), 1200);
+}
         let loopPreviewActive = false,
             loopPreviewTimer = null,
             loopPreviewDur = 5;

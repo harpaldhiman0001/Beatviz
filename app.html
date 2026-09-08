@@ -2510,7 +2510,10 @@ let pausedAt = 0;
     isPaused = false;
     pvPlaying = false;
     playbackState = 'stopped';
-
+if (isRecording) {
+    isRecording = false;
+    try { if (recorder && recorder.state !== 'inactive') recorder.stop(); } catch (e) {}
+}
     updatePlaybackUI();
 }
 
@@ -2608,10 +2611,19 @@ async function startAudioFrom(offset = 0) {
     if (!audioTracks.length) return false;
 
     const audioCtx = getSharedAudioCtx();
+    if (audioCtx.state === 'suspended') { try { await audioCtx.resume(); } catch (e) {} }
+    if (audioCtx.state === 'suspended') {
+        document.getElementById('audioUnlockBanner').classList.add('show');
+        return false;
+    }
 
+    if (!genAnalyser) {
+        genAnalyser = audioCtx.createAnalyser();
+        genAnalyser.fftSize = 1024;
+        genFreqData = new Uint8Array(genAnalyser.frequencyBinCount);
+        genAnalyser.connect(audioCtx.destination);
+    }
 
-
-    // Set this after AudioContext has resumed.
     playbackStartContextTime = audioCtx.currentTime;
 
     audioTracks.forEach((track, trackIndex) => {
@@ -2621,47 +2633,26 @@ async function startAudioFrom(offset = 0) {
         const trackStart = segment ? segment.start : 0;
         const trackDuration = segment ? segment.dur : track.buffer.duration;
 
-        if (offset < trackStart) {
-            const delay = trackStart - offset;
-
-            const source = audioCtx.createBufferSource();
-            const gain = audioCtx.createGain();
-
-            source.buffer = track.buffer;
-            gain.gain.value = track.volume ?? 1;
-
-            source.connect(gain);
-            gain.connect(audioCtx.destination);
-
-            source.onended = () => {
-                activeAudioSources.delete(source);
-            };
-
-            activeAudioSources.add(source);
-            source.start(audioCtx.currentTime + delay, 0, trackDuration);
-            return;
-        }
-
-        if (offset >= trackStart + trackDuration) return;
-
-        const sourceOffset = offset - trackStart;
-        const remainingDuration = trackDuration - sourceOffset;
-
         const source = audioCtx.createBufferSource();
         const gain = audioCtx.createGain();
-
         source.buffer = track.buffer;
         gain.gain.value = track.volume ?? 1;
-
         source.connect(gain);
-        gain.connect(audioCtx.destination);
+        gain.connect(genAnalyser);
+        if (isRecording && genDestNode) gain.connect(genDestNode);
 
-        source.onended = () => {
-            activeAudioSources.delete(source);
-        };
+        source.onended = () => activeAudioSources.delete(source);
 
-        activeAudioSources.add(source);
-        source.start(0, sourceOffset, remainingDuration);
+        if (offset < trackStart) {
+            const delay = trackStart - offset;
+            activeAudioSources.add(source);
+            source.start(audioCtx.currentTime + delay, 0, trackDuration);
+        } else if (offset < trackStart + trackDuration) {
+            const sourceOffset = offset - trackStart;
+            const remainingDuration = trackDuration - sourceOffset;
+            activeAudioSources.add(source);
+            source.start(0, sourceOffset, remainingDuration);
+        }
     });
 
     return true;
@@ -4670,7 +4661,11 @@ function togglePreview() {
                 if (elapsed >= audioDuration) stopAll();
             }
         }
-        let genAudioCtx = null;
+   let genAudioCtx = null;
+let genAnalyser = null;
+let genFreqData = null;
+let genDestNode = null;
+let isRecording = false;
 
         // ---- HARD STOP: stop EVERY audio source connected to this context ----
         function bvHardStopAudio() {
@@ -4770,27 +4765,47 @@ async function togglePause() {
     }
 }
 
-        function startRenderLoop(offset = 0) {
+function startRenderLoop(offset = 0) {
     const audioCtx = getSharedAudioCtx();
     const startedAt = audioCtx.currentTime - offset;
 
     function render() {
-        // Critical guard: no drawing/audio progression after Pause or Stop.
-        if (playbackState !== 'playing') {
-            renderFrameId = null;
-            return;
-        }
+        if (playbackState !== 'playing') { renderFrameId = null; return; }
 
         const currentTime = audioCtx.currentTime - startedAt;
 
-        // Your existing drawing, timeline, lyric, and video rendering logic:
-        // drawFrame(currentTime);
-        // updateTimeline(currentTime);
-        // updateLyrics(currentTime);
+        let beat = 0;
+        if (genAnalyser && genFreqData) {
+            genAnalyser.getByteFrequencyData(genFreqData);
+            freqData = genFreqData;
+            beat = detectBeat();
+        }
+
+        ctx.save();
+        drawBg(beat);
+        drawLayersStacked(beat, currentTime);
+        ctx.restore();
+        if (lyrics.length) drawLyricsOverlay(currentTime, beat);
+        drawWatermark();
+        TL.draw(currentTime);
+
+        const pct = audioDuration ? Math.min(100, (currentTime / audioDuration) * 100) : 0;
+        document.getElementById('progFill').style.width = pct + '%';
+        document.getElementById('timeDisp').textContent = `${fmt(currentTime)} / ${fmt(audioDuration)}`;
+
+        const meter = document.getElementById('audioMeter');
+        meter.classList.add('show');
+        const bars = document.querySelectorAll('#amBars .am-bar');
+        if (bars.length && genFreqData) {
+            const step = Math.floor(genFreqData.length / bars.length) || 1;
+            bars.forEach((b, i) => {
+                const v = genFreqData[i * step] || 0;
+                b.style.height = Math.max(2, (v / 255) * 16) + 'px';
+            });
+        }
 
         if (audioDuration && currentTime >= audioDuration) {
-            stopAllAudio(true);
-            drawIdle();
+            finishPlaybackOrRecording();
             return;
         }
 
@@ -4800,6 +4815,12 @@ async function togglePause() {
     renderFrameId = requestAnimationFrame(render);
 }
 
+function finishPlaybackOrRecording() {
+    const wasRecording = isRecording;
+    stopAllAudio(true);
+    if (!wasRecording) drawIdle();
+}
+
 async function handleGenerate() {
     if (playbackState === 'playing' || playbackState === 'paused') {
         stopAllAudio(true);
@@ -4807,19 +4828,55 @@ async function handleGenerate() {
         return;
     }
 
+    if (!audioTracks.length && !videoLayers.length && !chars.length) {
+        toast('Add audio, video, or images first.');
+        return;
+    }
+
+    chunks = [];
+    recordedBlob = null;
+    document.getElementById('dlWebm').style.display = 'none';
+    document.getElementById('dlMp4').style.display = 'none';
+    document.getElementById('readyLbl').classList.remove('show');
+
+    applyExportResolution();
+
+    const audioCtx = getSharedAudioCtx();
+    if (!genDestNode) genDestNode = audioCtx.createMediaStreamDestination();
+
+    const canvasStream = canvas.captureStream(30);
+    const combinedStream = new MediaStream([
+        ...canvasStream.getVideoTracks(),
+        ...genDestNode.stream.getAudioTracks()
+    ]);
+
+    const { mime, isMp4 } = pickRecorderMime();
+    recordingIsMp4 = isMp4;
+    try {
+        recorder = new MediaRecorder(combinedStream, { mimeType: mime });
+    } catch (e) {
+        toast('Recording is not supported in this browser.');
+        restorePreviewResolution();
+        return;
+    }
+    recorder.ondataavailable = ev => { if (ev.data && ev.data.size) chunks.push(ev.data); };
+    recorder.onstop = () => { finalize(); };
+    recorder.start();
+    isRecording = true;
+
     pausedAt = 0;
     pvOffset = 0;
-
     playbackState = 'playing';
     isPlaying = true;
     isPaused = false;
 
     const started = await startAudioFrom(0);
-
     if (!started) {
+        isRecording = false;
+        try { recorder.stop(); } catch (e) {}
         playbackState = 'stopped';
         isPlaying = false;
-        isPaused = false;
+        restorePreviewResolution();
         updatePlaybackUI();
         return;
     }

@@ -322,13 +322,6 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
     .left-toolbar, .right-panel { display: none !important; }
 }
 
-
-/* TEXT EDITING FIX */
-.text-live-label { font:700 10px var(--font); color:var(--accent); padding:0 14px 6px; }
-.text-preset-row { display:grid; grid-template-columns:repeat(3,1fr); gap:5px; padding:6px 10px 10px; }
-.text-preset-row button { min-height:42px; border:1px solid var(--border-strong); border-radius:var(--radius-sm); background:var(--bg-card); color:var(--text-2); font:700 10px var(--font); cursor:pointer; }
-.text-preset-row button:hover { border-color:var(--accent); color:#c3baff; }
-
 </style>
 </head>
 <body>
@@ -1168,27 +1161,15 @@ function renderTextLayerList() {
     } else wrap.style.display='none';
 }
 function applyTextProps() {
-    if (!selectedLayer || selectedLayer.type !== 'text') return;
-    const t = textLayers[selectedLayer.refIdx];
-    if (!t) return;
-    const contentEl = document.getElementById('txtContent');
-    const colorEl = document.getElementById('txtColor');
-    const sizeEl = document.getElementById('txtSize');
-    if (contentEl) t.content = contentEl.value || 'Text';
-    if (colorEl) t.color = colorEl.value;
-    if (sizeEl) {
-        t.size = parseInt(sizeEl.value, 10) || 48;
-        const label = document.getElementById('vTxtSize');
-        if (label) label.textContent = t.size + 'px';
-    }
-    const bold = document.getElementById('txtBold');
-    const shadow = document.getElementById('txtShadow');
-    if (bold) t.bold = bold.classList.contains('active');
-    if (shadow) t.shadow = shadow.classList.contains('active');
-    // Do NOT call renderTextLayerList here. Re-rendering replaces the field while the user types.
-    // Only redraw canvas/timeline, preserving keyboard focus and smooth editing.
-    drawIdle();
-    if (typeof TL !== 'undefined' && TL.draw) TL.draw(pvOffset);
+    if (!selectedLayer || selectedLayer.type!=='text') return;
+    const t = textLayers[selectedLayer.refIdx]; if (!t) return;
+    t.content = document.getElementById('txtContent').value || 'Text';
+    t.color = document.getElementById('txtColor').value;
+    t.size = parseInt(document.getElementById('txtSize').value);
+    document.getElementById('vTxtSize').textContent = t.size+'px';
+    t.bold = document.getElementById('txtBold').classList.contains('active');
+    t.shadow = document.getElementById('txtShadow').classList.contains('active');
+    drawIdle(); renderTextLayerList();
 }
 function setTextFont(font, btn) {
     if (!selectedLayer || selectedLayer.type!=='text') return;
@@ -1702,64 +1683,110 @@ function loopFn() {
 }
 let genAudioCtx = null;
 async function handleGenerate() {
-    window.bvRenderSources = [];
-    const canGenerate = sub.isActive || (sub.trialActive && sub.trialDaysLeft>0);
+    const canGenerate = sub.isActive || (sub.trialActive && sub.trialDaysLeft > 0);
     if (!canGenerate) { showPaywall(); return; }
-    if (!sub.isActive && sub.trialActive) { const trialVids=parseInt(localStorage.getItem('bvtrialvids')||'0',10); if (trialVids>=1) { showPaywall(); toast('Trial allows 1 video. Subscribe for unlimited!'); return; } }
     if (isPlaying) { stopAll(); return; }
-    const hasAnyMedia = audioTracks.length > 0 || audioBuffer !== null || chars.length > 0 || videoLayers.length > 0;
-    if (!hasAnyMedia) { toast('Add audio, a video, or an image first.'); return; }
-    // A silent visual export is valid if the user uploaded only an image.
-    // A soundtrack-only export is valid if the user uploaded only audio.
+    const hasAnyMedia = audioTracks.length > 0 || videoLayers.length > 0 || chars.length > 0;
+    if (!hasAnyMedia) { toast('Add audio, video, or an image first.'); return; }
     if (pvPlaying) pausePreview();
-    if (tapCatchActive) stopTapCatch(); if (autoCapActive) stopAutoCaption();
-    selectLayer(null); closeInlineEditor();
 
-    genAudioCtx = getSharedAudioCtx();
-    if (genAudioCtx.state === 'suspended') { await genAudioCtx.resume(); }
-    if (genAudioCtx.state === 'suspended') { toast('Click anywhere on the page first to enable audio, then try Generate again'); document.getElementById('audioUnlockBanner').classList.add('show'); return; }
+    // Fresh render-only context. Preview has its own context, so stopping an export never breaks Preview sound.
+    try { if (genAudioCtx && genAudioCtx.state !== 'closed') await genAudioCtx.close(); } catch (e) {}
+    genAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    await genAudioCtx.resume();
 
-    analyser=genAudioCtx.createAnalyser(); analyser.fftSize=2048; analyser.smoothingTimeConstant=.82;
-    freqData=new Uint8Array(analyser.frequencyBinCount);
-    const mDest=genAudioCtx.createMediaStreamDestination();
+    analyser = genAudioCtx.createAnalyser();
+    analyser.fftSize = 2048;
+    analyser.smoothingTimeConstant = 0.82;
+    freqData = new Uint8Array(analyser.frequencyBinCount);
 
-    if (audioTracks.length && audioSegments.length) {
-        audioSegments.forEach(seg=>{ const track=audioTracks[seg.trackIdx]; if (!track||track.muted) return;
-            const s=genAudioCtx.createBufferSource(); s.buffer=track.buffer; const g=genAudioCtx.createGain(); g.gain.value=track.volume||1;
-            window.bvRenderSources = window.bvRenderSources || []; window.bvRenderSources.push(s);
-            s.connect(g); g.connect(mDest); g.connect(genAudioCtx.destination); g.connect(analyser); s.start(genAudioCtx.currentTime,0,seg.dur); });
-    } else if (audioTracks.length) {
-        const track=audioTracks[0]; const s=genAudioCtx.createBufferSource(); s.buffer=track.buffer; const g=genAudioCtx.createGain(); g.gain.value=track.volume||1;
-        window.bvRenderSources = window.bvRenderSources || []; window.bvRenderSources.push(s);
-        s.connect(g); g.connect(mDest); g.connect(genAudioCtx.destination); g.connect(analyser); s.start(0);
-    } else {
-        // Video-only or image-only exports need a silent timeline driver.
-        // Video duration is used when available; an image-only export defaults to 10 seconds.
-        const rawDur = videoLayers.length ? videoLayers[0].el.duration : 10;
-        audioDuration = isFinite(rawDur) && rawDur > 0 ? rawDur : 10;
-        const frameCount=Math.max(1,Math.ceil(audioDuration*genAudioCtx.sampleRate));
-        const silentBuf=genAudioCtx.createBuffer(1,frameCount,genAudioCtx.sampleRate);
-        const s=genAudioCtx.createBufferSource(); s.buffer=silentBuf;
-        window.bvRenderSources = window.bvRenderSources || []; window.bvRenderSources.push(s);
-        s.connect(analyser); analyser.connect(genAudioCtx.destination); analyser.connect(mDest); s.start(0);
+    // One master mixer feeds BOTH the user's speakers and the MediaRecorder audio track.
+    const master = genAudioCtx.createGain();
+    master.gain.value = 1;
+    const recorderDestination = genAudioCtx.createMediaStreamDestination();
+    master.connect(analyser);
+    master.connect(recorderDestination);
+    master.connect(genAudioCtx.destination);
+
+    window.bvRenderSources = [];
+    window.bvVideoAudioNodes = [];
+
+    // Timeline duration: music track wins; otherwise calculate longest uploaded video.
+    if (!audioDuration || audioTracks.length === 0) {
+        const videoEnd = videoSegments.reduce((max, segment) => Math.max(max, segment.start + segment.dur), 0);
+        if (videoEnd > 0) audioDuration = videoEnd;
+        else if (chars.length > 0) audioDuration = 10;
     }
-    initParticles(); bassAvg=0; beatIntensity=0; lastBeat=0;
-    applyExportResolution(); await new Promise(r=>setTimeout(r,50));
 
-    const cvStr=canvas.captureStream(30);
-    const combined=new MediaStream([...cvStr.getVideoTracks(), ...mDest.stream.getAudioTracks()]);
-    const picked=pickRecorderMime(); const bitrate={hd:6000000,fhd:10000000,uhd:28000000}[exportQuality]||6000000;
-    recordingIsMp4=picked.isMp4; chunks=[];
-    recorder=new MediaRecorder(combined, {mimeType:picked.mime, videoBitsPerSecond:bitrate});
-    recorder.ondataavailable=e=>{ if (e.data.size>0) chunks.push(e.data); };
-    recorder.onstop=finalize;
-    playStart=genAudioCtx.currentTime; startVideoLayers(0); recorder.start(100);
-    isPlaying=true; isPaused=false; startLoop();
-    document.getElementById('statusDot').className='dot rec';
-    document.getElementById('statusTxt').textContent='Recording at '+Q_LABEL[exportQuality];
-    const gb=document.getElementById('genBtn'); gb.textContent='Stop'; gb.classList.add('stop');
+    // Mix every audio track using its actual timeline start/duration.
+    if (audioTracks.length > 0) {
+        const segments = audioSegments.length ? audioSegments : audioTracks.map((track, i) => ({trackIdx:i,start:0,dur:track.buffer.duration}));
+        segments.forEach(function(segment) {
+            const track = audioTracks[segment.trackIdx];
+            if (!track || track.muted || !track.buffer) return;
+            const source = genAudioCtx.createBufferSource();
+            const gain = genAudioCtx.createGain();
+            source.buffer = track.buffer;
+            gain.gain.value = Number(track.volume ?? 1);
+            source.connect(gain);
+            gain.connect(master);
+            window.bvRenderSources.push(source);
+            const when = Math.max(0, Number(segment.start) || 0);
+            const duration = Math.min(Number(segment.dur) || track.buffer.duration, track.buffer.duration);
+            try { source.start(genAudioCtx.currentTime + when, 0, duration); } catch (e) { console.warn('Audio track could not start', e); }
+        });
+    }
+
+    // Mix embedded video audio. The video element is routed through a MediaElementSource exactly once per render.
+    videoLayers.forEach(function(videoLayer, index) {
+        if (!videoLayer || !videoLayer.el || !videoLayer.audioEnabled || videoLayer.hidden) return;
+        try {
+            const source = genAudioCtx.createMediaElementSource(videoLayer.el);
+            const gain = genAudioCtx.createGain();
+            gain.gain.value = 1;
+            source.connect(gain);
+            gain.connect(master);
+            window.bvVideoAudioNodes.push({source:source,gain:gain});
+            // Audio now travels through the context, so element must remain unmuted.
+            videoLayer.el.muted = false;
+        } catch (e) {
+            console.warn('Could not mix video audio. This browser/video codec may not support it.', e);
+        }
+    });
+
+    initParticles();
+    bassAvg = 0; beatIntensity = 0; lastBeat = 0;
+    applyExportResolution();
+    await new Promise(function(resolve){ setTimeout(resolve, 60); });
+
+    const canvasStream = canvas.captureStream(30);
+    const outputStream = new MediaStream();
+    canvasStream.getVideoTracks().forEach(function(track){ outputStream.addTrack(track); });
+    recorderDestination.stream.getAudioTracks().forEach(function(track){ outputStream.addTrack(track); });
+
+    const picked = pickRecorderMime();
+    const bitrate = {hd:6000000,fhd:10000000,uhd:28000000}[exportQuality] || 6000000;
+    recordingIsMp4 = picked.isMp4;
+    chunks = [];
+    recorder = new MediaRecorder(outputStream, {mimeType:picked.mime, videoBitsPerSecond:bitrate});
+    recorder.ondataavailable = function(event){ if (event.data.size > 0) chunks.push(event.data); };
+    recorder.onstop = finalize;
+
+    playStart = genAudioCtx.currentTime;
+    startVideoLayers(0);
+    recorder.start(250);
+    isPlaying = true;
+    isPaused = false;
+    startLoop();
+
+    document.getElementById('statusDot').className = 'dot rec';
+    document.getElementById('statusTxt').textContent = 'Recording with audio';
+    const gb = document.getElementById('genBtn');
+    gb.textContent = 'Stop';
+    gb.classList.add('stop');
     showPauseUI(true);
-}
+} 
+
 function startVideoLayers(offset) { videoLayers.forEach(v=>{ if (!v.el) return; try{v.el.currentTime=offset;}catch(e){} v.el.muted=!v.audioEnabled; v.el.play().catch(()=>{}); }); }
 function pauseVideoLayers() { videoLayers.forEach(v=>v.el&&v.el.pause()); }
 function resumeVideoLayers() { videoLayers.forEach(v=>v.el&&v.el.play().catch(()=>{})); }
@@ -1771,62 +1798,44 @@ function pickRecorderMime() {
     return {mime:'video/webm',isMp4:false};
 }
 async function bvHardStopAudio() {
-    // 1. Stop preview source immediately.
-    try { if (pvSrc) { pvSrc.onended = null; pvSrc.stop(0); pvSrc.disconnect(); } } catch (e) {}
-    pvSrc = null;
-    pvPlaying = false;
-
-    // 2. Stop every audio BufferSource made for this render.
+    // Stop audio track sources used by this export.
     (window.bvRenderSources || []).forEach(function(source) {
-        try { source.onended = null; source.stop(0); source.disconnect(); } catch (e) {}
+        try { source.stop(0); source.disconnect(); } catch (e) {}
     });
     window.bvRenderSources = [];
 
-    // 3. Pause, mute, and rewind every uploaded video to stop embedded video audio.
-    videoLayers.forEach(function(videoLayer) {
-        if (!videoLayer || !videoLayer.el) return;
-        try { videoLayer.el.pause(); } catch (e) {}
-        try { videoLayer.el.muted = true; } catch (e) {}
-        try { videoLayer.el.currentTime = 0; } catch (e) {}
+    // Pause every video and cut its embedded audio.
+    videoLayers.forEach(function(layer) {
+        if (!layer || !layer.el) return;
+        try { layer.el.pause(); } catch (e) {}
+        try { layer.el.muted = true; } catch (e) {}
+        try { layer.el.currentTime = 0; } catch (e) {}
     });
 
-    // 4. Close the live generation graph. Closing is stronger than suspend:
-    // it permanently disconnects every active node in that graph.
-    try {
-        if (genAudioCtx && genAudioCtx.state !== 'closed') await genAudioCtx.close();
-    } catch (e) {}
+    // Disconnect video audio nodes and close ONLY the render-specific context.
+    (window.bvVideoAudioNodes || []).forEach(function(node) {
+        try { node.source.disconnect(); node.gain.disconnect(); } catch (e) {}
+    });
+    window.bvVideoAudioNodes = [];
+    try { if (genAudioCtx && genAudioCtx.state !== 'closed') await genAudioCtx.close(); } catch (e) {}
     genAudioCtx = null;
     analyser = null;
     freqData = null;
-
-    // 5. If preview has a distinct context, close it too.
-    try {
-        if (pvCtx && pvCtx !== sharedAudioCtx && pvCtx.state !== 'closed') await pvCtx.close();
-    } catch (e) {}
 }
 
 function stopAll() {
-    // Switch state first: prevents the animation loop from scheduling additional work.
     isPlaying = false;
     isPaused = false;
-
-    // Start stopping audio immediately; do not wait before updating the UI.
+    // Start shutdown immediately; this kills playback without disturbing normal Preview context.
     bvHardStopAudio();
-
     try { if (recorder && recorder.state !== 'inactive') recorder.stop(); } catch (e) {}
-    try { pauseVideoLayers(); } catch (e) {}
-
-    const meter = document.getElementById('audioMeter');
-    if (meter) meter.classList.remove('show');
-    const gb = document.getElementById('genBtn');
-    if (gb) { gb.textContent = 'Generate Video'; gb.classList.remove('stop'); }
+    const meter = document.getElementById('audioMeter'); if (meter) meter.classList.remove('show');
+    const gb = document.getElementById('genBtn'); if (gb) { gb.textContent = 'Generate Video'; gb.classList.remove('stop'); }
     showPauseUI(false);
-    const dot = document.getElementById('statusDot');
-    if (dot) dot.className = 'dot';
-    const status = document.getElementById('statusTxt');
-    if (status) status.textContent = 'Stopped';
-    try { updatePvUI(); } catch (e) {}
+    const dot = document.getElementById('statusDot'); if (dot) dot.className = 'dot';
+    const status = document.getElementById('statusTxt'); if (status) status.textContent = 'Stopped';
 }
+
 function showPauseUI(show) { const b=document.getElementById('pauseBtn'); if (b) b.style.display=show?'inline-block':'none'; }
 function togglePause() {
     if (!isPlaying) return;
@@ -1863,66 +1872,6 @@ function stopLoopPreview() { loopPreviewActive=false; if (loopPreviewTimer) clea
 
 setInterval(()=>{ if (audioDuration>0) updateQbTime(); checkAudioUnlockState(); }, 300);
 drawIdle();
-
-
-
-/* ================= RELIABLE TEXT EDITING ================= */
-function bvSetupTextEditing() {
-  const content = document.getElementById('txtContent');
-  if (content && !content.dataset.bvLive) {
-    content.dataset.bvLive = '1';
-    content.addEventListener('input', function() { applyTextProps(); });
-    content.addEventListener('focus', function() { if (!selectedLayer || selectedLayer.type !== 'text') { toast('Select a text layer first'); } });
-  }
-  const wrap = document.getElementById('textPropsWrap');
-  if (wrap && !document.getElementById('textPresets')) {
-    const label = document.createElement('div');
-    label.className = 'text-live-label';
-    label.id = 'selectedTextLabel';
-    label.textContent = 'Select a text layer to edit it live';
-    const presets = document.createElement('div');
-    presets.className = 'text-preset-row';
-    presets.id = 'textPresets';
-    presets.innerHTML = '<button onclick="applyTextPreset(\'title\')">TITLE</button><button onclick="applyTextPreset(\'subtitle\')">Subtitle</button><button onclick="applyTextPreset(\'artist\')">Artist Name</button>';
-    wrap.insertBefore(label, wrap.firstChild);
-    wrap.appendChild(presets);
-  }
-}
-function applyTextPreset(kind) {
-  if (!selectedLayer || selectedLayer.type !== 'text') { toast('Add or select a text layer first'); return; }
-  const t = textLayers[selectedLayer.refIdx];
-  const preset = {
-    title: {content:'YOUR TITLE', size:78, color:'#ffffff', font:'Inter', bold:true, shadow:true},
-    subtitle: {content:'A short subtitle', size:32, color:'#ffffff', font:'Inter', bold:false, shadow:true},
-    artist: {content:'ARTIST NAME', size:46, color:'#fbbf24', font:'Georgia', bold:true, shadow:true}
-  }[kind];
-  Object.assign(t, preset);
-  // Fill form values once after applying preset; then typing will update live without re-render.
-  document.getElementById('txtContent').value=t.content;
-  document.getElementById('txtColor').value=t.color;
-  document.getElementById('txtSize').value=t.size;
-  document.getElementById('vTxtSize').textContent=t.size+'px';
-  document.getElementById('txtBold').classList.toggle('active',t.bold);
-  document.getElementById('txtShadow').classList.toggle('active',t.shadow);
-  drawIdle(); if (typeof TL !== 'undefined') TL.draw(pvOffset); renderTextLayerList();
-}
-const __bvSelectLayerForText = selectLayer;
-selectLayer = function(layer) {
-  __bvSelectLayerForText(layer);
-  if (layer && layer.type === 'text') {
-    const t = textLayers[layer.refIdx];
-    const label = document.getElementById('selectedTextLabel');
-    if (label && t) label.textContent = 'Editing: ' + (t.content || 'Text layer');
-    // Set all values only on selection, never on every character typed.
-    if (t) {
-      document.getElementById('txtContent').value=t.content;
-      document.getElementById('txtColor').value=t.color;
-      document.getElementById('txtSize').value=t.size;
-      document.getElementById('vTxtSize').textContent=t.size+'px';
-    }
-  }
-};
-window.addEventListener('load', bvSetupTextEditing);
 
 </script>
 </body>

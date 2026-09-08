@@ -740,6 +740,8 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
 
 <div class="toast" id="toast"></div>
 
+    <audio id="previewAudio" preload="metadata" playsinline></audio>
+
 <script>
 
 const CONFIG = { SCRIPTURL: "https://script.google.com/macros/s/AKfycbxmlAuS2sftPJIuplMd5Scrv2PinK2D-IMVDM2CfxAsuJr2RzM7Yy-Jhh-Inoe5ptQzOQ/exec", RAZORPAYKEY: "rzp_live_TNjnMPpmLS7dJG" };
@@ -788,15 +790,181 @@ async function initiatePayment() {
 function toast(m) { const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),3200); }
 function fmt(s) { if (!isFinite(s)||isNaN(s)) return '0:00'; s=Math.max(0,s); const m=Math.floor(s/60), sc=Math.floor(s%60); return `${m}:${sc.toString().padStart(2,'0')}`; }
 
+/* ============================================================
+   AUDIO ENGINE — preview, analyser, recording and autoplay fix
+   ============================================================ */
+
 let sharedAudioCtx = null;
-function getSharedAudioCtx() { if (!sharedAudioCtx || sharedAudioCtx.state === 'closed') sharedAudioCtx = new (window.AudioContext||window.webkitAudioContext)(); return sharedAudioCtx; }
-function unlockAudioNow() {
-    const c = getSharedAudioCtx(); if (c.state === 'suspended') c.resume();
-    try { const buf = c.createBuffer(1,1,22050); const src = c.createBufferSource(); src.buffer=buf; src.connect(c.destination); src.start(0); } catch(e){}
-    document.getElementById('audioUnlockBanner').classList.remove('show'); toast('Sound enabled');
+let previewAudioSource = null;
+let previewAnalyser = null;
+let previewAudioDestination = null;
+let audioGraphConnected = false;
+let audioObjectUrl = null;
+let audioMeterFrame = null;
+
+const previewAudio = document.getElementById('previewAudio');
+
+function getSharedAudioCtx() {
+    if (!sharedAudioCtx || sharedAudioCtx.state === 'closed') {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+
+        if (!AudioContextClass) {
+            throw new Error('This browser does not support Web Audio.');
+        }
+
+        sharedAudioCtx = new AudioContextClass();
+    }
+
+    return sharedAudioCtx;
 }
-function checkAudioUnlockState() { const c = sharedAudioCtx; const banner = document.getElementById('audioUnlockBanner'); if (c && c.state === 'suspended') banner.classList.add('show'); else banner.classList.remove('show'); }
-['click','touchstart','keydown'].forEach(evt => document.addEventListener(evt, () => { const c=getSharedAudioCtx(); if (c.state==='suspended') c.resume(); }, {once:false, capture:true}));
+
+async function unlockAudioNow(showToast = true) {
+    try {
+        const audioCtx = getSharedAudioCtx();
+
+        if (audioCtx.state === 'suspended') {
+            await audioCtx.resume();
+        }
+
+        // Small silent buffer confirms that the context is usable after
+        // a direct click/touch/keyboard interaction.
+        const buffer = audioCtx.createBuffer(1, 1, audioCtx.sampleRate);
+        const source = audioCtx.createBufferSource();
+        source.buffer = buffer;
+        source.connect(audioCtx.destination);
+        source.start(0);
+
+        document.getElementById('audioUnlockBanner').classList.remove('show');
+
+        if (showToast) {
+            toast('Sound enabled');
+        }
+
+        return true;
+    } catch (error) {
+        console.error('Could not unlock audio:', error);
+        document.getElementById('audioUnlockBanner').classList.add('show');
+        return false;
+    }
+}
+
+function checkAudioUnlockState() {
+    const banner = document.getElementById('audioUnlockBanner');
+
+    if (sharedAudioCtx && sharedAudioCtx.state === 'suspended') {
+        banner.classList.add('show');
+    } else {
+        banner.classList.remove('show');
+    }
+}
+
+function connectPreviewAudioGraph() {
+    if (audioGraphConnected) return;
+
+    const audioCtx = getSharedAudioCtx();
+
+    // A MediaElementAudioSourceNode may only be created once
+    // for each HTMLAudioElement. Never create it inside play().
+    previewAudioSource = audioCtx.createMediaElementSource(previewAudio);
+
+    previewAnalyser = audioCtx.createAnalyser();
+    previewAnalyser.fftSize = 256;
+    previewAnalyser.smoothingTimeConstant = 0.82;
+
+    // This stream is used when generating/exporting WebM.
+    previewAudioDestination = audioCtx.createMediaStreamDestination();
+
+    previewAudioSource.connect(previewAnalyser);
+    previewAnalyser.connect(audioCtx.destination);
+    previewAnalyser.connect(previewAudioDestination);
+
+    audioGraphConnected = true;
+    freqData = new Uint8Array(previewAnalyser.frequencyBinCount);
+}
+
+async function ensureAudioReady() {
+    if (!previewAudio.src) {
+        toast('Upload an audio file first.');
+        return false;
+    }
+
+    const unlocked = await unlockAudioNow(false);
+
+    if (!unlocked) {
+        toast('Sound is blocked. Click “enable sound” and try again.');
+        return false;
+    }
+
+    try {
+        connectPreviewAudioGraph();
+        return true;
+    } catch (error) {
+        console.error('Audio graph setup failed:', error);
+        toast('Could not prepare audio playback.');
+        return false;
+    }
+}
+
+// Browsers allow context resume only after an interaction.
+['pointerdown', 'touchstart', 'keydown'].forEach((eventName) => {
+    document.addEventListener(
+        eventName,
+        () => {
+            if (sharedAudioCtx?.state === 'suspended') {
+                unlockAudioNow(false);
+            }
+        },
+        { capture: true }
+    );
+});
+
+previewAudio.addEventListener('error', () => {
+    const mediaError = previewAudio.error;
+    console.error('Audio element error:', mediaError);
+
+    const messages = {
+        1: 'Audio loading was cancelled.',
+        2: 'Network error while loading audio.',
+        3: 'This audio file is damaged or unsupported.',
+        4: 'This audio format is not supported by this browser.'
+    };
+
+    toast(messages[mediaError?.code] || 'Could not load this audio file.');
+    stopPreview(true);
+});
+
+previewAudio.addEventListener('waiting', () => {
+    document.getElementById('statusTxt').textContent = 'Buffering audio…';
+});
+
+previewAudio.addEventListener('canplay', () => {
+    if (!pvPlaying) {
+        document.getElementById('statusTxt').textContent = 'Ready';
+    }
+});
+
+previewAudio.addEventListener('ended', () => {
+    if (document.getElementById('loopPreviewBtn')?.dataset.looping === 'true') {
+        previewAudio.currentTime = 0;
+        previewAudio.play().catch(handleAudioPlayError);
+        return;
+    }
+
+    stopPreview(true);
+});
+
+function handleAudioPlayError(error) {
+    console.error('Audio play error:', error);
+
+    if (error?.name === 'NotAllowedError') {
+        document.getElementById('audioUnlockBanner').classList.add('show');
+        toast('Browser blocked sound. Click “enable sound”.');
+    } else {
+        toast('Audio could not start. Try MP3 or WAV.');
+    }
+
+    stopPreview(false);
+}
 
 let appMode='character';
 function setAppMode(m) { appMode=m; document.getElementById('modeChar').classList.toggle('active',m==='character'); document.getElementById('modePromo').classList.toggle('active',m==='promo'); }
@@ -1499,7 +1667,35 @@ document.addEventListener('keydown', e => {
 
 let pvCtx=null, pvAnalyser=null, pvSrc=null, pvStartAt=0, pvGainNode=null;
 function getPvTime() { if (!pvCtx) return pvOffset; return pvPlaying ? pvOffset+(pvCtx.currentTime-pvStartAt) : pvOffset; }
-async function togglePreview() { if (!audioBuffer) { toast('Load audio first'); return; } pvPlaying ? pausePreview() : await playPreview(); }
+async function getRecordingStream() {
+    const canvasStream = canvas.captureStream(30);
+
+    if (!previewAudio.src) {
+        return canvasStream;
+    }
+
+    const ready = await ensureAudioReady();
+
+    if (!ready || !previewAudioDestination) 
+    
+        return canvasStream;
+    }
+
+    return new MediaStream([
+        ...canvasStream.getVideoTracks(),
+        ...previewAudioDestination.stream.getAudioTracks()
+    ]);
+}
+
+function getSupportedRecorderOptions() {
+    const options = [
+        { mimeType: 'video/webm;codecs=vp9,opus' },
+        { mimeType: 'video/webm;codecs=vp8,opus' },
+        { mimeType: 'video/webm' }
+    ];
+
+    return options.find((option) => MediaRecorder.isTypeSupported(option.mimeType)) || {};
+}
 async function playPreview() {
     pvCtx = getSharedAudioCtx();
     if (pvCtx.state === 'suspended') { await pvCtx.resume(); }
@@ -1785,6 +1981,214 @@ async function handleGenerate() {
     document.getElementById('statusTxt').textContent='Recording at '+Q_LABEL[exportQuality];
     const gb=document.getElementById('genBtn'); gb.textContent='Stop'; gb.classList.add('stop');
     showPauseUI(true);
+}
+
+    async function loadAudio(event) {
+    const files = Array.from(event.target.files || []);
+
+    if (!files.length) {
+        return;
+    }
+
+    // This player uses the first selected audio file for preview/export.
+    // The UI still displays one selected track clearly.
+    const file = files[0];
+
+    if (!file.type.startsWith('audio/')) {
+        toast('Please select an audio file.');
+        return;
+    }
+
+    stopPreview(true);
+
+    if (audioObjectUrl) {
+        URL.revokeObjectURL(audioObjectUrl);
+        audioObjectUrl = null;
+    }
+
+    audioBuffer = null;
+    audioDuration = 0;
+    audioTracks = [];
+    audioSegments = [];
+    pvOffset = 0;
+    pvPlaying = false;
+    isPlaying = false;
+
+    audioObjectUrl = URL.createObjectURL(file);
+
+    previewAudio.pause();
+    previewAudio.removeAttribute('src');
+    previewAudio.load();
+
+    previewAudio.src = audioObjectUrl;
+    previewAudio.volume = previewVolume;
+    previewAudio.currentTime = 0;
+    previewAudio.load();
+
+    const track = {
+        id: `audio-${Date.now()}`,
+        name: file.name,
+        file,
+        url: audioObjectUrl,
+        duration: 0,
+        volume: previewVolume,
+        start: 0,
+        trimStart: 0,
+        trimEnd: 0
+    };
+
+    audioTracks = [track];
+
+    document.getElementById('audioName').textContent = file.name;
+    document.getElementById('pvBtn').disabled = true;
+    document.getElementById('pvTime').textContent = '0:00 / 0:00';
+    document.getElementById('pvFill').style.width = '0%';
+    document.getElementById('timeDisp').textContent = '0:00 / 0:00';
+    document.getElementById('qbTime').textContent = '0:00';
+
+    renderAudioTrackList();
+
+    const loaded = await new Promise((resolve) => {
+        const onLoaded = () => {
+            cleanup();
+            resolve(true);
+        };
+
+        const onError = () => {
+            cleanup();
+            resolve(false);
+        };
+
+        const cleanup = () => {
+            previewAudio.removeEventListener('loadedmetadata', onLoaded);
+            previewAudio.removeEventListener('error', onError);
+        };
+
+        previewAudio.addEventListener('loadedmetadata', onLoaded, { once: true });
+        previewAudio.addEventListener('error', onError, { once: true });
+    });
+
+    if (!loaded) {
+        return;
+    }
+
+    audioDuration = Number.isFinite(previewAudio.duration)
+        ? previewAudio.duration
+        : 0;
+
+    track.duration = audioDuration;
+    track.trimEnd = audioDuration;
+
+    audioSegments = [{
+        refIdx: 0,
+        start: 0,
+        end: audioDuration,
+        sourceStart: 0,
+        sourceEnd: audioDuration
+    }];
+
+    document.getElementById('pvBtn').disabled = false;
+    document.getElementById('qbInput').disabled = false;
+    document.getElementById('tapCatchBtn').disabled = false;
+    document.getElementById('autoCapBtn').disabled = false;
+    document.getElementById('timelineWrap').classList.remove('tl-disabled');
+
+    document.getElementById('pvTime').textContent =
+        `0:00 / ${fmt(audioDuration)}`;
+
+    document.getElementById('timeDisp').textContent =
+        `0:00 / ${fmt(audioDuration)}`;
+
+    renderAudioTrackList();
+
+    if (typeof TL !== 'undefined' && TL.render) {
+        TL.render();
+    }
+
+    checkReady();
+    drawIdle();
+
+    toast(`Audio loaded: ${file.name}`);
+}
+
+function renderAudioTrackList() {
+    const list = document.getElementById('audioTrackList');
+
+    if (!audioTracks.length) {
+        list.innerHTML = '';
+        return;
+    }
+
+    const track = audioTracks[0];
+
+    list.innerHTML = `
+        <div class="track-item selected" title="${escapeHtml(track.name)}">
+            <span style="font-size:14px">🎵</span>
+            <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+                ${escapeHtml(track.name)}
+            </span>
+            <span style="font-size:9px;color:var(--text-3)">
+                ${fmt(audioDuration)}
+            </span>
+            <button type="button" onclick="removeAudioTrack(event)" title="Remove audio">✕</button>
+        </div>
+    `;
+}
+
+function removeAudioTrack(event) {
+    event?.stopPropagation();
+
+    stopPreview(true);
+
+    if (audioObjectUrl) {
+        URL.revokeObjectURL(audioObjectUrl);
+    }
+
+    audioObjectUrl = null;
+    audioTracks = [];
+    audioSegments = [];
+    audioBuffer = null;
+    audioDuration = 0;
+    pvOffset = 0;
+
+    previewAudio.pause();
+    previewAudio.removeAttribute('src');
+    previewAudio.load();
+
+    document.getElementById('audioIn').value = '';
+    document.getElementById('audioName').textContent = 'Drop your track here';
+    document.getElementById('pvBtn').disabled = true;
+    document.getElementById('pvFill').style.width = '0%';
+    document.getElementById('pvTime').textContent = '0:00 / 0:00';
+    document.getElementById('timeDisp').textContent = '0:00 / 0:00';
+    document.getElementById('qbTime').textContent = '0:00';
+    document.getElementById('qbInput').disabled = true;
+    document.getElementById('tapCatchBtn').disabled = true;
+    document.getElementById('autoCapBtn').disabled = true;
+
+    renderAudioTrackList();
+
+    if (typeof TL !== 'undefined' && TL.render) {
+        TL.render();
+    }
+
+    checkReady();
+    drawIdle();
+    toast('Audio removed');
+}
+
+function escapeHtml(value) {
+    return String(value || '').replace(/[&<>"']/g, (character) => {
+        const entities = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+
+        return entities[character];
+    });
 }
 function startVideoLayers(offset) { videoLayers.forEach(v=>{ if (!v.el) return; try{v.el.currentTime=offset;}catch(e){} v.el.muted=!v.audioEnabled; v.el.play().catch(()=>{}); }); }
 function pauseVideoLayers() { videoLayers.forEach(v=>v.el&&v.el.pause()); }

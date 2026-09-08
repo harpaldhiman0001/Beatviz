@@ -119,6 +119,7 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
 .lyric-list { display: flex; flex-direction: column; gap: 4px; padding: 6px 8px; max-height: 260px; overflow-y: auto; }
 .lyric-row { display: flex; flex-direction: column; padding: 8px 12px; background: var(--bg-card); border-radius: var(--radius-sm); border: 1px solid var(--border); cursor: pointer; gap: 6px; }
 .lyric-row.active { border-color: var(--accent); background: var(--accent-soft); }
+.lyric-row.clip-src { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold) inset; }
 .lyric-row .lr-top { display: flex; align-items: center; gap: 8px; width: 100%; }
 .lyric-row .lr-time { font-size: 10px; font-weight: 700; color: var(--accent); background: var(--accent-soft); padding: 3px 8px; border-radius: 5px; cursor: pointer; flex-shrink:0; }
 .lyric-row .lr-time.end { color: #c3baff; background: rgba(139,123,255,.1); }
@@ -127,11 +128,11 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
 .lyric-row .lr-text:focus { background: rgba(255,255,255,.05); color: var(--text-1); }
 .lyric-row .lr-del { width: 22px; height: 22px; border-radius: 5px; border: 1px solid var(--border); background: none; color: var(--text-3); cursor: pointer; flex-shrink:0; }
 .lyric-row .lr-del:hover { border-color: var(--red); color: var(--red); background: var(--red-soft); }
-.lyric-row .lr-actions { display: none; gap: 5px; flex-wrap: wrap; padding-top: 5px; border-top: 1px solid var(--border); }
-.lyric-row.active .lr-actions, .lyric-row:hover .lr-actions { display: flex; }
+.lyric-row .lr-actions { display: flex; gap: 5px; flex-wrap: wrap; padding-top: 5px; border-top: 1px solid var(--border); }
 .lyric-row .lr-act { padding: 3px 10px; border-radius: 4px; border: 1px solid var(--border); background: rgba(255,255,255,.03); color: var(--text-3); font-size: 9.5px; font-weight: 600; cursor: pointer; }
 .lyric-row .lr-act:hover { background: var(--accent-soft); border-color: var(--accent); color: var(--text-1); }
 .lyric-row .lr-act.paste { border-color: rgba(6,182,212,.3); color: #67e8f9; }
+.lyric-row .lr-act.paste:disabled { opacity: .35; cursor: not-allowed; }
 .lyric-empty { text-align: center; padding: 22px 14px; color: var(--text-3); font-size: 12px; line-height: 1.7; }
 .lyric-empty strong { color: var(--text-2); }
 
@@ -143,17 +144,25 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
 .canvas-empty .ce-title { font-size: 15px; font-weight: 700; color: var(--text-2); }
 .canvas-badge { position: absolute; top: 14px; right: 14px; background: rgba(0,0,0,.75); border-radius: var(--radius-sm); padding: 4px 11px; font-size: 10px; font-weight: 700; color: rgba(255,255,255,.55); }
 
-.timeline-wrap { background: var(--bg-panel); border-top: 1px solid var(--border); height: 140px; position: relative; flex-shrink: 0; user-select: none; }
+.timeline-wrap { background: var(--bg-panel); border-top: 1px solid var(--border); height: 168px; position: relative; flex-shrink: 0; user-select: none; }
 .timeline-wrap.tl-disabled { opacity: .5; }
-.timeline-wrap .tl-topright { position: absolute; top: 5px; right: 12px; display: flex; align-items: center; gap: 9px; z-index: 6; }
-.timeline-wrap .tl-hint { font-size: 9px; color: var(--text-4); }
+.timeline-wrap .tl-topbar { display:flex; align-items:center; justify-content:space-between; padding: 6px 12px; border-bottom: 1px solid var(--border); }
+.timeline-wrap .tl-hint { font-size: 9.5px; color: var(--text-3); }
+.timeline-wrap .tl-actions { display:flex; align-items:center; gap:6px; }
+.tl-btn { display:flex; align-items:center; gap:6px; padding:6px 12px; border-radius: var(--radius-sm); border:1px solid var(--border-strong); background: var(--bg-card); color: var(--text-2); font-size:11px; font-weight:700; cursor:pointer; }
+.tl-btn.primary { border-color: var(--accent); background: var(--accent-soft); color: #c3baff; }
+.tl-btn.primary:hover { background: var(--accent); color: #fff; }
+.tl-btn.paste-mode { border-color: var(--gold); background: var(--gold-soft); color: #ffd166; }
+.tl-btn:disabled { opacity:.35; cursor:not-allowed; }
 .timeline-wrap .tl-zoom { display: flex; align-items: center; gap: 4px; }
 .timeline-wrap .tl-zoom button { width: 22px; height: 22px; border-radius: var(--radius-xs); border: 1px solid var(--border-strong); background: var(--bg-card); color: var(--text-3); cursor: pointer; font-size:13px; }
 .timeline-wrap .tl-zoom .tl-lbl { font-size: 9px; color: var(--text-3); min-width: 30px; text-align: center; }
-.timeline-wrap .tl-scroll { overflow-x: auto; height: 140px; position: relative; }
-.timeline-wrap #tlCanvas { display: block; height: 140px; cursor: crosshair; }
-.timeline-wrap .tl-tip { position: absolute; top: -28px; background: var(--bg-card); border: 1px solid var(--border-strong); border-radius: var(--radius-sm); padding: 3px 10px; font-size: 10.5px; font-weight: 700; color: var(--text-2); pointer-events: none; white-space: nowrap; transform: translateX(-50%); z-index: 10; display: none; }
-.timeline-wrap .tl-empty-banner { position:absolute; left:0; right:0; top:28px; text-align:center; font-size:11px; color:var(--text-3); pointer-events:none; }
+.timeline-wrap .tl-scroll { overflow-x: auto; height: 128px; }
+.timeline-wrap #tlCanvas { display: block; height: 128px; cursor: crosshair; }
+.timeline-wrap .tl-tip { position: absolute; top: 34px; background: var(--bg-card); border: 1px solid var(--border-strong); border-radius: var(--radius-sm); padding: 3px 10px; font-size: 10.5px; font-weight: 700; color: var(--text-2); pointer-events: none; white-space: nowrap; transform: translateX(-50%); z-index: 10; display: none; }
+.timeline-wrap .tl-clip-banner { position:absolute; left:12px; bottom:6px; font-size:10px; color:#ffd166; background:rgba(242,181,68,.1); border:1px solid rgba(242,181,68,.3); padding:3px 9px; border-radius:100px; display:none; align-items:center; gap:6px; }
+.timeline-wrap .tl-clip-banner.show { display:flex; }
+.timeline-wrap .tl-clip-banner button { background:none; border:none; color:#ffd166; text-decoration:underline; font-size:10px; cursor:pointer; padding:0; }
 
 .status-bar { padding: 6px 16px; border-top: 1px solid var(--border); background: var(--bg-panel); display: flex; align-items: center; gap: 12px; min-height: 34px; }
 .status-bar .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-4); }
@@ -389,23 +398,12 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
                             <div class="mp-bar" id="pvBar"><div class="mp-fill" id="pvFill"></div></div>
                             <span class="mp-time" id="pvTime">0:00 / 0:00</span>
                         </div>
-                        <div style="font-size:9px;color:var(--text-3);text-align:center">Space play/pause · click empty timeline to add lyric · drag bar edges to resize · right-click for menu</div>
-                    </div>
-                </div>
-                <div>
-                    <div class="sec-head">Add Lyric <span class="sec-badge">L key</span></div>
-                    <div style="padding:6px 10px 10px">
-                        <button id="stampBtn" onclick="stampLyric()" style="width:100%;padding:10px;border-radius:var(--radius-sm);border:2px dashed var(--border-strong);background:transparent;color:var(--text-3);font-size:12px;font-weight:600;cursor:pointer">＋ <span id="stampLabel">Add lyric at 0:00</span></button>
-                        <div id="lyricInputWrap" style="display:none;flex-direction:column;gap:5px;background:var(--bg-card);border:1.5px solid var(--accent);border-radius:var(--radius-sm);padding:10px;margin-top:6px">
-                            <span id="litTime" style="font-size:10px;font-weight:700;color:var(--accent)">at 0:00</span>
-                            <input type="text" id="lyricTextIn" placeholder="Type lyric…" style="width:100%;background:var(--bg-app);border:1.5px solid var(--border-strong);border-radius:var(--radius-sm);color:var(--text-2);font-size:14px;padding:8px 11px" onkeydown="if(event.key==='Enter'){event.preventDefault();saveLyric();}if(event.key==='Escape')cancelLyric();">
-                            <div style="display:flex;gap:5px"><button onclick="saveLyric()" style="flex:1;padding:7px;border-radius:var(--radius-sm);border:none;background:var(--accent);color:#fff;font-size:11px;font-weight:700;cursor:pointer">Save</button><button onclick="cancelLyric()" style="padding:7px 14px;border-radius:var(--radius-sm);border:1px solid var(--border-strong);background:none;color:var(--text-3);cursor:pointer">Cancel</button></div>
-                        </div>
+                        <div style="font-size:9px;color:var(--text-3);text-align:center">Space play/pause · use the "Add Lyric" bar under the video</div>
                     </div>
                 </div>
                 <div>
                     <div class="sec-head">Lyrics <span id="lyricCount"></span></div>
-                    <div class="lyric-list" id="lyricsList"><div class="lyric-empty">Upload audio first — then click the timeline strip below the video to add lyrics.</div></div>
+                    <div class="lyric-list" id="lyricsList"><div class="lyric-empty">Upload audio, then use the <strong>Add Lyric</strong> button on the timeline below the video.</div></div>
                 </div>
                 <div>
                     <div class="sec-head">Lyric Style</div>
@@ -459,12 +457,16 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
         </div>
 
         <div class="timeline-wrap tl-disabled" id="timelineWrap">
-            <div class="tl-topright">
-                <span class="tl-hint">Drag edges to resize · drag middle to move · right-click for menu</span>
-                <div class="tl-zoom"><button onclick="TL.zoomBy(0.7)">−</button><span class="tl-lbl" id="tlZoomLbl">Fit</span><button onclick="TL.zoomBy(1.5)">+</button></div>
+            <div class="tl-topbar">
+                <div style="display:flex;align-items:center;gap:8px">
+                    <button class="tl-btn primary" id="addLyricBtn" onclick="addLyricAtPlayhead()" disabled>＋ Add Lyric at Playhead</button>
+                    <button class="tl-btn" id="pasteNextBtn" onclick="pasteNextInSequence()" disabled>📋 Paste Next</button>
+                </div>
+                <div class="tl-zoom"><span class="tl-hint">drag edges to resize · click bar to edit</span><button onclick="TL.zoomBy(0.7)">−</button><span class="tl-lbl" id="tlZoomLbl">Fit</span><button onclick="TL.zoomBy(1.5)">+</button></div>
             </div>
             <div class="tl-scroll" id="tlScroll"><canvas id="tlCanvas"></canvas></div>
             <div class="tl-tip" id="tlTip"></div>
+            <div class="tl-clip-banner" id="tlClipBanner">📋 Lyric copied — click <b>Paste Next</b> or right-click timeline to place it<button onclick="clearClipboard()">Clear</button></div>
         </div>
 
         <div class="status-bar" id="statusBar">
@@ -512,6 +514,11 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
     <div class="mp-label">Move lyric</div>
     <input type="text" id="moveTimeInput" placeholder="0:11">
     <div class="mp-btns"><button class="go" onclick="confirmMoveLyric()">Move</button><button class="cancel" onclick="closeMovePopup()">Cancel</button></div>
+</div>
+<div class="move-popup" id="editLyricPopup">
+    <div class="mp-label">Edit lyric</div>
+    <input type="text" id="editLyricInput" placeholder="Lyric text">
+    <div class="mp-btns"><button class="go" onclick="confirmEditLyric()">Save</button><button class="cancel" onclick="closeEditPopup()">Cancel</button></div>
 </div>
 
 <div class="paywall" id="paywall">
@@ -642,6 +649,7 @@ let isPlaying=false, isPaused=false, pvPlaying=false, pvOffset=0;
 let recorder=null, chunks=[], recordedBlob=null, recordingIsMp4=false;
 let selectedLyricIdx=-1;
 let copiedLyric=null;
+let lastPasteRefIdx=-1; // tracks the "chain" for Paste Next — always follows the most recently pasted/selected lyric
 let activeFX=new Set();
 
 function checkReady() {
@@ -770,16 +778,14 @@ async function addAudioTrack(file) {
     audioSegments.push({trackIdx:audioTracks.length-1,start:lastEnd,dur:buf.duration});
     if (chars.length && audioDuration>0) { const each=audioDuration/chars.length; imgSegments=chars.map((_,i)=>({charIdx:i,start:i*each,dur:each})); }
     if (isFirst) {
-        // CRITICAL: enable timeline interactivity now that we have a real duration
         document.getElementById('timelineWrap').classList.remove('tl-disabled');
-        TL.resize();  // force full re-measure + redraw, not just draw()
-    } else {
-        TL.draw(pvOffset);
-    }
-    toast(`${name} — ${fmt(buf.duration)} — click the timeline below to add lyrics`);
+        document.getElementById('addLyricBtn').disabled=false;
+        TL.resize();
+    } else { TL.draw(pvOffset); }
+    toast(`${name} — ${fmt(buf.duration)} — use "Add Lyric" on the timeline below`);
 }
 function renderAudioTrackList() { document.getElementById('audioTrackList').innerHTML = audioTracks.map((t,i)=>`<div class="track-item"><span style="flex:1;overflow:hidden;text-overflow:ellipsis">${t.name}</span><span>${fmt(t.buffer.duration)}</span><button onclick="removeAudioTrack(${i})">✕</button></div>`).join(''); }
-function removeAudioTrack(i) { audioTracks.splice(i,1); if (audioTracks.length) { audioBuffer=audioTracks[0].buffer; audioDuration=audioBuffer.duration; } else { audioBuffer=null; audioDuration=0; document.getElementById('audioName').textContent='Drop your track here'; document.getElementById('timelineWrap').classList.add('tl-disabled'); } renderAudioTrackList(); checkReady(); TL.resize(); }
+function removeAudioTrack(i) { audioTracks.splice(i,1); if (audioTracks.length) { audioBuffer=audioTracks[0].buffer; audioDuration=audioBuffer.duration; } else { audioBuffer=null; audioDuration=0; document.getElementById('audioName').textContent='Drop your track here'; document.getElementById('timelineWrap').classList.add('tl-disabled'); document.getElementById('addLyricBtn').disabled=true; } renderAudioTrackList(); checkReady(); TL.resize(); }
 
 async function loadVideos(e) { const files=Array.from(e.target.files||[]); for (const f of files) await addVideoLayer(f); e.target.value=''; }
 async function addVideoLayer(file) {
@@ -791,7 +797,7 @@ async function addVideoLayer(file) {
     const lastEnd = videoSegments.length ? videoSegments[videoSegments.length-1].start+videoSegments[videoSegments.length-1].dur : 0;
     videoSegments.push({vidIdx:videoLayers.length-1,start:lastEnd,dur});
     renderVideoLayerList();
-    if (!audioDuration && video.duration) { audioDuration=video.duration; document.getElementById('timelineWrap').classList.remove('tl-disabled'); TL.resize(); }
+    if (!audioDuration && video.duration) { audioDuration=video.duration; document.getElementById('timelineWrap').classList.remove('tl-disabled'); document.getElementById('addLyricBtn').disabled=false; TL.resize(); }
     checkReady(); TL.draw(pvOffset);
     toast(`${name} added`);
 }
@@ -809,73 +815,111 @@ function drawVideoLayers(elapsed) {
         ctx.restore(); } catch(e){} });
 }
 
-// ============================ LYRICS: add / edit / delete ============================
-function stampLyricAt(t) {
-    if (pvPlaying) pausePreview();
-    pvOffset = Math.max(0, Math.min(audioDuration, t));
-    updatePvUI();
-    document.getElementById('lyricInputWrap').style.display='flex';
-    document.getElementById('litTime').textContent='at '+fmt(pvOffset);
-    document.getElementById('stampBtn').classList.add('on');
-    document.getElementById('lyricTextIn').value=''; document.getElementById('lyricTextIn').focus();
-    document.getElementById('stampLabel').textContent='Add lyric at '+fmt(pvOffset);
+// ============================ ADD / EDIT LYRICS ============================
+function addLyricAtPlayhead() {
+    if (!audioDuration) { toast('Upload audio first'); return; }
+    const text = prompt('Type the lyric text for '+fmt(pvOffset)+':', '');
+    if (text===null) return; // cancelled
+    if (!text.trim()) { toast('Lyric text cannot be empty'); return; }
+    insertLyric(pvOffset, text.trim());
 }
-function stampLyric() {
-    if (!audioBuffer && !videoLayers.length) { toast('Load audio first'); return; }
-    stampLyricAt(getPvTime());
+function insertLyric(t, text) {
+    const nxt = lyrics.find(l=>l.time>t+0.05);
+    const end = Math.min(audioDuration||t+4, nxt?Math.min(nxt.time,t+4):t+4);
+    const existingIdx = lyrics.findIndex(l=>Math.abs(l.time-t)<0.3);
+    let newIdx;
+    if (existingIdx>=0) { lyrics[existingIdx].text=text; lyrics[existingIdx].endTime=end; newIdx=existingIdx; }
+    else {
+        lyrics.push({time:t,endTime:end,text,ds:{beatCount:0,jumpAmt:0,spinAng:0,spinDir:1,phase:Math.random()*Math.PI*2}});
+        lyrics.sort((a,b)=>a.time-b.time);
+        newIdx = lyrics.findIndex(l=>Math.abs(l.time-t)<0.1);
+    }
+    selectedLyricIdx=newIdx; lastPasteRefIdx=newIdx;
+    renderLyrics(); TL.draw(pvOffset); toast('Lyric added at '+fmt(t));
+    updatePasteNextBtn();
 }
-function saveLyric() {
-    const text=document.getElementById('lyricTextIn').value.trim(); if (!text) { toast('Type some lyric text first'); return; }
-    const t=pvOffset;
-    const nxt=lyrics.find(l=>l.time>t+0.05);
-    const end=Math.min(audioDuration||t+4, nxt?Math.min(nxt.time,t+4):t+4);
-    const idx=lyrics.findIndex(l=>Math.abs(l.time-t)<0.3);
-    if (idx>=0) { lyrics[idx].text=text; lyrics[idx].endTime=end; }
-    else lyrics.push({time:t,endTime:end,text,ds:{beatCount:0,jumpAmt:0,spinAng:0,spinDir:1,phase:Math.random()*Math.PI*2}});
-    lyrics.sort((a,b)=>a.time-b.time);
-    selectedLyricIdx=lyrics.findIndex(l=>Math.abs(l.time-t)<0.1);
-    renderLyrics(); toast('Lyric added at '+fmt(t)); cancelLyric(); TL.draw(pvOffset);
+function deleteLyric(i) { lyrics.splice(i,1); if (selectedLyricIdx>=lyrics.length) selectedLyricIdx=lyrics.length-1; if (lastPasteRefIdx>=lyrics.length) lastPasteRefIdx=lyrics.length-1; renderLyrics(); TL.draw(pvOffset); }
+
+// Click a lyric (in list OR on the timeline bar) -> IMMEDIATELY opens edit popup
+function selectLyric(i) { selectedLyricIdx=i; lastPasteRefIdx=i; seekPreview(lyrics[i].time); renderLyrics(); updatePasteNextBtn(); }
+function openEditPopupFor(i) {
+    if (i<0||i>=lyrics.length) return;
+    selectedLyricIdx=i; lastPasteRefIdx=i;
+    const popup=document.getElementById('editLyricPopup'); const inp=document.getElementById('editLyricInput');
+    popup.style.display='block'; popup.style.left=(window.innerWidth/2-120)+'px'; popup.style.top=(window.innerHeight/2-70)+'px';
+    inp.value=lyrics[i].text; inp.focus(); inp.select();
+    inp.onkeydown = e => { if (e.key==='Enter') confirmEditLyric(); if (e.key==='Escape') closeEditPopup(); };
+    editTargetIdx=i;
+    renderLyrics();
 }
-function cancelLyric() { document.getElementById('lyricInputWrap').style.display='none'; document.getElementById('stampBtn').classList.remove('on'); document.getElementById('lyricTextIn').value=''; }
-function deleteLyric(i) { lyrics.splice(i,1); if (selectedLyricIdx>=lyrics.length) selectedLyricIdx=lyrics.length-1; renderLyrics(); TL.draw(pvOffset); }
-function selectLyric(i) { selectedLyricIdx=i; seekPreview(lyrics[i].time); renderLyrics(); }
+let editTargetIdx=-1;
+function confirmEditLyric() {
+    if (editTargetIdx<0||editTargetIdx>=lyrics.length) { closeEditPopup(); return; }
+    const val=document.getElementById('editLyricInput').value.trim();
+    if (!val) { lyrics.splice(editTargetIdx,1); toast('Lyric removed (empty text)'); }
+    else lyrics[editTargetIdx].text=val;
+    closeEditPopup(); renderLyrics(); TL.draw(pvOffset);
+}
+function closeEditPopup() { editTargetIdx=-1; document.getElementById('editLyricPopup').style.display='none'; }
 function saveLyricText(i, el) { const text=el.textContent.trim(); if (text) lyrics[i].text=text; else lyrics.splice(i,1); renderLyrics(); }
 function renderLyrics() {
     document.getElementById('lyricCount').textContent = lyrics.length ? `(${lyrics.length})` : '';
     const el=document.getElementById('lyricsList');
-    if (!lyrics.length) { el.innerHTML=`<div class="lyric-empty">${audioDuration>0?'Click the timeline strip below the video to add lyrics.':'Upload audio first — then click the timeline strip below the video to add lyrics.'}</div>`; return; }
+    if (!lyrics.length) { el.innerHTML=`<div class="lyric-empty">Upload audio, then use the <strong>Add Lyric</strong> button on the timeline below the video.</div>`; return; }
     el.innerHTML = lyrics.map((l,i)=>{ const isSel=i===selectedLyricIdx; const endT=l.endTime;
-        return `<div class="lyric-row ${isSel?'active':''}" onclick="selectLyric(${i})" oncontextmenu="event.preventDefault();selectedLyricIdx=${i};renderLyrics();showLyricContextMenu(event.clientX,event.clientY,${i})">
+        return `<div class="lyric-row ${isSel?'active':''}" onclick="openEditPopupFor(${i})" oncontextmenu="event.preventDefault();selectedLyricIdx=${i};renderLyrics();showLyricContextMenu(event.clientX,event.clientY,${i})">
             <div class="lr-top">
                 <span class="lr-time" onclick="event.stopPropagation();seekPreview(${l.time})">${fmt(l.time)}</span>
                 <span class="lr-arrow">→</span>
                 <span class="lr-time end" onclick="event.stopPropagation();seekPreview(${endT})">${fmt(endT)}</span>
-                <span class="lr-text" contenteditable="true" spellcheck="false" onclick="event.stopPropagation()" onblur="saveLyricText(${i},this)">${l.text.replace(/</g,'&lt;')}</span>
+                <span class="lr-text" onclick="event.stopPropagation();openEditPopupFor(${i})">${l.text.replace(/</g,'&lt;')}</span>
                 <button class="lr-del" onclick="event.stopPropagation();deleteLyric(${i})">✕</button>
             </div>
             <div class="lr-actions">
                 <button class="lr-act" onclick="event.stopPropagation();copyLyric(${i})">Copy</button>
-                <button class="lr-act paste" onclick="event.stopPropagation();pasteAfterLyric(${i})">Paste after</button>
+                <button class="lr-act paste" onclick="event.stopPropagation();pasteAfterLyric(${i})" ${!copiedLyric?'disabled':''}>Paste after</button>
                 <button class="lr-act" onclick="event.stopPropagation();moveLyric(${i})">Move</button>
             </div>
         </div>`; }).join('');
 }
 
-function copyLyric(i) { if (i<0||i>=lyrics.length) return; copiedLyric={...lyrics[i]}; toast('Copied — click empty timeline or "Paste after" to paste'); }
+// ============================ COPY / PASTE NEXT (chained) ============================
+function copyLyric(i) {
+    if (i<0||i>=lyrics.length) return;
+    copiedLyric={...lyrics[i]}; lastPasteRefIdx=i;
+    document.getElementById('tlClipBanner').classList.add('show');
+    updatePasteNextBtn();
+    toast('Copied "'+lyrics[i].text.slice(0,24)+'" — click Paste Next to place it right after');
+}
+function clearClipboard() { copiedLyric=null; document.getElementById('tlClipBanner').classList.remove('show'); updatePasteNextBtn(); renderLyrics(); }
+function updatePasteNextBtn() { const b=document.getElementById('pasteNextBtn'); if (b) b.disabled = !copiedLyric; }
+// "Paste Next" — always chains off the most recently pasted/selected lyric so repeated clicks lay copies back-to-back
+function pasteNextInSequence() {
+    if (!copiedLyric) { toast('Copy a lyric first'); return; }
+    if (lastPasteRefIdx<0 || lastPasteRefIdx>=lyrics.length) {
+        // no reference lyric yet -> paste at current playhead
+        pasteAtPlayhead(); return;
+    }
+    pasteAfterLyric(lastPasteRefIdx);
+}
 function pasteAfterLyric(afterIdx) {
     if (!copiedLyric) { toast('Nothing copied — Copy a lyric first'); return; }
     const refEnd=lyrics[afterIdx].endTime; const dur=copiedLyric.endTime-copiedLyric.time;
     const newStart=Math.min(audioDuration-dur, refEnd+0.5);
     lyrics.splice(afterIdx+1,0,{text:copiedLyric.text,time:+newStart.toFixed(2),endTime:+(newStart+dur).toFixed(2),ds:{beatCount:0,jumpAmt:0,spinAng:0,spinDir:1,phase:Math.random()*Math.PI*2}});
-    lyrics.sort((a,b)=>a.time-b.time); selectedLyricIdx=lyrics.findIndex(l=>Math.abs(l.time-newStart)<0.1);
-    copiedLyric=null; renderLyrics(); TL.draw(pvOffset); toast('Pasted at '+fmt(newStart));
+    lyrics.sort((a,b)=>a.time-b.time);
+    const newIdx=lyrics.findIndex(l=>Math.abs(l.time-newStart)<0.1);
+    selectedLyricIdx=newIdx; lastPasteRefIdx=newIdx; // chain: next "Paste Next" click follows THIS new one
+    renderLyrics(); TL.draw(pvOffset); toast('Pasted at '+fmt(newStart)+' — click Paste Next again to chain another');
 }
 function pasteAtPlayhead() {
     if (!copiedLyric) { toast('Nothing copied'); return; }
     const t=pvOffset||0; const dur=copiedLyric.endTime-copiedLyric.time; const newStart=Math.max(0,Math.min(audioDuration-dur,t));
     lyrics.push({text:copiedLyric.text,time:+newStart.toFixed(2),endTime:+(newStart+dur).toFixed(2),ds:{beatCount:0,jumpAmt:0,spinAng:0,spinDir:1,phase:Math.random()*Math.PI*2}});
-    lyrics.sort((a,b)=>a.time-b.time); selectedLyricIdx=lyrics.findIndex(l=>Math.abs(l.time-newStart)<0.1);
-    copiedLyric=null; renderLyrics(); TL.draw(pvOffset); toast('Pasted at '+fmt(newStart));
+    lyrics.sort((a,b)=>a.time-b.time);
+    const newIdx=lyrics.findIndex(l=>Math.abs(l.time-newStart)<0.1);
+    selectedLyricIdx=newIdx; lastPasteRefIdx=newIdx;
+    renderLyrics(); TL.draw(pvOffset); toast('Pasted at '+fmt(newStart));
 }
 let moveTargetIdx=-1;
 function moveLyric(i) {
@@ -905,19 +949,19 @@ function showLyricContextMenu(x,y,idx) {
     menu.style.display='block'; menu.style.left=Math.min(x,window.innerWidth-190)+'px'; menu.style.top=Math.min(y,window.innerHeight-180)+'px';
 }
 function hideLyricContextMenu() { lcmIdx=-1; document.getElementById('lyricContextMenu').style.display='none'; }
-function lcmEdit() { if (lcmIdx<0) { hideLyricContextMenu(); return; } hideLyricContextMenu(); selectLyric(lcmIdx); }
+function lcmEdit() { if (lcmIdx<0) { hideLyricContextMenu(); return; } hideLyricContextMenu(); openEditPopupFor(lcmIdx); }
 function lcmCopy() { if (lcmIdx<0) { hideLyricContextMenu(); return; } hideLyricContextMenu(); copyLyric(lcmIdx); }
 function lcmPaste() { if (lcmIdx<0) { hideLyricContextMenu(); return; } hideLyricContextMenu(); pasteAfterLyric(lcmIdx); }
 function lcmMove() { if (lcmIdx<0) { hideLyricContextMenu(); return; } hideLyricContextMenu(); moveLyric(lcmIdx); }
 function lcmDelete() { if (lcmIdx<0) { hideLyricContextMenu(); return; } hideLyricContextMenu(); deleteLyric(lcmIdx); }
 document.addEventListener('click', e => { const menu=document.getElementById('lyricContextMenu'); if (menu && !menu.contains(e.target)) hideLyricContextMenu(); });
 document.addEventListener('keydown', e => {
-    if (e.key==='Escape') { hideLyricContextMenu(); closeMovePopup(); }
+    if (e.key==='Escape') { hideLyricContextMenu(); closeMovePopup(); closeEditPopup(); }
     if (e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.isContentEditable) return;
     if (e.code==='Space') { e.preventDefault(); togglePreview(); }
-    if (e.key.toLowerCase()==='l') stampLyric();
+    if (e.key.toLowerCase()==='l') addLyricAtPlayhead();
     if ((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='c' && selectedLyricIdx>=0) { copyLyric(selectedLyricIdx); }
-    if ((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='v' && copiedLyric) { pasteAtPlayhead(); }
+    if ((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='v' && copiedLyric) { pasteNextInSequence(); }
 });
 
 // PREVIEW PLAYER
@@ -941,7 +985,6 @@ function updatePvUI() {
     const b=document.getElementById('pvBtn'); if (b) { b.textContent=pvPlaying?'⏸':'▶'; b.classList.toggle('playing',pvPlaying); }
     const tm=document.getElementById('pvTime'); if (tm) tm.textContent=`${fmt(t)} / ${fmt(audioDuration)}`;
     const fl=document.getElementById('pvFill'); if (fl) fl.style.width=pct+'%';
-    const sl=document.getElementById('stampLabel'); if (sl) sl.textContent='Add lyric at '+fmt(t);
 }
 function tickPreview() { if (!pvPlaying) return; updatePvUI(); drawIdle(); TL.draw(getPvTime()); requestAnimationFrame(tickPreview); }
 document.getElementById('pvBar').addEventListener('click', function(e) { if (!audioDuration) return; const r=this.getBoundingClientRect(); seekPreview((e.clientX-r.left)/r.width*audioDuration); });
@@ -955,9 +998,9 @@ function toggleFX(fx,btn) { if (activeFX.has(fx)) activeFX.delete(fx); else acti
 const TEMPLATES={edm:{style:'neon',dance:'jump',lyricStyle:'neon',color:'#f472b6'},chill:{style:'forest',dance:'sway',lyricStyle:'subtitle',color:'#06b6d4'},bollywood:{style:'stage',dance:'groove',lyricStyle:'karaoke',color:'#fbbf24'}};
 function applyTemplate(key) { const t=TEMPLATES[key]; if(!t)return; pickStyle(t.style,null); pickDance(t.dance,null); pickLS(t.lyricStyle,null); document.getElementById('lyricColor').value=t.color; toast(`${key} template applied`); }
 
-// ============================ TIMELINE — HiDPI-safe drag/resize/context-menu ============================
+// ============================ TIMELINE ============================
 const TL = {
-    c:null, x:null, wrap:null, W:0, H:140, zoom:1, minZoom:1, maxZoom:20, dragging:null, dpr:1,
+    c:null, x:null, wrap:null, W:0, H:128, zoom:1, minZoom:1, maxZoom:20, dragging:null,
     init(){
         this.c=document.getElementById('tlCanvas'); this.x=this.c.getContext('2d'); this.wrap=document.getElementById('tlScroll');
         this.resize();
@@ -975,14 +1018,12 @@ const TL = {
         this.wrap.addEventListener('wheel', e => { if (!audioDuration) return; if (e.ctrlKey||e.metaKey) { e.preventDefault(); this.zoomBy(e.deltaY>0?0.85:1.18); } }, {passive:false});
         window.addEventListener('resize', ()=>this.resize());
     },
-    // Convert a mouse event to canvas-local logical coordinates, robust to any CSS scaling
     getXY(e){ const r=this.c.getBoundingClientRect(); const scaleX=this.c.width/r.width, scaleY=this.c.height/r.height;
         return { mx:(e.clientX-r.left)*scaleX, my:(e.clientY-r.top)*scaleY }; },
     resize(){
         const vw = this.wrap ? this.wrap.clientWidth : (this.c.offsetWidth||600);
         this.viewportW = Math.max(vw,1);
         this.W = Math.max(this.viewportW, Math.round(this.viewportW*this.zoom));
-        // set BOTH internal resolution and CSS size explicitly and equal (1:1, no HiDPI mismatch)
         this.c.width = this.W; this.c.height = this.H;
         this.c.style.width = this.W+'px'; this.c.style.height = this.H+'px';
         const lbl=document.getElementById('tlZoomLbl'); if (lbl) lbl.textContent = this.zoom<=1?'Fit':Math.round(this.zoom*100)+'%';
@@ -993,7 +1034,7 @@ const TL = {
     x2t(x){ return audioDuration ? Math.max(0,Math.min(audioDuration, x/this.W*audioDuration)) : 0; },
     hit(mx,my){
         if (!lyrics.length) return null;
-        const y0=28, y1=84; // bar vertical band, matches draw()
+        const y0=26, y1=80;
         if (my<y0 || my>y1) return null;
         for (let i=lyrics.length-1;i>=0;i--) { const l=lyrics[i]; const x1=this.t2x(l.time), x2=this.t2x(l.endTime);
             if (mx>=x1 && mx<=x1+10) return {idx:i, handle:'left'};
@@ -1004,11 +1045,15 @@ const TL = {
     onDown(e){
         if (!audioDuration) { toast('Upload audio first to use the timeline'); return; }
         const {mx,my}=this.getXY(e);
-        if (my<26) { seekPreview(this.x2t(mx)); this.dragging={handle:'playhead'}; this.c.style.cursor='col-resize'; return; }
+        if (my<20) { seekPreview(this.x2t(mx)); this.dragging={handle:'playhead'}; this.c.style.cursor='col-resize'; return; }
         const h=this.hit(mx,my);
         if (h) {
+            if (h.handle==='body') {
+                // single click on the BODY of a bar (not a resize edge) -> open edit immediately
+                this._clickCandidate = { idx:h.idx, x:mx, y:my };
+            }
             selectedLyricIdx=h.idx;
-            this.dragging={...h, startX:mx, origStart:lyrics[h.idx].time, origEnd:lyrics[h.idx].endTime};
+            this.dragging={...h, startX:mx, origStart:lyrics[h.idx].time, origEnd:lyrics[h.idx].endTime, moved:false};
             this.c.style.cursor = (h.handle==='left'||h.handle==='right') ? 'ew-resize' : 'grabbing';
             renderLyrics(); return;
         }
@@ -1016,11 +1061,11 @@ const TL = {
         if (copiedLyric) {
             const dur=copiedLyric.endTime-copiedLyric.time; const newT=Math.max(0,Math.min(audioDuration-dur,t));
             lyrics.push({text:copiedLyric.text,time:+newT.toFixed(2),endTime:+(newT+dur).toFixed(2),ds:{beatCount:0,jumpAmt:0,spinAng:0,spinDir:1,phase:Math.random()*Math.PI*2}});
-            lyrics.sort((a,b)=>a.time-b.time); copiedLyric=null; renderLyrics(); this.draw(pvOffset); toast('Pasted at '+fmt(newT)); return;
+            lyrics.sort((a,b)=>a.time-b.time);
+            const newIdx=lyrics.findIndex(l=>Math.abs(l.time-newT)<0.1); selectedLyricIdx=newIdx; lastPasteRefIdx=newIdx;
+            renderLyrics(); this.draw(pvOffset); toast('Pasted at '+fmt(newT)); return;
         }
-        selectedLyricIdx=-1; renderLyrics();
-        stampLyricAt(t);
-        this.draw(t);
+        seekPreview(t);
     },
     onMove(e){
         if (!audioDuration) return;
@@ -1028,33 +1073,44 @@ const TL = {
         const tip=document.getElementById('tlTip');
         if (this.dragging?.handle==='playhead') { const t=this.x2t(mx); seekPreview(t); if(tip){tip.style.display='block';tip.style.left=Math.min(this.W-50,Math.max(30,mx))+'px';tip.textContent=fmt(t);} this.c.style.cursor='col-resize'; return; }
         if (this.dragging && this.dragging.handle!=='playhead') {
+            const movedPx = Math.abs(mx-this.dragging.startX);
+            if (movedPx>3) this.dragging.moved=true;
             const dt = (mx-this.dragging.startX)/this.W*audioDuration;
             const l = lyrics[this.dragging.idx]; if (!l) return;
             if (this.dragging.handle==='body') { const dur=this.dragging.origEnd-this.dragging.origStart; l.time=Math.max(0,Math.min(audioDuration-dur,this.dragging.origStart+dt)); l.endTime=l.time+dur; }
             else if (this.dragging.handle==='left') { l.time=Math.max(0,Math.min(this.dragging.origEnd-0.3,this.dragging.origStart+dt)); }
             else if (this.dragging.handle==='right') { l.endTime=Math.max(this.dragging.origStart+0.3,Math.min(audioDuration,this.dragging.origEnd+dt)); }
-            if (tip) { tip.style.display='block'; tip.style.left=Math.min(this.W-70,Math.max(40,mx))+'px'; tip.textContent=fmt(l.time)+' – '+fmt(l.endTime); }
-            renderLyrics(); this.draw(pvOffset); return;
+            if (this.dragging.moved) { if (tip) { tip.style.display='block'; tip.style.left=Math.min(this.W-70,Math.max(40,mx))+'px'; tip.textContent=fmt(l.time)+' – '+fmt(l.endTime); } renderLyrics(); this.draw(pvOffset); }
+            return;
         }
         const h=this.hit(mx,my);
         this.c.style.cursor = h ? (h.handle==='left'||h.handle==='right' ? 'ew-resize' : 'grab') : 'crosshair';
         if (tip) tip.style.display='none';
     },
-    onUp(){ const tip=document.getElementById('tlTip'); if (tip) tip.style.display='none';
-        if (this.dragging && this.dragging.handle!=='playhead') { lyrics.sort((a,b)=>a.time-b.time); renderLyrics(); }
-        this.dragging=null; this.c.style.cursor='crosshair'; },
+    onUp(){
+        const tip=document.getElementById('tlTip'); if (tip) tip.style.display='none';
+        if (this.dragging && this.dragging.handle!=='playhead') {
+            if (!this.dragging.moved && this.dragging.handle==='body') {
+                // it was a CLICK, not a drag -> open edit popup immediately
+                openEditPopupFor(this.dragging.idx);
+            } else {
+                lyrics.sort((a,b)=>a.time-b.time); renderLyrics();
+            }
+        }
+        this.dragging=null; this.c.style.cursor='crosshair';
+    },
     onLeave(){ this.c.style.cursor='default'; },
     draw(currentTime){
         if (!this.c) return; const c=this.x, CW=this.W, CH=this.H;
-        c.clearRect(0,0,CW,CH); c.fillStyle='#0d0f16'; c.fillRect(0,0,CW,CH); c.fillStyle='#11141c'; c.fillRect(0,0,CW,26);
+        c.clearRect(0,0,CW,CH); c.fillStyle='#0d0f16'; c.fillRect(0,0,CW,CH); c.fillStyle='#11141c'; c.fillRect(0,0,CW,20);
         if (!audioDuration) { c.fillStyle='#454858'; c.font='12px Inter'; c.textAlign='center'; c.fillText('Upload audio to enable the timeline', CW/2, CH/2); return; }
         const ts=Math.ceil(audioDuration); let step=5; if(ts>300)step=60; else if(ts>120)step=30; else if(ts>60)step=15;
         c.strokeStyle='#1c1c2a'; c.fillStyle='#6c6f82'; c.font='9px Inter'; c.textAlign='center'; c.lineWidth=1;
-        for (let t=0;t<=audioDuration;t+=step) { const x=this.t2x(t); c.globalAlpha=.5; c.beginPath(); c.moveTo(x,0); c.lineTo(x,CH); c.stroke(); c.globalAlpha=1; c.fillText(fmt(t),x,13); }
-        if (!lyrics.length) { c.fillStyle='#6c6f82'; c.font='11px Inter'; c.textAlign='center'; c.fillText('Click anywhere below the ruler to add a lyric at that time', CW/2, 60); }
+        for (let t=0;t<=audioDuration;t+=step) { const x=this.t2x(t); c.globalAlpha=.5; c.beginPath(); c.moveTo(x,0); c.lineTo(x,CH); c.stroke(); c.globalAlpha=1; c.fillText(fmt(t),x,12); }
+        if (!lyrics.length) { c.fillStyle='#6c6f82'; c.font='11px Inter'; c.textAlign='center'; c.fillText('Click "＋ Add Lyric at Playhead" above to add your first line', CW/2, 55); }
         const cols=['#6d5ef5','#06b6d4','#f472b6','#2ecc8f','#f2b544'];
         lyrics.forEach((l,i)=>{
-            const x1=this.t2x(l.time), x2=this.t2x(l.endTime), bw=Math.max(12,x2-x1); const col=cols[i%cols.length]; const isSel=i===selectedLyricIdx; const y=28,bh=56;
+            const x1=this.t2x(l.time), x2=this.t2x(l.endTime), bw=Math.max(12,x2-x1); const col=cols[i%cols.length]; const isSel=i===selectedLyricIdx; const y=26,bh=54;
             c.fillStyle=col+(isSel?'cc':'88'); c.beginPath(); c.roundRect(x1,y,bw,bh,4); c.fill();
             c.strokeStyle=col; c.lineWidth=isSel?2:1; c.beginPath(); c.roundRect(x1,y,bw,bh,4); c.stroke();
             c.fillStyle=col+'ee'; c.fillRect(x1,y,7,bh); c.fillRect(x2-7,y,7,bh);

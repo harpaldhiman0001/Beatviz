@@ -4169,33 +4169,9 @@ function fitImageIndexToFull(idx) {
                 pvOffset; }
 
 function togglePreview() {
-    if (!window.previewAudio) return;
-
-    if (playbackState === 'playing') {
-        pauseAllAudio();
-        return;
-    }
-
-    if (playbackState === 'paused') {
-        playbackState = 'playing';
-        isPlaying = true;
-        isPaused = false;
-
-        startAudioFrom(pausedAt);
-        startRenderLoop(pausedAt);
-        updatePlaybackUI();
-        return;
-    }
-
-    // Only an explicit Preview/Play action can begin from zero.
-    pausedAt = 0;
-    playbackState = 'playing';
-    isPlaying = true;
-    isPaused = false;
-
-    startAudioFrom(0);
-    startRenderLoop(0);
-    updatePlaybackUI();
+    if (!audioBuffer) { toast('Upload audio first'); return; }
+    if (pvPlaying) pausePreview();
+    else playPreview();
 }
 
         async function playPreview() {
@@ -4902,8 +4878,9 @@ async function handleGenerate() {
 
     chunks = [];
     recordedBlob = null;
-    document.getElementById('dlWebm').style.display = 'none';
-    document.getElementById('dlMp4').style.display = 'none';
+    // FIXED: use classList, not inline style — must match how finalize() shows them
+    document.getElementById('dlWebm').classList.remove('show');
+    document.getElementById('dlMp4').classList.remove('show');
     document.getElementById('readyLbl').classList.remove('show');
 
     applyExportResolution();
@@ -4987,6 +4964,10 @@ function finalize() {
     const webmBtn = document.getElementById('dlWebm');
     const mp4Btn = document.getElementById('dlMp4');
 
+    // Clear any stray inline style so classList('show') is guaranteed to work
+    webmBtn.style.display = '';
+    mp4Btn.style.display = '';
+
     if (recordingIsMp4) {
         webmBtn.classList.remove('show');
         mp4Btn.classList.add('show');
@@ -4995,7 +4976,9 @@ function finalize() {
             const a = document.createElement('a');
             a.href = url;
             a.download = 'beatviz-' + exportQuality + '.mp4';
+            document.body.appendChild(a);
             a.click();
+            document.body.removeChild(a);
         };
     } else {
         webmBtn.href = url;

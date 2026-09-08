@@ -327,6 +327,7 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
 <body>
 
 <header class="topbar" id="topbar">
+    <span id="buildTag" style="position:absolute;left:50%;transform:translateX(-50%);font:600 10px Inter,sans-serif;color:#6c6f82;letter-spacing:.4px">BUILD 2026-09-08-1756</span>
     <div class="topbar-left">
         <div class="topbar-logo"><div class="mark">🎬</div>Beat<em>Viz</em></div>
         <div class="topbar-divider"></div>
@@ -883,13 +884,16 @@ function renderAllLayersList() {
 }
 
 function checkReady() {
-    const hasVisual = chars.length>0 || videoLayers.length>0;
-    const hasAudioOrVideo = !!audioBuffer || videoLayers.length>0;
-    const ok = hasAudioOrVideo && hasVisual;
-    document.getElementById('genBtn').disabled = !ok;
-    const lp=document.getElementById('loopPreviewBtn'); if (lp) lp.disabled=!ok;
-    const lbl=document.getElementById('readyLbl'); if (lbl) lbl.classList.toggle('show',ok);
-    if (ok) document.getElementById('canvasEmpty').style.display='none';
+    // Generate becomes available after ANY media is added:
+    // audio-only, image-only, video-only, or any combination.
+    const hasAnyMedia = audioTracks.length > 0 || audioBuffer !== null || chars.length > 0 || videoLayers.length > 0;
+    const generateBtn = document.getElementById('genBtn');
+    if (generateBtn) generateBtn.disabled = !hasAnyMedia;
+    const lp = document.getElementById('loopPreviewBtn');
+    if (lp) lp.disabled = !(audioBuffer || videoLayers.length > 0);
+    const lbl = document.getElementById('readyLbl');
+    if (lbl) lbl.classList.toggle('show', hasAnyMedia);
+    if (hasAnyMedia) document.getElementById('canvasEmpty').style.display = 'none';
     rebuildLayerStack();
     drawIdle();
 }
@@ -1683,9 +1687,10 @@ async function handleGenerate() {
     if (!canGenerate) { showPaywall(); return; }
     if (!sub.isActive && sub.trialActive) { const trialVids=parseInt(localStorage.getItem('bvtrialvids')||'0',10); if (trialVids>=1) { showPaywall(); toast('Trial allows 1 video. Subscribe for unlimited!'); return; } }
     if (isPlaying) { stopAll(); return; }
-    const hasVideoForGen = videoLayers.length>0;
-    if (!audioBuffer && !hasVideoForGen) { toast('Add audio or upload a video first.'); return; }
-    if (!chars.length && !hasVideoForGen) { toast('Add an image or video first.'); return; }
+    const hasAnyMedia = audioTracks.length > 0 || audioBuffer !== null || chars.length > 0 || videoLayers.length > 0;
+    if (!hasAnyMedia) { toast('Add audio, a video, or an image first.'); return; }
+    // A silent visual export is valid if the user uploaded only an image.
+    // A soundtrack-only export is valid if the user uploaded only audio.
     if (pvPlaying) pausePreview();
     if (tapCatchActive) stopTapCatch(); if (autoCapActive) stopAutoCaption();
     selectLayer(null); closeInlineEditor();
@@ -1705,10 +1710,15 @@ async function handleGenerate() {
     } else if (audioTracks.length) {
         const track=audioTracks[0]; const s=genAudioCtx.createBufferSource(); s.buffer=track.buffer; const g=genAudioCtx.createGain(); g.gain.value=track.volume||1;
         s.connect(g); g.connect(mDest); g.connect(genAudioCtx.destination); g.connect(analyser); s.start(0);
-    } else if (videoLayers.length) {
-        const rawDur=videoLayers[0].el.duration; audioDuration = isFinite(rawDur)&&rawDur>0 ? rawDur : 600;
-        const frameCount=Math.max(1,Math.ceil(audioDuration*genAudioCtx.sampleRate)); const silentBuf=genAudioCtx.createBuffer(1,frameCount,genAudioCtx.sampleRate);
-        const s=genAudioCtx.createBufferSource(); s.buffer=silentBuf; s.connect(analyser); analyser.connect(genAudioCtx.destination); analyser.connect(mDest); s.start(0);
+    } else {
+        // Video-only or image-only exports need a silent timeline driver.
+        // Video duration is used when available; an image-only export defaults to 10 seconds.
+        const rawDur = videoLayers.length ? videoLayers[0].el.duration : 10;
+        audioDuration = isFinite(rawDur) && rawDur > 0 ? rawDur : 10;
+        const frameCount=Math.max(1,Math.ceil(audioDuration*genAudioCtx.sampleRate));
+        const silentBuf=genAudioCtx.createBuffer(1,frameCount,genAudioCtx.sampleRate);
+        const s=genAudioCtx.createBufferSource(); s.buffer=silentBuf;
+        s.connect(analyser); analyser.connect(genAudioCtx.destination); analyser.connect(mDest); s.start(0);
     }
     initParticles(); bassAvg=0; beatIntensity=0; lastBeat=0;
     applyExportResolution(); await new Promise(r=>setTimeout(r,50));

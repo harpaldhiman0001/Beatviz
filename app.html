@@ -323,55 +323,17 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
 }
 
 
-/* ============================================================
-   TIMELINE ALWAYS VISIBLE — DESKTOP WINDOW-SAFE GRID
-   ============================================================ */
-@media (min-width: 769px) {
-  /* Fixed three-row workspace: PREVIEW / TIMELINE / STATUS. */
-  .preview-area {
-    display:grid !important;
-    grid-template-rows:minmax(160px,1fr) 270px 34px !important;
-    height:100% !important;
-    min-height:0 !important;
-    overflow:hidden !important;
-  }
-  .canvas-wrap {
-    grid-row:1 !important;
-    min-height:0 !important;
-    height:auto !important;
-    overflow:hidden !important;
-    padding:8px !important;
-  }
-  .canvas-wrap canvas { max-width:100% !important; max-height:100% !important; width:auto !important; height:auto !important; }
-  .timeline-wrap {
-    grid-row:2 !important;
-    height:270px !important;
-    min-height:270px !important;
-    max-height:270px !important;
-    overflow:hidden !important;
-    border-top:2px solid var(--accent) !important;
-  }
-  .tl-topbar { height:39px !important; min-height:39px !important; }
-  .tl-tracks { height:231px !important; min-height:231px !important; max-height:231px !important; overflow-y:auto !important; overflow-x:auto !important; }
-  .tl-track-row { height:38px !important; min-height:38px !important; }
-  .tl-track-label { width:88px !important; font-size:9px !important; }
-  .tl-track-canvas-wrap,.tl-tracks canvas { height:38px !important; min-height:38px !important; }
-  .status-bar { grid-row:3 !important; height:34px !important; min-height:34px !important; }
-}
-@media (min-width: 769px) and (max-height: 760px) {
-  .preview-area { grid-template-rows:minmax(100px,1fr) 230px 30px !important; }
-  .timeline-wrap { height:230px !important; min-height:230px !important; max-height:230px !important; }
-  .tl-topbar { height:34px !important; min-height:34px !important; }
-  .tl-tracks { height:196px !important; min-height:196px !important; max-height:196px !important; }
-  .tl-track-row,.tl-track-canvas-wrap,.tl-tracks canvas { height:32px !important; min-height:32px !important; }
-  .status-bar { height:30px !important; min-height:30px !important; }
-}
+/* TEXT EDITING FIX */
+.text-live-label { font:700 10px var(--font); color:var(--accent); padding:0 14px 6px; }
+.text-preset-row { display:grid; grid-template-columns:repeat(3,1fr); gap:5px; padding:6px 10px 10px; }
+.text-preset-row button { min-height:42px; border:1px solid var(--border-strong); border-radius:var(--radius-sm); background:var(--bg-card); color:var(--text-2); font:700 10px var(--font); cursor:pointer; }
+.text-preset-row button:hover { border-color:var(--accent); color:#c3baff; }
 
 </style>
 </head>
 <body>
 
-<header class="topbar" id="topbar"><span id="buildTag" style="position:absolute;left:50%;transform:translateX(-50%);font:600 10px Inter,sans-serif;color:#a3a6b8;letter-spacing:.5px">AUDIO STOP + TIMELINE FIT</span>
+<header class="topbar" id="topbar">
     <span id="buildTag" style="position:absolute;left:50%;transform:translateX(-50%);font:600 10px Inter,sans-serif;color:#6c6f82;letter-spacing:.4px">BUILD 2026-09-08-1756</span>
     <div class="topbar-left">
         <div class="topbar-logo"><div class="mark">🎬</div>Beat<em>Viz</em></div>
@@ -1206,15 +1168,27 @@ function renderTextLayerList() {
     } else wrap.style.display='none';
 }
 function applyTextProps() {
-    if (!selectedLayer || selectedLayer.type!=='text') return;
-    const t = textLayers[selectedLayer.refIdx]; if (!t) return;
-    t.content = document.getElementById('txtContent').value || 'Text';
-    t.color = document.getElementById('txtColor').value;
-    t.size = parseInt(document.getElementById('txtSize').value);
-    document.getElementById('vTxtSize').textContent = t.size+'px';
-    t.bold = document.getElementById('txtBold').classList.contains('active');
-    t.shadow = document.getElementById('txtShadow').classList.contains('active');
-    drawIdle(); renderTextLayerList();
+    if (!selectedLayer || selectedLayer.type !== 'text') return;
+    const t = textLayers[selectedLayer.refIdx];
+    if (!t) return;
+    const contentEl = document.getElementById('txtContent');
+    const colorEl = document.getElementById('txtColor');
+    const sizeEl = document.getElementById('txtSize');
+    if (contentEl) t.content = contentEl.value || 'Text';
+    if (colorEl) t.color = colorEl.value;
+    if (sizeEl) {
+        t.size = parseInt(sizeEl.value, 10) || 48;
+        const label = document.getElementById('vTxtSize');
+        if (label) label.textContent = t.size + 'px';
+    }
+    const bold = document.getElementById('txtBold');
+    const shadow = document.getElementById('txtShadow');
+    if (bold) t.bold = bold.classList.contains('active');
+    if (shadow) t.shadow = shadow.classList.contains('active');
+    // Do NOT call renderTextLayerList here. Re-rendering replaces the field while the user types.
+    // Only redraw canvas/timeline, preserving keyboard focus and smooth editing.
+    drawIdle();
+    if (typeof TL !== 'undefined' && TL.draw) TL.draw(pvOffset);
 }
 function setTextFont(font, btn) {
     if (!selectedLayer || selectedLayer.type!=='text') return;
@@ -1831,13 +1805,13 @@ async function bvHardStopAudio() {
     } catch (e) {}
 }
 
-async function stopAll() {
+function stopAll() {
     // Switch state first: prevents the animation loop from scheduling additional work.
     isPlaying = false;
     isPaused = false;
 
     // Start stopping audio immediately; do not wait before updating the UI.
-    await bvHardStopAudio();
+    bvHardStopAudio();
 
     try { if (recorder && recorder.state !== 'inactive') recorder.stop(); } catch (e) {}
     try { pauseVideoLayers(); } catch (e) {}
@@ -1889,6 +1863,66 @@ function stopLoopPreview() { loopPreviewActive=false; if (loopPreviewTimer) clea
 
 setInterval(()=>{ if (audioDuration>0) updateQbTime(); checkAudioUnlockState(); }, 300);
 drawIdle();
+
+
+
+/* ================= RELIABLE TEXT EDITING ================= */
+function bvSetupTextEditing() {
+  const content = document.getElementById('txtContent');
+  if (content && !content.dataset.bvLive) {
+    content.dataset.bvLive = '1';
+    content.addEventListener('input', function() { applyTextProps(); });
+    content.addEventListener('focus', function() { if (!selectedLayer || selectedLayer.type !== 'text') { toast('Select a text layer first'); } });
+  }
+  const wrap = document.getElementById('textPropsWrap');
+  if (wrap && !document.getElementById('textPresets')) {
+    const label = document.createElement('div');
+    label.className = 'text-live-label';
+    label.id = 'selectedTextLabel';
+    label.textContent = 'Select a text layer to edit it live';
+    const presets = document.createElement('div');
+    presets.className = 'text-preset-row';
+    presets.id = 'textPresets';
+    presets.innerHTML = '<button onclick="applyTextPreset(\'title\')">TITLE</button><button onclick="applyTextPreset(\'subtitle\')">Subtitle</button><button onclick="applyTextPreset(\'artist\')">Artist Name</button>';
+    wrap.insertBefore(label, wrap.firstChild);
+    wrap.appendChild(presets);
+  }
+}
+function applyTextPreset(kind) {
+  if (!selectedLayer || selectedLayer.type !== 'text') { toast('Add or select a text layer first'); return; }
+  const t = textLayers[selectedLayer.refIdx];
+  const preset = {
+    title: {content:'YOUR TITLE', size:78, color:'#ffffff', font:'Inter', bold:true, shadow:true},
+    subtitle: {content:'A short subtitle', size:32, color:'#ffffff', font:'Inter', bold:false, shadow:true},
+    artist: {content:'ARTIST NAME', size:46, color:'#fbbf24', font:'Georgia', bold:true, shadow:true}
+  }[kind];
+  Object.assign(t, preset);
+  // Fill form values once after applying preset; then typing will update live without re-render.
+  document.getElementById('txtContent').value=t.content;
+  document.getElementById('txtColor').value=t.color;
+  document.getElementById('txtSize').value=t.size;
+  document.getElementById('vTxtSize').textContent=t.size+'px';
+  document.getElementById('txtBold').classList.toggle('active',t.bold);
+  document.getElementById('txtShadow').classList.toggle('active',t.shadow);
+  drawIdle(); if (typeof TL !== 'undefined') TL.draw(pvOffset); renderTextLayerList();
+}
+const __bvSelectLayerForText = selectLayer;
+selectLayer = function(layer) {
+  __bvSelectLayerForText(layer);
+  if (layer && layer.type === 'text') {
+    const t = textLayers[layer.refIdx];
+    const label = document.getElementById('selectedTextLabel');
+    if (label && t) label.textContent = 'Editing: ' + (t.content || 'Text layer');
+    // Set all values only on selection, never on every character typed.
+    if (t) {
+      document.getElementById('txtContent').value=t.content;
+      document.getElementById('txtColor').value=t.color;
+      document.getElementById('txtSize').value=t.size;
+      document.getElementById('vTxtSize').textContent=t.size+'px';
+    }
+  }
+};
+window.addEventListener('load', bvSetupTextEditing);
 
 </script>
 </body>

@@ -3396,56 +3396,46 @@ function fitLayerToFull(showMessage = true) {
     }
 }
 
-        function loadChars(e) {
-            const files = Array.from(e.target.files || []);
-            const room = 20 - chars.length;
-            files.slice(0, room).forEach(f => {
-                const reader = new FileReader();
-                reader.onload = ev => { const img = new Image();
-                    img.src = ev.target.result;
-img.onload = () => {
-    const newImageIndex = chars.length;
+function loadChars(e) {
+    const files = Array.from(e.target.files || []);
+    const room = 20 - chars.length;
+    files.slice(0, room).forEach(f => {
+        const reader = new FileReader();
+        reader.onload = ev => {
+            const img = new Image();
+            img.src = ev.target.result;
+            img.onload = () => {
+                const newImageIndex = chars.length;
+                chars.push({
+                    img,
+                    url: ev.target.result,
+                    name: f.name,
+                    fileSize: f.size,
+                    fingerprint: { name: f.name, size: f.size },
+                    ds: { beatCount: 0, jumpAmt: 0, spinAng: 0, spinDir: 1, phase: Math.random() * Math.PI * 2 },
+                    userPlaced: false,
+                    opacity: 1,
+                    hidden: false
+                });
 
-    chars.push({
-        img,
-        url: ev.target.result,
-        name: f.name,
-        fileSize: f.size,
-        fingerprint: {
-            name: f.name,
-            size: f.size
-        },
-        ds: {
-            beatCount: 0,
-            jumpAmt: 0,
-            spinAng: 0,
-            spinDir: 1,
-            phase: Math.random() * Math.PI * 2
-        },
-        userPlaced: false,
-        opacity: 1,
-        hidden: false
-    });
+                rebuildLayerStack();
+                checkReady();
+                resequenceImages();
 
-    rebuildLayerStack();
-    checkReady();
-    resequenceImages();
-
-    // Automatically fit only when a single file was uploaded,
-    // or this is the first image in the project.
-    if (files.length === 1 || newImageIndex === 0) {
-        selectLayer({ type: 'img', refIdx: newImageIndex }, true);
-        toast('Image added and fitted to screen.');
-    } else {
-        drawIdle();
-        toast('Image added.');
-    }
-};
-                reader.readAsDataURL(f);
-            });
-            e.target.value = '';
-            if (files.length > room) toast('Max 20 images.');
-        }
+                if (files.length === 1 || newImageIndex === 0) {
+                    selectLayer({ type: 'img', refIdx: newImageIndex }, true);
+                    toast('Image added and fitted to screen.');
+                } else {
+                    drawIdle();
+                    toast('Image added.');
+                }
+            }; // closes img.onload
+        };     // ← ADD THIS: closes reader.onload
+        reader.readAsDataURL(f);
+    });        // closes forEach callback + forEach(...) call
+    e.target.value = '';
+    if (files.length > room) toast('Max 20 images.');
+}
 
         function resequenceImages() {
             if (!chars.length || !audioDuration) { if (!chars.length) imgSegments = []; return; }

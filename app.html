@@ -2597,42 +2597,71 @@ function updatePlaybackUI() {
     }
 }
 
-        function startAudioFrom(offset = 0) {
-    if (!audioBuffer) return;
+function startAudioFrom(offset = 0) {
+    if (!audioTracks.length) return;
 
     const audioCtx = getSharedAudioCtx();
 
     if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
+        audioCtx.resume().catch(() => {});
     }
 
-    const source = audioCtx.createBufferSource();
-    const gain = audioCtx.createGain();
-
-    source.buffer = audioBuffer;
-    gain.gain.value = previewVolume;
-
-    source.connect(gain);
-    gain.connect(audioCtx.destination);
-
-    source.onended = () => {
-        activeAudioSources.delete(source);
-
-        // Do not auto-restart after pause or stop.
-        if (playbackState !== 'playing') return;
-
-        // Natural end of the music.
-        if (pausedAt >= audioBuffer.duration - 0.05) {
-            stopAllAudio(true);
-        }
-    };
-
-    activeAudioSources.add(source);
-
     playbackStartContextTime = audioCtx.currentTime;
-    source.start(0, Math.max(0, offset));
 
-    return source;
+    audioTracks.forEach((track, trackIndex) => {
+        if (!track || !track.buffer || track.muted) return;
+
+        const segment = audioSegments.find(s => s.trackIdx === trackIndex);
+
+        const trackStart = segment ? segment.start : 0;
+        const trackDuration = segment ? segment.dur : track.buffer.duration;
+
+        // This track has not started yet.
+        if (offset < trackStart) {
+            const delay = trackStart - offset;
+
+            const source = audioCtx.createBufferSource();
+            const gain = audioCtx.createGain();
+
+            source.buffer = track.buffer;
+            gain.gain.value = track.volume ?? 1;
+
+            source.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            source.onended = () => {
+                activeAudioSources.delete(source);
+            };
+
+            activeAudioSources.add(source);
+            source.start(audioCtx.currentTime + delay, 0, trackDuration);
+            return;
+        }
+
+        // This track has already ended.
+        if (offset >= trackStart + trackDuration) {
+            return;
+        }
+
+        const sourceOffset = offset - trackStart;
+        const remainingDuration = trackDuration - sourceOffset;
+
+        const source = audioCtx.createBufferSource();
+        const gain = audioCtx.createGain();
+
+        source.buffer = track.buffer;
+        gain.gain.value = track.volume ?? 1;
+
+        source.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        source.onended = () => {
+            activeAudioSources.delete(source);
+        };
+
+        activeAudioSources.add(source);
+        source.start(0, sourceOffset, remainingDuration);
+    });
 }
 
         function getSharedAudioCtx() { if (!sharedAudioCtx || sharedAudioCtx.state === 'closed') sharedAudioCtx = new(window
@@ -2898,15 +2927,24 @@ function selectLayer(layer, autoFitImage = true) {
     drawIdle();
 }
 
-        function toggleLayerVisibility() {
-            if (!selectedLayer) return;
-            if (selectedLayer.type === 'img') chars[selectedLayer.refIdx].hidden = !chars[selectedLayer.refIdx].hidden;
-            if (selectedLayer.type === 'video') videoLayers[selectedLayer.refIdx].hidden = !videoLayers[selectedLayer
-                .refIdx].hidden;
-            if (selectedLayer.type === 'text') textLayers[selectedLayer.refIdx].hidden = !textLayers[selectedLayer
-                .refIdx].hidden;
-            selectLayer(selectedLayer);
-        }
+function toggleLayerVisibility() {
+    if (!selectedLayer) return;
+
+    if (selectedLayer.type === 'img') {
+        chars[selectedLayer.refIdx].hidden = !chars[selectedLayer.refIdx].hidden;
+    }
+
+    if (selectedLayer.type === 'video') {
+        videoLayers[selectedLayer.refIdx].hidden = !videoLayers[selectedLayer.refIdx].hidden;
+    }
+
+    if (selectedLayer.type === 'text') {
+        textLayers[selectedLayer.refIdx].hidden = !textLayers[selectedLayer.refIdx].hidden;
+    }
+
+    // Refresh selection/UI but do NOT change image size or placement.
+    selectLayer(selectedLayer, false);
+}
 
         function applyLayerProps() {
             if (!selectedLayer) return;
@@ -3241,9 +3279,22 @@ function selectLayer(layer, autoFitImage = true) {
             if (selectedLayer) { const r = layerRect(selectedLayer); if (r) { const h = hitTestHandle(r, x, y); if (h) {
                         canvasDrag = { mode: 'resize', handle: h, startX: x, startY: y, orig: { ...r } }; return; } } }
             const layer = hitTestLayer(x, y);
-            if (layer) { selectLayer(layer);
-                const r = layerRect(layer);
-                canvasDrag = { mode: 'move', startX: x, startY: y, orig: { ...r } }; } else selectLayer(null);
+if (layer) {
+    const isAlreadySelected =
+        selectedLayer &&
+        selectedLayer.type === layer.type &&
+        selectedLayer.refIdx === layer.refIdx;
+
+    // First selection fits the image.
+    // Later clicks allow moving it without fitting it again.
+    selectLayer(layer, !isAlreadySelected);
+
+    const r = layerRect(layer);
+
+    canvasDrag = {
+        mode: 'move',
+        startX: x,
+        startY: y, orig: { ...r } }; } else selectLayer(null);
         });
         canvas.addEventListener('mousemove', e => {
             if (!canvasDrag) return;
@@ -3372,16 +3423,16 @@ img.onload = () => {
     checkReady();
     resequenceImages();
 
-    // Automatically select and fit the newly uploaded image.
-    const newLayer = {
-        type: 'img',
-        refIdx: newImageIndex
-    };
-
-    selectLayer(newLayer, true);
-
-    toast('Image added and fitted to screen.');
-}; };
+    // Automatically fit only when a single file was uploaded,
+    // or this is the first image in the project.
+    if (files.length === 1 || newImageIndex === 0) {
+        selectLayer({ type: 'img', refIdx: newImageIndex }, true);
+        toast('Image added and fitted to screen.');
+    } else {
+        drawIdle();
+        toast('Image added.');
+    }
+};
                 reader.readAsDataURL(f);
             });
             e.target.value = '';

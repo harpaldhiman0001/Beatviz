@@ -1091,7 +1091,7 @@ canvas.addEventListener('mouseup', () => { canvasDrag=null; });
 canvas.addEventListener('mouseleave', () => { canvasDrag=null; });
 
 function loadChars(e) {
-    const files=Array.from(e.target.files||[]); const room=5-chars.length;
+    const files=Array.from(e.target.files||[]); const room=20-chars.length;
     files.slice(0,room).forEach(f=>{
         const reader=new FileReader();
         reader.onload=ev=>{ const img=new Image(); img.src=ev.target.result;
@@ -1101,7 +1101,7 @@ function loadChars(e) {
                 toast('Image added — plays in its own slot on the timeline'); }; };
         reader.readAsDataURL(f);
     });
-    e.target.value=''; if (files.length>room) toast('Max 5 images.');
+     e.target.value=''; if (files.length>room) toast('Max 20 images.');
 }
 function resequenceImages() {
     if (!chars.length || !audioDuration) { if (!chars.length) imgSegments=[]; return; }
@@ -1720,6 +1720,8 @@ let rafId=null, playStart=0;
 function startLoop() { if (rafId) cancelAnimationFrame(rafId); rafId=requestAnimationFrame(loopFn); }
 function loopFn() {
     rafId=requestAnimationFrame(loopFn);
+    if (!isPlaying) return;
+    if (isPaused) return;               // <-- freeze the render loop entirely while paused
     if (analyser && isPlaying) analyser.getByteFrequencyData(freqData); else if (!freqData) freqData=new Uint8Array(1024);
     const beat=detectBeat(); let elapsed=0;
     if (isPlaying && genAudioCtx) elapsed = genAudioCtx.currentTime - playStart;
@@ -1821,8 +1823,8 @@ async function handleGenerate() {
 }
 function startVideoLayers(offset) { videoLayers.forEach(v=>{ if (!v.el) return; try{v.el.currentTime=offset;}catch(e){} v.el.muted=!v.audioEnabled; v.el.play().catch(()=>{}); }); }
 function pauseVideoLayers() { videoLayers.forEach(v=>v.el&&v.el.pause()); }
-function resumeVideoLayers() { videoLayers.forEach(v=>v.el&&v.el.play().catch(()=>{})); }
-function pickRecorderMime() {
+function resumeVideoLayers() { videoLayers.forEach(v=>{ if (!v.el) return; if (v.el.paused) v.el.play().catch(()=>{}); }); }
+    function pickRecorderMime() {
     const mp4=['video/mp4;codecs=avc1.640028,mp4a.40.2','video/mp4'];
     if (window.MediaRecorder) for (const m of mp4) if (MediaRecorder.isTypeSupported(m)) return {mime:m,isMp4:true};
     const webm=['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'];
@@ -1830,36 +1832,24 @@ function pickRecorderMime() {
     return {mime:'video/webm',isMp4:false};
 }
 async function bvHardStopAudio() {
-    // 1. Stop preview source immediately.
     try { if (pvSrc) { pvSrc.onended = null; pvSrc.stop(0); pvSrc.disconnect(); } } catch (e) {}
     pvSrc = null;
     pvPlaying = false;
 
-    // 2. Stop every audio BufferSource made for this render.
     (window.bvRenderSources || []).forEach(function(source) {
         try { source.onended = null; source.stop(0); source.disconnect(); } catch (e) {}
     });
     window.bvRenderSources = [];
 
-    // 3. Pause and mute every uploaded video to stop embedded video audio.
-    //    NOTE: we deliberately do NOT rewind currentTime to 0 here — that used
-    //    to run *before* the context suspend below, which was harmless, but
-    //    keeping it minimal avoids fighting the canvas redraw loop mid-stop.
+    // Pause, mute, AND disconnect every uploaded video's audio node so Stop
+    // leaves nothing playing in the background (picture or sound).
     videoLayers.forEach(function(videoLayer) {
         if (!videoLayer || !videoLayer.el) return;
         try { videoLayer.el.pause(); } catch (e) {}
         try { videoLayer.el.muted = true; } catch (e) {}
+        try { if (videoLayer._audioNode) videoLayer._audioNode.disconnect(); } catch (e) {}
     });
 
-    // 4. Silence the shared generation graph by SUSPENDING it — not closing it.
-    //    Closing the AudioContext permanently invalidates every
-    //    MediaElementAudioSourceNode created from an uploaded <video>, and a
-    //    browser will never let you create a second source node for the same
-    //    <video> element even in a brand-new context. That was the root cause
-    //    of "video audio only works the first time": Generate -> Stop closed
-    //    the context, the next Generate got a fresh context, and every video's
-    //    audio silently failed to (re)connect. Suspending keeps the same
-    //    context — and all its node bindings — alive for the next Generate.
     try {
         if (genAudioCtx && genAudioCtx.state === 'running') await genAudioCtx.suspend();
     } catch (e) {}
@@ -1869,14 +1859,15 @@ async function bvHardStopAudio() {
 }
 
 async function stopAll() {
-    // Switch state first: prevents the animation loop from scheduling additional work.
     isPlaying = false;
     isPaused = false;
 
-    // Start stopping audio immediately; do not wait before updating the UI.
+    if (rafId) { cancelAnimationFrame(rafId); rafId = null; } // kill the render loop outright
+
     await bvHardStopAudio();
 
     try { if (recorder && recorder.state !== 'inactive') recorder.stop(); } catch (e) {}
+    recorder = null;
     try { pauseVideoLayers(); } catch (e) {}
 
     const meter = document.getElementById('audioMeter');
@@ -1888,15 +1879,29 @@ async function stopAll() {
     if (dot) dot.className = 'dot';
     const status = document.getElementById('statusTxt');
     if (status) status.textContent = 'Stopped';
+    const pf = document.getElementById('progFill'); if (pf) pf.style.width = '0%';
+    const td = document.getElementById('timeDisp'); if (td) td.textContent = `0:00 / ${fmt(audioDuration)}`;
+    const pb = document.getElementById('pauseBtn'); if (pb) pb.textContent = '⏸ Pause';
     try { updatePvUI(); } catch (e) {}
+    drawIdle();
 }
+
+
 function showPauseUI(show) { const b=document.getElementById('pauseBtn'); if (b) b.style.display=show?'inline-block':'none'; }
 function togglePause() {
     if (!isPlaying) return;
-    if (!isPaused) { isPaused=true; pauseVideoLayers(); try{if(recorder.state==='recording')recorder.pause();}catch(e){} try{genAudioCtx?.suspend();}catch(e){}
-        document.getElementById('statusDot').className='dot paused'; document.getElementById('statusTxt').textContent='Paused'; document.getElementById('pauseBtn').textContent='▶ Resume'; }
-    else { isPaused=false; resumeVideoLayers(); try{genAudioCtx?.resume();}catch(e){} try{if(recorder.state==='paused')recorder.resume();}catch(e){}
-        document.getElementById('statusDot').className='dot rec'; document.getElementById('statusTxt').textContent='Recording'; document.getElementById('pauseBtn').textContent='⏸ Pause'; }
+    if (!isPaused) {
+        isPaused=true; pauseVideoLayers();
+        try{ if (recorder && recorder.state==='recording') recorder.pause(); }catch(e){}
+        try{ genAudioCtx?.suspend(); }catch(e){}
+        document.getElementById('statusDot').className='dot paused'; document.getElementById('statusTxt').textContent='Paused'; document.getElementById('pauseBtn').textContent='▶ Resume';
+    } else {
+        isPaused=false;
+        try{ genAudioCtx?.resume().then(resumeVideoLayers); }catch(e){ resumeVideoLayers(); }
+        try{ if (recorder && recorder.state==='paused') recorder.resume(); }catch(e){}
+        document.getElementById('statusDot').className='dot rec'; document.getElementById('statusTxt').textContent='Recording'; document.getElementById('pauseBtn').textContent='⏸ Pause';
+        startLoop();  // restart the render loop that Pause stopped from advancing
+    }
 }
 function finalize() {
     restorePreviewResolution();

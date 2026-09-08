@@ -37,7 +37,6 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
 .topbar-logo .mark { width: 32px; height: 32px; border-radius: 9px; background: linear-gradient(135deg, var(--accent), #8b7bff); display: flex; align-items: center; justify-content: center; font-size: 16px; box-shadow: 0 4px 14px var(--accent-glow); }
 .topbar-logo em { color: var(--accent); font-style: normal; }
 .topbar-divider { width: 1px; height: 26px; background: var(--border); }
-.topbar-project-name { font-size: 13.5px; font-weight: 600; color: var(--text-2); padding: 6px 10px; border-radius: var(--radius-sm); max-width: 200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .topbar-badge { font-size: 10px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase; padding: 4px 11px; border-radius: 100px; display: inline-flex; align-items: center; gap: 5px; }
 .topbar-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; }
 .topbar-badge.pro { background: var(--green-soft); color: #7ff0c4; } .topbar-badge.pro::before { background: var(--green); }
@@ -126,44 +125,35 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
 .layer-order-row button { flex:1; padding:7px; border-radius:var(--radius-sm); border:1px solid var(--border-strong); background:var(--bg-card); color:var(--text-2); font-size:10px; font-weight:600; cursor:pointer; }
 .layer-order-row button:hover { border-color:var(--accent); color:#c3baff; }
 
-.lyric-mode-tabs { display:flex; gap:4px; padding: 8px 10px 4px; }
-.lyric-mode-tabs button { flex:1; padding:7px 4px; border-radius: var(--radius-sm); border:1px solid var(--border-strong); background:var(--bg-card); color:var(--text-3); font-size:9.5px; font-weight:700; cursor:pointer; }
-.lyric-mode-tabs button.active { border-color: var(--accent); background: var(--accent-soft); color:#c3baff; }
-.lyric-mode-pane { display:none; padding: 4px 10px 10px; }
-.lyric-mode-pane.active { display:block; }
+/* SMOOTH INLINE LYRIC EDITOR — click a bar, type directly, no popups */
+.lyric-quickbar { padding: 10px 14px; display:flex; flex-direction:column; gap:8px; background:var(--bg-panel); }
+.lyric-quickbar .qb-row { display:flex; gap:8px; align-items:center; }
+.lyric-quickbar input[type=text] { flex:1; background: var(--bg-card); border: 1.5px solid var(--border-strong); border-radius: var(--radius-sm); color: var(--text-1); font-size: 13px; padding: 10px 12px; outline:none; transition: border-color .15s var(--ease); }
+.lyric-quickbar input[type=text]:focus { border-color: var(--accent); }
+.lyric-quickbar .qb-time { font-size:10.5px; font-weight:700; color:var(--accent); background:var(--accent-soft); padding:6px 10px; border-radius:var(--radius-sm); white-space:nowrap; }
+.lyric-quickbar .qb-hint { font-size:9.5px; color:var(--text-3); text-align:center; }
+.tap-toggle-row { display:flex; align-items:center; justify-content:space-between; padding:8px 14px; gap:8px; }
+.tap-toggle-row .ttr-info { display:flex; flex-direction:column; gap:1px; }
+.tap-toggle-row .ttr-info b { font-size:11px; color:var(--text-2); }
+.tap-toggle-row .ttr-info span { font-size:9px; color:var(--text-3); }
+.tap-toggle-btn { padding: 8px 14px; border-radius: var(--radius-sm); border: 1.5px solid var(--gold); background: var(--gold-soft); color:#ffd166; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap; }
+.tap-toggle-btn.active { background: var(--red); border-color: var(--red); color:#fff; animation: pulseRec 1.1s infinite; }
+@keyframes pulseRec { 0%,100%{box-shadow:0 0 0 0 rgba(240,82,92,.5)} 50%{box-shadow:0 0 0 7px rgba(240,82,92,0)} }
+.autocap-row { display:flex; align-items:center; justify-content:space-between; padding:0 14px 10px; gap:8px; }
+.autocap-btn-sm { padding: 6px 12px; border-radius: var(--radius-sm); border: 1.5px solid var(--cyan); background: var(--cyan-soft); color:#67e8f9; font-size:10.5px; font-weight:700; cursor:pointer; white-space:nowrap; }
+.autocap-btn-sm.listening { background: var(--red); border-color: var(--red); color:#fff; animation: pulseRec 1.1s infinite; }
+.autocap-btn-sm:disabled, .tap-toggle-btn:disabled { opacity:.35; cursor:not-allowed; }
 
-.tapcatch-btn { width:100%; padding:14px; border-radius: var(--radius-md); border:2px solid var(--gold); background: var(--gold-soft); color:#ffd166; font-size:13px; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition: all .15s var(--ease); }
-.tapcatch-btn:hover:not(:disabled) { background: var(--gold); color:#241a00; transform: translateY(-1px); }
-.tapcatch-btn:disabled { opacity:.35; cursor:not-allowed; }
-.tapcatch-btn.active { background: var(--red); border-color: var(--red); color:#fff; animation: pulseRec 1s infinite; }
-@keyframes pulseRec { 0%,100%{box-shadow:0 0 0 0 rgba(240,82,92,.5)} 50%{box-shadow:0 0 0 8px rgba(240,82,92,0)} }
-.tapcatch-hint { font-size: 9.5px; color: var(--text-3); text-align:center; line-height:1.6; margin-top:6px; }
-.tapcatch-count { font-size:10px; color:var(--gold); text-align:center; margin-top:4px; font-weight:700; }
-
-.autocap-btn { width:100%; padding:11px; border-radius: var(--radius-sm); border:1.5px solid var(--cyan); background: var(--cyan-soft); color:#67e8f9; font-size:11.5px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:7px; }
-.autocap-btn:hover:not(:disabled) { background: var(--cyan); color:#04202a; }
-.autocap-btn:disabled { opacity:.35; cursor:not-allowed; }
-.autocap-btn.listening { background: var(--red); border-color: var(--red); color:#fff; animation: pulseRec 1s infinite; }
-.autocap-note { font-size: 9px; color: var(--text-3); text-align:center; line-height:1.6; margin-top:6px; padding: 0 4px; }
-.autocap-note b { color: var(--text-2); }
-
-.lyric-list { display: flex; flex-direction: column; gap: 4px; padding: 6px 8px; max-height: 220px; overflow-y: auto; }
-.lyric-row { display: flex; flex-direction: column; padding: 8px 12px; background: var(--bg-card); border-radius: var(--radius-sm); border: 1px solid var(--border); cursor: pointer; gap: 6px; }
+.lyric-list { display: flex; flex-direction: column; gap: 4px; padding: 6px 8px; max-height: 260px; overflow-y: auto; }
+.lyric-row { display: flex; align-items:center; padding: 7px 10px; background: var(--bg-card); border-radius: var(--radius-sm); border: 1px solid var(--border); cursor: pointer; gap: 8px; }
+.lyric-row:hover { border-color: var(--border-strong); }
 .lyric-row.active { border-color: var(--accent); background: var(--accent-soft); }
 .lyric-row.placeholder-row { border-left: 3px solid var(--gold); }
-.lyric-row .lr-top { display: flex; align-items: center; gap: 8px; width: 100%; }
-.lyric-row .lr-time { font-size: 10px; font-weight: 700; color: var(--accent); background: var(--accent-soft); padding: 3px 8px; border-radius: 5px; cursor: pointer; flex-shrink:0; }
-.lyric-row .lr-time.end { color: #c3baff; background: rgba(139,123,255,.1); }
-.lyric-row .lr-arrow { color: var(--text-4); font-size: 9px; }
-.lyric-row .lr-text { flex: 1; font-size: 13px; color: var(--text-2); outline: none; padding: 3px 5px; border-radius: 4px; min-width:0; }
+.lyric-row .lr-time { font-size: 10px; font-weight: 700; color: var(--accent); background: var(--accent-soft); padding: 3px 8px; border-radius: 5px; flex-shrink:0; }
+.lyric-row .lr-text { flex: 1; font-size: 13px; color: var(--text-2); background:transparent; border:none; outline: none; padding: 2px 0; min-width:0; font-family: var(--font); }
 .lyric-row .lr-text.empty-text { color: var(--gold); font-style:italic; }
-.lyric-row .lr-del { width: 22px; height: 22px; border-radius: 5px; border: 1px solid var(--border); background: none; color: var(--text-3); cursor: pointer; flex-shrink:0; }
+.lyric-row .lr-del { width: 22px; height: 22px; border-radius: 5px; border: 1px solid var(--border); background: none; color: var(--text-3); cursor: pointer; flex-shrink:0; font-size:11px; }
 .lyric-row .lr-del:hover { border-color: var(--red); color: var(--red); background: var(--red-soft); }
-.lyric-row .lr-actions { display: flex; gap: 5px; flex-wrap: wrap; padding-top: 5px; border-top: 1px solid var(--border); }
-.lyric-row .lr-act { padding: 3px 10px; border-radius: 4px; border: 1px solid var(--border); background: rgba(255,255,255,.03); color: var(--text-3); font-size: 9.5px; font-weight: 600; cursor: pointer; }
-.lyric-row .lr-act:hover { background: var(--accent-soft); border-color: var(--accent); color: var(--text-1); }
-.lyric-row .lr-act.paste { border-color: rgba(6,182,212,.3); color: #67e8f9; }
-.lyric-row .lr-act.paste:disabled { opacity: .35; cursor: not-allowed; }
 .lyric-empty { text-align: center; padding: 22px 14px; color: var(--text-3); font-size: 12px; line-height: 1.7; }
 .lyric-empty strong { color: var(--text-2); }
 
@@ -176,9 +166,19 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
 .canvas-badge { position: absolute; top: 14px; right: 14px; background: rgba(0,0,0,.75); border-radius: var(--radius-sm); padding: 4px 11px; font-size: 10px; font-weight: 700; color: rgba(255,255,255,.55); }
 .layer-hint { position:absolute; top:14px; left:14px; background:rgba(0,0,0,.75); border-radius:var(--radius-sm); padding:4px 11px; font-size:9.5px; color:rgba(255,255,255,.6); display:none; }
 .layer-hint.show { display:block; }
-.tapcatch-live-badge { position:absolute; top:14px; left:50%; transform:translateX(-50%); background:rgba(240,82,92,.92); border-radius:100px; padding:6px 16px; font-size:11px; font-weight:800; color:#fff; display:none; align-items:center; gap:7px; }
-.tapcatch-live-badge.show { display:flex; }
-.tapcatch-live-badge .dotpulse { width:8px; height:8px; border-radius:50%; background:#fff; animation: pulseRec 1s infinite; }
+.live-badge { position:absolute; top:14px; left:50%; transform:translateX(-50%); background:rgba(240,82,92,.92); border-radius:100px; padding:6px 16px; font-size:11px; font-weight:800; color:#fff; display:none; align-items:center; gap:7px; }
+.live-badge.show { display:flex; }
+.live-badge .dotpulse { width:8px; height:8px; border-radius:50%; background:#fff; animation: pulseRec 1s infinite; }
+
+/* Floating inline editor that appears ON the timeline where you clicked */
+.tl-inline-editor { position:absolute; z-index:20; background:var(--bg-card); border:1.5px solid var(--accent); border-radius:var(--radius-md); padding:8px; box-shadow:var(--shadow-2); display:none; min-width:220px; }
+.tl-inline-editor.show { display:block; }
+.tl-inline-editor input { width:100%; background:var(--bg-app); border:1px solid var(--border-strong); border-radius:var(--radius-sm); color:var(--text-1); font-size:13px; padding:8px 10px; outline:none; }
+.tl-inline-editor input:focus { border-color:var(--accent); }
+.tl-inline-editor .tie-row { display:flex; gap:5px; margin-top:6px; }
+.tl-inline-editor .tie-row button { flex:1; padding:6px; border-radius:var(--radius-xs); font-size:10px; font-weight:700; cursor:pointer; }
+.tl-inline-editor .tie-save { border:none; background:var(--accent); color:#fff; }
+.tl-inline-editor .tie-del { border:1px solid var(--red); background:var(--red-soft); color:var(--red); }
 
 .timeline-wrap { background: var(--bg-panel); border-top: 1px solid var(--border); height: 236px; position: relative; flex-shrink: 0; user-select: none; display:flex; flex-direction:column; }
 .timeline-wrap.tl-disabled .tl-tracks { opacity: .45; pointer-events:none; }
@@ -264,22 +264,6 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
 .paywall .pw-btn { width: 100%; padding: 15px; border-radius: var(--radius-md); border: none; background: linear-gradient(135deg,var(--accent),#8b7bff); color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; }
 .paywall .pw-note2 { font-size: 10.5px; color: var(--text-3); text-align: center; }
 
-.ctx-menu { position: fixed; z-index: 9999; background: var(--bg-card); border: 1px solid var(--border-strong); border-radius: var(--radius-md); padding: 4px 0; box-shadow: var(--shadow-2); display: none; min-width: 175px; }
-.ctx-menu .ctx-title { font-size: 8.5px; font-weight: 700; color: var(--text-3); padding: 5px 12px; text-transform: uppercase; letter-spacing: .4px; border-bottom: 1px solid var(--border); margin-bottom: 2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.ctx-menu button { width: 100%; padding: 7px 12px; background: none; border: none; color: var(--text-2); font-size: 11px; font-weight: 600; cursor: pointer; text-align: left; }
-.ctx-menu button:hover { background: var(--accent-soft); color: var(--text-1); }
-.ctx-menu button.danger { color: var(--red); }
-.ctx-menu button.danger:hover { background: var(--red-soft); }
-.ctx-menu button:disabled { opacity: .35; cursor: not-allowed; }
-.ctx-menu .ctx-sep { border-top: 1px solid var(--border); margin: 3px 0; }
-.move-popup { position: fixed; z-index: 9999; background: var(--bg-card); border: 1.5px solid var(--accent); border-radius: var(--radius-md); padding: 14px 16px; box-shadow: var(--shadow-2); display: none; min-width: 220px; }
-.move-popup .mp-label { font-size: 9px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: .4px; margin-bottom: 8px; }
-.move-popup input { width: 100%; background: var(--bg-app); border: 1.5px solid var(--border-strong); border-radius: var(--radius-sm); color: var(--text-2); font-size: 14px; font-weight: 700; padding: 7px 10px; text-align: center; margin-bottom: 8px; outline:none; }
-.move-popup .mp-btns { display: flex; gap: 6px; }
-.move-popup .mp-btns button { flex: 1; padding: 7px; border-radius: var(--radius-sm); font-size: 11px; font-weight: 700; cursor: pointer; }
-.move-popup .mp-btns .go { border: none; background: var(--accent); color: #fff; }
-.move-popup .mp-btns .cancel { border: 1px solid var(--border-strong); background: none; color: var(--text-3); }
-
 .hidden { display: none !important; }
 @media (max-width: 1024px) { .app-main { grid-template-columns: 48px 250px 1fr 210px; } }
 @media (max-width: 768px) {
@@ -295,7 +279,6 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
     <div class="topbar-left">
         <div class="topbar-logo"><div class="mark">🎬</div>Beat<em>Viz</em></div>
         <div class="topbar-divider"></div>
-        <span class="topbar-project-name" id="projectName">Untitled Project</span>
         <span class="topbar-badge trial" id="subBadge">Free Trial</span>
     </div>
     <div class="topbar-right">
@@ -447,35 +430,26 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
                     </div>
                 </div>
 
-                <div class="lyric-mode-tabs">
-                    <button class="active" data-lm="manual" onclick="setLyricMode('manual',this)">✍️ Manual</button>
-                    <button data-lm="tapcatch" onclick="setLyricMode('tapcatch',this)">👆 Tap-to-Catch</button>
-                    <button data-lm="auto" onclick="setLyricMode('auto',this)">🤖 Auto-Caption</button>
+                <div class="lyric-quickbar">
+                    <div class="qb-row">
+                        <span class="qb-time" id="qbTime">0:00</span>
+                        <input type="text" id="qbInput" placeholder="Type a lyric line and hit Enter…" disabled onkeydown="if(event.key==='Enter'){event.preventDefault();quickAddLyric();}">
+                    </div>
+                    <div class="qb-hint">Playhead time updates live — type anytime and press Enter to drop it in exactly here.</div>
                 </div>
 
-                <div class="lyric-mode-pane active" id="lm-manual">
-                    <button id="addLyricBtn" onclick="addLyricAtPlayhead()" disabled style="width:100%;padding:10px;border-radius:var(--radius-sm);border:2px dashed var(--border-strong);background:transparent;color:var(--text-3);font-size:12px;font-weight:600;cursor:pointer">＋ Add Lyric at Playhead</button>
-                    <div style="font-size:9.5px;color:var(--text-3);text-align:center;margin-top:6px">Type each line yourself while the track plays.</div>
+                <div class="tap-toggle-row">
+                    <div class="ttr-info"><b>Tap-to-Catch</b><span>Tap in rhythm, fill in words after</span></div>
+                    <button class="tap-toggle-btn" id="tapCatchBtn" onclick="toggleTapCatch()" disabled>👆 Start</button>
                 </div>
-
-                <div class="lyric-mode-pane" id="lm-tapcatch">
-                    <button id="tapCatchBtn" class="tapcatch-btn" onclick="toggleTapCatch()" disabled>
-                        <span id="tapCatchIcon">👆</span><span id="tapCatchLabel">Start Tap-to-Catch</span>
-                    </button>
-                    <div class="tapcatch-hint">Press <b>Play</b>, then tap this button (or hit <b>L</b>) every time a new lyric line starts. Empty placeholders drop on the timeline instantly — fill in the words afterward without losing the beat.</div>
-                    <div class="tapcatch-count" id="tapCatchCount"></div>
-                </div>
-
-                <div class="lyric-mode-pane" id="lm-auto">
-                    <button id="autoCapBtn" class="autocap-btn" onclick="toggleAutoCaption()" disabled>
-                        <span id="autoCapIcon">🤖</span><span id="autoCapLabel">Start Auto-Caption</span>
-                    </button>
-                    <div class="autocap-note">Plays your track through the speakers while your browser's built-in speech recognizer listens and drafts timed lines automatically. Works best in <b>Chrome</b>, needs mic permission, and works best with clear vocals — always review the results afterward.</div>
+                <div class="autocap-row">
+                    <div class="ttr-info"><b>Auto-Caption</b><span>Chrome speech-to-text (needs mic)</span></div>
+                    <button class="autocap-btn-sm" id="autoCapBtn" onclick="toggleAutoCaption()" disabled>🤖 Start</button>
                 </div>
 
                 <div>
                     <div class="sec-head">Lyrics <span id="lyricCount"></span></div>
-                    <div class="lyric-list" id="lyricsList"><div class="lyric-empty">Upload audio, then add lyrics manually, with Tap-to-Catch, or Auto-Caption above.</div></div>
+                    <div class="lyric-list" id="lyricsList"><div class="lyric-empty">Upload audio, then type in the box above and hit Enter — or tap along, or try Auto-Caption.</div></div>
                 </div>
                 <div>
                     <div class="sec-head">Lyric Style</div>
@@ -519,16 +493,15 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
             </div>
             <div class="canvas-badge" id="canvasBadge">1280×720 · HD</div>
             <div class="layer-hint" id="layerHint">Drag to move · drag corner to resize</div>
-            <div class="tapcatch-live-badge" id="tapCatchLiveBadge"><span class="dotpulse"></span><span id="tapCatchLiveText">Tap-to-Catch active — tap on every lyric line</span></div>
+            <div class="live-badge" id="liveBadge"><span class="dotpulse"></span><span id="liveBadgeText">Listening…</span></div>
         </div>
 
         <div class="timeline-wrap tl-disabled" id="timelineWrap">
             <div class="tl-topbar">
+                <span class="tl-hint">Click empty space on the Lyrics row to add a line · drag clip edges to trim · click a lyric bar to edit</span>
                 <div class="tl-actions">
-                    <button class="tl-btn primary" id="addLyricBtnTL" onclick="addLyricAtPlayhead()" disabled>＋ Add Lyric</button>
                     <button class="tl-btn" id="pasteNextBtn" onclick="pasteNextInSequence()" disabled>📋 Paste Next</button>
                 </div>
-                <span class="tl-hint">drag clip edges to trim · drag body to move · click lyric to edit</span>
                 <div class="tl-zoom"><button onclick="TL.zoomBy(0.7)">−</button><span class="tl-lbl" id="tlZoomLbl">Fit</span><button onclick="TL.zoomBy(1.5)">+</button></div>
             </div>
             <div class="tl-tracks" id="tlTracks">
@@ -539,6 +512,13 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
             </div>
             <div class="tl-tip" id="tlTip"></div>
             <div class="tl-clip-banner" id="tlClipBanner">📋 Lyric copied — click <b>Paste Next</b> to place it right after<button onclick="clearClipboard()">Clear</button></div>
+            <div class="tl-inline-editor" id="tlInlineEditor">
+                <input type="text" id="tlInlineInput" placeholder="Type lyric…">
+                <div class="tie-row">
+                    <button class="tie-save" onclick="confirmInlineEdit()">Save</button>
+                    <button class="tie-del" onclick="deleteInlineEdit()">Delete</button>
+                </div>
+            </div>
         </div>
 
         <div class="status-bar" id="statusBar">
@@ -573,26 +553,6 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
     </aside>
 </div>
 
-<div class="ctx-menu" id="lyricContextMenu">
-    <div class="ctx-title" id="lcmTitle"></div>
-    <button onclick="lcmEdit()">✏️ Edit</button>
-    <button onclick="lcmCopy()">📋 Copy</button>
-    <button onclick="lcmPaste()" id="lcmPasteBtn">📥 Paste after</button>
-    <button onclick="lcmMove()">↔️ Move to time…</button>
-    <div class="ctx-sep"></div>
-    <button class="danger" onclick="lcmDelete()">🗑 Delete</button>
-</div>
-<div class="move-popup" id="moveLyricPopup">
-    <div class="mp-label">Move lyric</div>
-    <input type="text" id="moveTimeInput" placeholder="0:11">
-    <div class="mp-btns"><button class="go" onclick="confirmMoveLyric()">Move</button><button class="cancel" onclick="closeMovePopup()">Cancel</button></div>
-</div>
-<div class="move-popup" id="editLyricPopup">
-    <div class="mp-label">Edit lyric</div>
-    <input type="text" id="editLyricInput" placeholder="Lyric text">
-    <div class="mp-btns"><button class="go" onclick="confirmEditLyric()">Save</button><button class="cancel" onclick="closeEditPopup()">Cancel</button></div>
-</div>
-
 <div class="paywall" id="paywall">
     <div class="pw-box">
         <button class="pw-close" onclick="hidePaywall()">✕</button>
@@ -616,7 +576,6 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
                 <div class="pf"><div class="pf-ck">✓</div>All aspect ratios — YouTube, TikTok, Instagram</div>
                 <div class="pf"><div class="pf-ck">✓</div>Zero watermark on your videos</div>
                 <div class="pf"><div class="pf-ck">✓</div>Full HD / Ultra HD MP4 export</div>
-                <div class="pf"><div class="pf-ck">✓</div>Tap-to-Catch &amp; Auto-Caption lyric tools</div>
             </div>
         </div>
         <div class="pw-acts">
@@ -955,7 +914,7 @@ async function addAudioTrack(file) {
     if (chars.length && audioDuration>0) { const each=audioDuration/chars.length; imgSegments=chars.map((_,i)=>({charIdx:i,start:i*each,dur:each})); }
     if (isFirst) {
         document.getElementById('timelineWrap').classList.remove('tl-disabled');
-        document.getElementById('addLyricBtn').disabled=false; document.getElementById('addLyricBtnTL').disabled=false;
+        document.getElementById('qbInput').disabled=false;
         document.getElementById('tapCatchBtn').disabled=false; document.getElementById('autoCapBtn').disabled=false;
         TL.resize();
     } else TL.draw(pvOffset);
@@ -966,7 +925,7 @@ function removeAudioTrack(i) {
     audioTracks.splice(i,1); audioSegments=audioSegments.filter(s=>s.trackIdx!==i); audioSegments.forEach(s=>{if(s.trackIdx>i)s.trackIdx--;});
     if (audioTracks.length) { audioBuffer=audioTracks[0].buffer; audioDuration=audioBuffer.duration; }
     else { audioBuffer=null; audioDuration=0; document.getElementById('audioName').textContent='Drop your track here'; document.getElementById('timelineWrap').classList.add('tl-disabled');
-        document.getElementById('addLyricBtn').disabled=true; document.getElementById('addLyricBtnTL').disabled=true; document.getElementById('tapCatchBtn').disabled=true; document.getElementById('autoCapBtn').disabled=true; }
+        document.getElementById('qbInput').disabled=true; document.getElementById('tapCatchBtn').disabled=true; document.getElementById('autoCapBtn').disabled=true; }
     renderAudioTrackList(); checkReady(); TL.resize();
 }
 
@@ -981,7 +940,7 @@ async function addVideoLayer(file) {
     videoSegments.push({vidIdx:videoLayers.length-1,start:lastEnd,dur});
     renderVideoLayerList();
     if (!audioDuration && video.duration) { audioDuration=video.duration; document.getElementById('timelineWrap').classList.remove('tl-disabled');
-        document.getElementById('addLyricBtn').disabled=false; document.getElementById('addLyricBtnTL').disabled=false; document.getElementById('tapCatchBtn').disabled=false; document.getElementById('autoCapBtn').disabled=false; TL.resize(); }
+        document.getElementById('qbInput').disabled=false; document.getElementById('tapCatchBtn').disabled=false; document.getElementById('autoCapBtn').disabled=false; TL.resize(); }
     checkReady(); TL.draw(pvOffset);
     toast(`${name} added as its own layer — drag on canvas to reposition`);
 }
@@ -994,73 +953,54 @@ function removeVideoLayer(i) {
     checkReady(); TL.draw(pvOffset);
 }
 
-// ============================ LYRIC INPUT MODES: Manual / Tap-to-Catch / Auto-Caption ============================
-let currentLyricMode = 'manual';
-function setLyricMode(mode, btn) {
-    if (tapCatchActive) toggleTapCatch();
-    if (autoCapActive) toggleAutoCaption();
-    currentLyricMode = mode;
-    document.querySelectorAll('.lyric-mode-tabs button').forEach(b=>b.classList.remove('active'));
-    if (btn) btn.classList.add('active');
-    document.querySelectorAll('.lyric-mode-pane').forEach(p=>p.classList.remove('active'));
-    document.getElementById('lm-'+mode).classList.add('active');
-}
+// ============================ LYRICS — smooth, no popups (Canva/VEED style) ============================
+// Live-updating time badge above the quick-add input
+function updateQbTime() { const el=document.getElementById('qbTime'); if (el) el.textContent = fmt(getPvTime()); }
 
-// ---- MANUAL ----
-function addLyricAtPlayhead() {
-    if (!audioDuration) { toast('Upload audio first'); return; }
-    const text = prompt('Type the lyric text for '+fmt(pvOffset)+':', '');
-    if (text===null) return;
-    if (!text.trim()) { toast('Lyric text cannot be empty'); return; }
-    insertLyric(pvOffset, text.trim());
+function quickAddLyric() {
+    const inp = document.getElementById('qbInput');
+    const text = inp.value.trim(); if (!text) return;
+    insertLyric(getPvTime(), text);
+    inp.value = '';
+    inp.focus(); // stays focused so you can keep typing the next line without re-clicking
 }
 function insertLyric(t, text) {
     const nxt = lyrics.find(l=>l.time>t+0.05);
     const end = Math.min(audioDuration||t+4, nxt?Math.min(nxt.time,t+4):t+4);
     const existingIdx = lyrics.findIndex(l=>Math.abs(l.time-t)<0.3);
     let newIdx;
-    if (existingIdx>=0) { lyrics[existingIdx].text=text; lyrics[existingIdx].endTime=end; newIdx=existingIdx; }
+    if (existingIdx>=0) { lyrics[existingIdx].text=text; lyrics[existingIdx].endTime=end; newIdx=existingIdx; delete lyrics[existingIdx].isPlaceholder; }
     else { lyrics.push({time:t,endTime:end,text,ds:{beatCount:0,jumpAmt:0,spinAng:0,spinDir:1,phase:Math.random()*Math.PI*2}}); lyrics.sort((a,b)=>a.time-b.time); newIdx=lyrics.findIndex(l=>Math.abs(l.time-t)<0.1); }
     selectedLyricIdx=newIdx; lastPasteRefIdx=newIdx;
-    renderLyrics(); TL.draw(pvOffset); toast('Lyric added at '+fmt(t)); updatePasteNextBtn();
+    renderLyrics(); TL.draw(pvOffset); updatePasteNextBtn();
 }
 
-// ---- TAP-TO-CATCH ----
+// ---- TAP-TO-CATCH: lightweight toggle, no separate "mode" screen ----
 let tapCatchActive = false;
 async function toggleTapCatch() {
     if (!audioDuration) { toast('Upload audio first'); return; }
     if (tapCatchActive) { stopTapCatch(); return; }
     tapCatchActive = true;
-    document.getElementById('tapCatchBtn').classList.add('active');
-    document.getElementById('tapCatchIcon').textContent='⏹';
-    document.getElementById('tapCatchLabel').textContent='Stop Tap-to-Catch';
-    document.getElementById('tapCatchLiveBadge').classList.add('show');
+    const btn=document.getElementById('tapCatchBtn'); btn.classList.add('active'); btn.textContent='⏹ Stop';
+    document.getElementById('liveBadge').classList.add('show');
+    document.getElementById('liveBadgeText').textContent='Tap-to-Catch — press L on every line';
     if (!pvPlaying) await playPreview();
-    toast('Tap-to-Catch active — tap the button or press L on every line');
+    toast('Tap-to-Catch active — press L on every new line');
 }
 function stopTapCatch() {
     tapCatchActive = false;
-    document.getElementById('tapCatchBtn').classList.remove('active');
-    document.getElementById('tapCatchIcon').textContent='👆';
-    document.getElementById('tapCatchLabel').textContent='Start Tap-to-Catch';
-    document.getElementById('tapCatchLiveBadge').classList.remove('show');
+    const btn=document.getElementById('tapCatchBtn'); btn.classList.remove('active'); btn.textContent='👆 Start';
+    document.getElementById('liveBadge').classList.remove('show');
     if (pvPlaying) pausePreview();
-    updateTapCatchCount();
 }
 function tapCatchHit() {
     if (!tapCatchActive) { toggleTapCatch(); return; }
     const t = getPvTime();
-    // drop an EMPTY placeholder — text filled in afterward
     const nxt = lyrics.find(l=>l.time>t+0.05);
     const end = Math.min(audioDuration||t+3, nxt?Math.min(nxt.time,t+3):t+3);
     lyrics.push({time:t, endTime:end, text:'', isPlaceholder:true, ds:{beatCount:0,jumpAmt:0,spinAng:0,spinDir:1,phase:Math.random()*Math.PI*2}});
     lyrics.sort((a,b)=>a.time-b.time);
-    renderLyrics(); TL.draw(pvOffset); updateTapCatchCount();
-}
-function updateTapCatchCount() {
-    const n = lyrics.filter(l=>l.isPlaceholder).length;
-    const el = document.getElementById('tapCatchCount');
-    if (el) el.textContent = n ? `${n} placeholder${n>1?'s':''} caught — fill in the text below` : '';
+    renderLyrics(); TL.draw(pvOffset);
 }
 
 // ---- AUTO-CAPTION (Web Speech API) ----
@@ -1069,7 +1009,7 @@ function toggleAutoCaption() {
     if (!audioDuration) { toast('Upload audio first'); return; }
     if (autoCapActive) { stopAutoCaption(); return; }
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) { toast('Speech recognition is not supported in this browser. Try Chrome.'); return; }
+    if (!SR) { toast('Speech recognition needs Chrome.'); return; }
     speechRec = new SR();
     speechRec.continuous = true; speechRec.interimResults = false; speechRec.lang = 'en-US';
     speechRec.onresult = (e) => {
@@ -1083,74 +1023,43 @@ function toggleAutoCaption() {
             lyrics.sort((a,b)=>a.time-b.time); renderLyrics(); TL.draw(pvOffset);
         }
     };
-    speechRec.onerror = (e) => { if (e.error==='not-allowed') { toast('Microphone permission denied — needed for Auto-Caption'); stopAutoCaption(); } };
+    speechRec.onerror = (e) => { if (e.error==='not-allowed') { toast('Microphone permission denied'); stopAutoCaption(); } };
     speechRec.onend = () => { if (autoCapActive) { try { speechRec.start(); } catch(e){} } };
     try { speechRec.start(); } catch(e) { toast('Could not start speech recognition'); return; }
     autoCapActive = true;
-    document.getElementById('autoCapBtn').classList.add('listening');
-    document.getElementById('autoCapIcon').textContent='⏹';
-    document.getElementById('autoCapLabel').textContent='Stop Auto-Caption';
-    document.getElementById('tapCatchLiveBadge').classList.add('show');
-    document.getElementById('tapCatchLiveText').textContent='Auto-Caption listening — play your track now';
+    const btn=document.getElementById('autoCapBtn'); btn.classList.add('listening'); btn.textContent='⏹ Stop';
+    document.getElementById('liveBadge').classList.add('show');
+    document.getElementById('liveBadgeText').textContent='Auto-Caption listening…';
     if (!pvPlaying) playPreview();
     toast('Listening — play your track through your speakers now');
 }
 function stopAutoCaption() {
     autoCapActive = false;
     if (speechRec) { try { speechRec.onend=null; speechRec.stop(); } catch(e){} speechRec=null; }
-    document.getElementById('autoCapBtn').classList.remove('listening');
-    document.getElementById('autoCapIcon').textContent='🤖';
-    document.getElementById('autoCapLabel').textContent='Start Auto-Caption';
-    document.getElementById('tapCatchLiveBadge').classList.remove('show');
-    toast('Auto-Caption stopped — review the lines it caught below');
+    const btn=document.getElementById('autoCapBtn'); btn.classList.remove('listening'); btn.textContent='🤖 Start';
+    document.getElementById('liveBadge').classList.remove('show');
+    toast('Auto-Caption stopped — review the lines below');
 }
 
 function deleteLyric(i) { lyrics.splice(i,1); if (selectedLyricIdx>=lyrics.length) selectedLyricIdx=lyrics.length-1; if (lastPasteRefIdx>=lyrics.length) lastPasteRefIdx=lyrics.length-1; renderLyrics(); TL.draw(pvOffset); }
 function selectLyric(i) { selectedLyricIdx=i; lastPasteRefIdx=i; seekPreview(lyrics[i].time); renderLyrics(); updatePasteNextBtn(); }
-let editTargetIdx=-1;
-function openEditPopupFor(i) {
-    if (i<0||i>=lyrics.length) return;
-    selectedLyricIdx=i; lastPasteRefIdx=i;
-    const popup=document.getElementById('editLyricPopup'); const inp=document.getElementById('editLyricInput');
-    popup.style.display='block'; popup.style.left=(window.innerWidth/2-120)+'px'; popup.style.top=(window.innerHeight/2-70)+'px';
-    inp.value=lyrics[i].text; inp.focus(); inp.select();
-    inp.onkeydown = e => { if (e.key==='Enter') confirmEditLyric(); if (e.key==='Escape') closeEditPopup(); };
-    editTargetIdx=i; renderLyrics();
-}
-function confirmEditLyric() {
-    if (editTargetIdx<0||editTargetIdx>=lyrics.length) { closeEditPopup(); return; }
-    const val=document.getElementById('editLyricInput').value.trim();
-    if (!val) { lyrics.splice(editTargetIdx,1); toast('Lyric removed (empty text)'); }
-    else { lyrics[editTargetIdx].text=val; delete lyrics[editTargetIdx].isPlaceholder; delete lyrics[editTargetIdx].autoGenerated; }
-    closeEditPopup(); renderLyrics(); TL.draw(pvOffset); updateTapCatchCount();
-}
-function closeEditPopup() { editTargetIdx=-1; document.getElementById('editLyricPopup').style.display='none'; }
+function saveLyricInlineText(i, val) { if (!lyrics[i]) return; const v=val.trim(); if (v) { lyrics[i].text=v; delete lyrics[i].isPlaceholder; delete lyrics[i].autoGenerated; } else lyrics.splice(i,1); renderLyrics(); TL.draw(pvOffset); }
 function renderLyrics() {
     document.getElementById('lyricCount').textContent = lyrics.length ? `(${lyrics.length})` : '';
     const el=document.getElementById('lyricsList');
-    if (!lyrics.length) { el.innerHTML=`<div class="lyric-empty">Upload audio, then add lyrics manually, with Tap-to-Catch, or Auto-Caption above.</div>`; return; }
-    el.innerHTML = lyrics.map((l,i)=>{ const isSel=i===selectedLyricIdx; const endT=l.endTime; const isPh=l.isPlaceholder && !l.text;
-        return `<div class="lyric-row ${isSel?'active':''} ${l.isPlaceholder?'placeholder-row':''}" onclick="openEditPopupFor(${i})" oncontextmenu="event.preventDefault();selectedLyricIdx=${i};renderLyrics();showLyricContextMenu(event.clientX,event.clientY,${i})">
-            <div class="lr-top">
-                <span class="lr-time" onclick="event.stopPropagation();seekPreview(${l.time})">${fmt(l.time)}</span>
-                <span class="lr-arrow">→</span>
-                <span class="lr-time end" onclick="event.stopPropagation();seekPreview(${endT})">${fmt(endT)}</span>
-                <span class="lr-text ${isPh?'empty-text':''}" onclick="event.stopPropagation();openEditPopupFor(${i})">${isPh?'(tap to type this line)':l.text.replace(/</g,'&lt;')}</span>
-                ${l.autoGenerated?'<span class="placeholder-badge" style="color:#67e8f9;background:rgba(34,211,238,.15)">AI</span>':''}
-                <button class="lr-del" onclick="event.stopPropagation();deleteLyric(${i})">✕</button>
-            </div>
-            <div class="lr-actions">
-                <button class="lr-act" onclick="event.stopPropagation();copyLyric(${i})">Copy</button>
-                <button class="lr-act paste" onclick="event.stopPropagation();pasteAfterLyric(${i})" ${!copiedLyric?'disabled':''}>Paste after</button>
-                <button class="lr-act" onclick="event.stopPropagation();moveLyric(${i})">Move</button>
-            </div>
+    if (!lyrics.length) { el.innerHTML=`<div class="lyric-empty">Upload audio, then type in the box above and hit Enter — or tap along, or try Auto-Caption.</div>`; return; }
+    el.innerHTML = lyrics.map((l,i)=>{ const isSel=i===selectedLyricIdx; const isPh=(l.isPlaceholder||l.text==='') ;
+        return `<div class="lyric-row ${isSel?'active':''} ${l.isPlaceholder?'placeholder-row':''}" onclick="selectLyric(${i})">
+            <span class="lr-time">${fmt(l.time)}</span>
+            <input type="text" class="lr-text ${isPh?'empty-text':''}" value="${(l.text||'').replace(/"/g,'&quot;')}" placeholder="(type this line)" onclick="event.stopPropagation()" onchange="saveLyricInlineText(${i},this.value)" onkeydown="if(event.key==='Enter')this.blur()">
+            <button class="lr-del" onclick="event.stopPropagation();deleteLyric(${i})">✕</button>
         </div>`; }).join('');
 }
 
 function copyLyric(i) { if (i<0||i>=lyrics.length) return; copiedLyric={...lyrics[i]}; lastPasteRefIdx=i; document.getElementById('tlClipBanner').classList.add('show'); updatePasteNextBtn(); toast('Copied "'+(lyrics[i].text||'(empty)').slice(0,24)+'"'); }
 function clearClipboard() { copiedLyric=null; document.getElementById('tlClipBanner').classList.remove('show'); updatePasteNextBtn(); renderLyrics(); }
 function updatePasteNextBtn() { const b=document.getElementById('pasteNextBtn'); if (b) b.disabled = !copiedLyric; }
-function pasteNextInSequence() { if (!copiedLyric) { toast('Copy a lyric first'); return; } if (lastPasteRefIdx<0||lastPasteRefIdx>=lyrics.length) { pasteAtPlayhead(); return; } pasteAfterLyric(lastPasteRefIdx); }
+function pasteNextInSequence() { if (!copiedLyric) { toast('Copy a lyric first (right-click it)'); return; } if (lastPasteRefIdx<0||lastPasteRefIdx>=lyrics.length) { pasteAtPlayhead(); return; } pasteAfterLyric(lastPasteRefIdx); }
 function pasteAfterLyric(afterIdx) {
     if (!copiedLyric) { toast('Nothing copied'); return; }
     const refEnd=lyrics[afterIdx].endTime; const dur=copiedLyric.endTime-copiedLyric.time; const newStart=Math.min(audioDuration-dur, refEnd+0.5);
@@ -1165,46 +1074,40 @@ function pasteAtPlayhead() {
     lyrics.sort((a,b)=>a.time-b.time); const newIdx=lyrics.findIndex(l=>Math.abs(l.time-newStart)<0.1); selectedLyricIdx=newIdx; lastPasteRefIdx=newIdx;
     renderLyrics(); TL.draw(pvOffset); toast('Pasted at '+fmt(newStart));
 }
-let moveTargetIdx=-1;
-function moveLyric(i) {
-    if (i<0||i>=lyrics.length) return; moveTargetIdx=i;
-    const popup=document.getElementById('moveLyricPopup'); const inp=document.getElementById('moveTimeInput');
-    popup.style.display='block'; popup.style.left=(window.innerWidth/2-120)+'px'; popup.style.top=(window.innerHeight/2-70)+'px';
-    inp.value=fmt(lyrics[i].time); inp.focus(); inp.select();
-    inp.onkeydown = e => { if (e.key==='Enter') confirmMoveLyric(); if (e.key==='Escape') closeMovePopup(); };
-}
-function confirmMoveLyric() {
-    if (moveTargetIdx<0||moveTargetIdx>=lyrics.length) { closeMovePopup(); return; }
-    const raw=(document.getElementById('moveTimeInput').value||'').trim(); let newTime=0;
-    if (raw.includes(':')) { const parts=raw.split(':'); newTime=(parseInt(parts[0])||0)*60+(parseFloat(parts[1])||0); } else newTime=parseFloat(raw)||0;
-    newTime=Math.max(0,Math.min(audioDuration-0.3,newTime));
-    const l=lyrics[moveTargetIdx]; const dur=Math.max(0.5,l.endTime-l.time);
-    l.time=+newTime.toFixed(2); l.endTime=+(newTime+dur).toFixed(2);
-    lyrics.sort((a,b)=>a.time-b.time); selectedLyricIdx=lyrics.findIndex(ly=>Math.abs(ly.time-newTime)<0.1);
-    closeMovePopup(); renderLyrics(); TL.draw(pvOffset); seekPreview(newTime); toast('Moved to '+fmt(newTime));
-}
-function closeMovePopup() { moveTargetIdx=-1; document.getElementById('moveLyricPopup').style.display='none'; }
 
-let lcmIdx=-1;
-function showLyricContextMenu(x,y,idx) {
-    lcmIdx=idx; const menu=document.getElementById('lyricContextMenu'); const l=lyrics[idx];
-    const title=document.getElementById('lcmTitle'); if (title) title.textContent=(l.text||'(empty)').slice(0,22)+((l.text||'').length>22?'…':'');
-    document.getElementById('lcmPasteBtn').disabled = !copiedLyric;
-    menu.style.display='block'; menu.style.left=Math.min(x,window.innerWidth-190)+'px'; menu.style.top=Math.min(y,window.innerHeight-180)+'px';
+// ---- INLINE TIMELINE EDITOR (floats right on the bar you clicked — no modal) ----
+let inlineEditIdx = -1;
+function openInlineEditor(idx, screenX, screenY) {
+    inlineEditIdx = idx;
+    selectedLyricIdx = idx; renderLyrics();
+    const box = document.getElementById('tlInlineEditor');
+    const wrapRect = document.getElementById('timelineWrap').getBoundingClientRect();
+    let left = screenX - wrapRect.left, top = screenY - wrapRect.top - 90;
+    if (top < 0) top = screenY - wrapRect.top + 20;
+    box.style.left = Math.max(4, Math.min(left, wrapRect.width-240)) + 'px';
+    box.style.top = Math.max(4, top) + 'px';
+    box.classList.add('show');
+    const inp = document.getElementById('tlInlineInput');
+    inp.value = lyrics[idx] ? lyrics[idx].text : '';
+    inp.focus(); inp.select();
+    inp.onkeydown = e => { if (e.key==='Enter') confirmInlineEdit(); if (e.key==='Escape') closeInlineEditor(); };
 }
-function hideLyricContextMenu() { lcmIdx=-1; document.getElementById('lyricContextMenu').style.display='none'; }
-function lcmEdit() { if (lcmIdx<0) { hideLyricContextMenu(); return; } hideLyricContextMenu(); openEditPopupFor(lcmIdx); }
-function lcmCopy() { if (lcmIdx<0) { hideLyricContextMenu(); return; } hideLyricContextMenu(); copyLyric(lcmIdx); }
-function lcmPaste() { if (lcmIdx<0) { hideLyricContextMenu(); return; } hideLyricContextMenu(); pasteAfterLyric(lcmIdx); }
-function lcmMove() { if (lcmIdx<0) { hideLyricContextMenu(); return; } hideLyricContextMenu(); moveLyric(lcmIdx); }
-function lcmDelete() { if (lcmIdx<0) { hideLyricContextMenu(); return; } hideLyricContextMenu(); deleteLyric(lcmIdx); }
-document.addEventListener('click', e => { const menu=document.getElementById('lyricContextMenu'); if (menu && !menu.contains(e.target)) hideLyricContextMenu(); });
+function closeInlineEditor() { inlineEditIdx=-1; document.getElementById('tlInlineEditor').classList.remove('show'); }
+function confirmInlineEdit() {
+    if (inlineEditIdx<0 || !lyrics[inlineEditIdx]) { closeInlineEditor(); return; }
+    const v = document.getElementById('tlInlineInput').value.trim();
+    if (v) { lyrics[inlineEditIdx].text=v; delete lyrics[inlineEditIdx].isPlaceholder; delete lyrics[inlineEditIdx].autoGenerated; }
+    else { lyrics.splice(inlineEditIdx,1); }
+    closeInlineEditor(); renderLyrics(); TL.draw(pvOffset);
+}
+function deleteInlineEdit() { if (inlineEditIdx>=0 && lyrics[inlineEditIdx]) { lyrics.splice(inlineEditIdx,1); } closeInlineEditor(); renderLyrics(); TL.draw(pvOffset); }
+document.addEventListener('mousedown', e => { const box=document.getElementById('tlInlineEditor'); if (box.classList.contains('show') && !box.contains(e.target) && e.target.id!=='tlCanvas') closeInlineEditor(); });
+
 document.addEventListener('keydown', e => {
-    if (e.key==='Escape') { hideLyricContextMenu(); closeMovePopup(); closeEditPopup(); }
+    if (e.key==='Escape') closeInlineEditor();
     if (e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.isContentEditable) return;
     if (e.code==='Space') { e.preventDefault(); togglePreview(); }
-    if (e.key.toLowerCase()==='l') { if (tapCatchActive) tapCatchHit(); else addLyricAtPlayhead(); }
-    if ((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='c' && selectedLyricIdx>=0) copyLyric(selectedLyricIdx);
+    if (e.key.toLowerCase()==='l') { if (tapCatchActive) tapCatchHit(); }
     if ((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='v' && copiedLyric) pasteNextInSequence();
     if (e.key==='Delete' && selectedLayer) { if (selectedLayer.type==='img') removeChar(selectedLayer.refIdx); else removeVideoLayer(selectedLayer.refIdx); }
 });
@@ -1229,6 +1132,7 @@ function updatePvUI() {
     const b=document.getElementById('pvBtn'); if (b) { b.textContent=pvPlaying?'⏸':'▶'; b.classList.toggle('playing',pvPlaying); }
     const tm=document.getElementById('pvTime'); if (tm) tm.textContent=`${fmt(t)} / ${fmt(audioDuration)}`;
     const fl=document.getElementById('pvFill'); if (fl) fl.style.width=pct+'%';
+    updateQbTime();
 }
 function tickPreview() { if (!pvPlaying) return; updatePvUI(); drawIdle(); TL.draw(getPvTime()); requestAnimationFrame(tickPreview); }
 document.getElementById('pvBar').addEventListener('click', function(e) { if (!audioDuration) return; const r=this.getBoundingClientRect(); seekPreview((e.clientX-r.left)/r.width*audioDuration); });
@@ -1252,8 +1156,8 @@ const TL = {
             this.wraps[lane].appendChild(c); this.canvases[lane]=c; this.ctxs[lane]=c.getContext('2d');
             c.addEventListener('mousedown', e=>this.onDown(e,lane));
             c.addEventListener('mousemove', e=>this.onMove(e,lane));
-            c.addEventListener('mouseup', ()=>this.onUp());
-            c.addEventListener('mouseleave', ()=>this.onUp());
+            c.addEventListener('mouseup', (e)=>this.onUp(e,lane));
+            c.addEventListener('mouseleave', ()=>this.onLeaveCanvas());
             c.addEventListener('contextmenu', e=>this.onContext(e,lane));
         });
         this.resize();
@@ -1283,16 +1187,26 @@ const TL = {
 
     onDown(e,lane){
         if (!audioDuration) { toast('Upload audio first to use the timeline'); return; }
+        closeInlineEditor();
         const {mx,my}=this.getXY(e,lane);
         if (lane==='lyrics') {
             const h=this.hitLyric(mx);
-            if (h) { selectedLyricIdx=h.idx; this.dragging={lane,...h,startX:mx,origStart:lyrics[h.idx].time,origEnd:lyrics[h.idx].endTime,moved:false}; renderLyrics(); return; }
+            if (h) { selectedLyricIdx=h.idx; this.dragging={lane,...h,startX:mx,startScreenX:e.clientX,startScreenY:e.clientY,origStart:lyrics[h.idx].time,origEnd:lyrics[h.idx].endTime,moved:false}; renderLyrics(); return; }
             const t=this.x2t(mx);
             if (copiedLyric) { const dur=copiedLyric.endTime-copiedLyric.time; const newT=Math.max(0,Math.min(audioDuration-dur,t));
                 lyrics.push({text:copiedLyric.text,time:+newT.toFixed(2),endTime:+(newT+dur).toFixed(2),ds:{beatCount:0,jumpAmt:0,spinAng:0,spinDir:1,phase:Math.random()*Math.PI*2}});
                 lyrics.sort((a,b)=>a.time-b.time); const ni=lyrics.findIndex(l=>Math.abs(l.time-newT)<0.1); selectedLyricIdx=ni; lastPasteRefIdx=ni;
                 renderLyrics(); this.draw(pvOffset); toast('Pasted at '+fmt(newT)); return; }
-            seekPreview(t); return;
+            // Click empty lyric space -> instantly create a new bar AND open its inline editor (Canva/VEED style)
+            const dur = 3;
+            const nxt = lyrics.find(l=>l.time>t+0.05);
+            const end = Math.min(audioDuration, nxt?Math.min(nxt.time,t+dur):t+dur);
+            lyrics.push({time:t, endTime:end, text:'', ds:{beatCount:0,jumpAmt:0,spinAng:0,spinDir:1,phase:Math.random()*Math.PI*2}});
+            lyrics.sort((a,b)=>a.time-b.time);
+            const newIdx = lyrics.findIndex(l=>Math.abs(l.time-t)<0.1);
+            selectedLyricIdx=newIdx; renderLyrics(); this.draw(pvOffset);
+            openInlineEditor(newIdx, e.clientX, e.clientY);
+            return;
         }
         if (lane==='video') { const h=this.hitSeg(mx,videoSegments); if (h) { this.dragging={lane,...h,startX:mx,orig:{...videoSegments[h.idx]}}; selectLayer({type:'video',refIdx:videoSegments[h.idx].vidIdx}); return; } seekPreview(this.x2t(mx)); return; }
         if (lane==='images') { const h=this.hitSeg(mx,imgSegments); if (h) { this.dragging={lane,...h,startX:mx,orig:{...imgSegments[h.idx]}}; selectLayer({type:'img',refIdx:imgSegments[h.idx].charIdx}); return; } seekPreview(this.x2t(mx)); return; }
@@ -1305,7 +1219,7 @@ const TL = {
         if (!this.dragging) {
             let h=null;
             if (lane==='lyrics') h=this.hitLyric(mx); else if (lane==='video') h=this.hitSeg(mx,videoSegments); else if (lane==='images') h=this.hitSeg(mx,imgSegments); else if (lane==='audio') h=this.hitSeg(mx,audioSegments);
-            this.canvases[lane].style.cursor = h ? (h.handle==='left'||h.handle==='right'?'ew-resize':'grab') : 'crosshair';
+            this.canvases[lane].style.cursor = h ? (h.handle==='left'||h.handle==='right'?'ew-resize':'pointer') : 'crosshair';
             if (tip) tip.style.display='none';
             return;
         }
@@ -1329,15 +1243,21 @@ const TL = {
             this.draw(pvOffset);
         }
     },
-    onUp(){
+    onUp(e,lane){
         const tip=document.getElementById('tlTip'); if (tip) tip.style.display='none';
-        if (this.dragging && this.dragging.lane==='lyrics') { if (!this.dragging.moved && this.dragging.handle==='body') openEditPopupFor(this.dragging.idx); else { lyrics.sort((a,b)=>a.time-b.time); renderLyrics(); } }
+        if (this.dragging && this.dragging.lane==='lyrics') {
+            if (!this.dragging.moved && this.dragging.handle==='body') {
+                // plain click (no drag) on an existing bar -> open inline editor right there
+                openInlineEditor(this.dragging.idx, this.dragging.startScreenX, this.dragging.startScreenY);
+            } else { lyrics.sort((a,b)=>a.time-b.time); renderLyrics(); }
+        }
         this.dragging=null;
     },
+    onLeaveCanvas(){ /* keep dragging state; mouseup elsewhere on doc still resolves via global listener if needed */ },
     onContext(e,lane){
         e.preventDefault(); if (!audioDuration) return;
         const {mx}=this.getXY(e,lane);
-        if (lane==='lyrics') { const h=this.hitLyric(mx); if (h) { selectedLyricIdx=h.idx; renderLyrics(); showLyricContextMenu(e.clientX,e.clientY,h.idx); } else if (copiedLyric) { const t=this.x2t(mx); pvOffset=t; seekPreview(t); pasteAtPlayhead(); } }
+        if (lane==='lyrics') { const h=this.hitLyric(mx); if (h) { selectedLyricIdx=h.idx; renderLyrics(); copyLyric(h.idx); } else if (copiedLyric) { const t=this.x2t(mx); pvOffset=t; seekPreview(t); pasteAtPlayhead(); } }
     },
     draw(currentTime){ this.lanes.forEach(lane=>this.drawLane(lane,currentTime)); },
     drawLane(lane, currentTime){
@@ -1348,12 +1268,12 @@ const TL = {
         c.strokeStyle='#1c1c2a'; c.lineWidth=1;
         for (let t=0;t<=audioDuration;t+=step) { const x=this.t2x(t); c.globalAlpha=.4; c.beginPath(); c.moveTo(x,0); c.lineTo(x,CH); c.stroke(); c.globalAlpha=1; }
         if (lane==='lyrics') {
-            if (!lyrics.length) { c.fillStyle='#6c6f82'; c.font='10px Inter'; c.textAlign='center'; c.fillText('Add lyrics using the panel on the left', CW/2, CH/2+3); }
+            if (!lyrics.length) { c.fillStyle='#6c6f82'; c.font='10px Inter'; c.textAlign='center'; c.fillText('Click here to add a lyric line', CW/2, CH/2+3); }
             const cols=['#6d5ef5','#06b6d4','#f472b6','#2ecc8f','#f2b544'];
-            lyrics.forEach((l,i)=>{ const x1=this.t2x(l.time),x2=this.t2x(l.endTime),bw=Math.max(10,x2-x1); const col= l.isPlaceholder && !l.text ? '#f2b544' : cols[i%cols.length]; const isSel=i===selectedLyricIdx;
+            lyrics.forEach((l,i)=>{ const x1=this.t2x(l.time),x2=this.t2x(l.endTime),bw=Math.max(10,x2-x1); const col= !l.text ? '#f2b544' : cols[i%cols.length]; const isSel=i===selectedLyricIdx;
                 c.fillStyle=col+(isSel?'cc':'88'); c.beginPath(); c.roundRect(x1,3,bw,CH-6,4); c.fill();
                 c.strokeStyle=col; c.lineWidth=isSel?2:1; c.beginPath(); c.roundRect(x1,3,bw,CH-6,4); c.stroke();
-                if (bw>26) { c.fillStyle='#fff'; c.font='500 9px Inter'; c.textAlign='left'; const label=l.text||'…'; const mc=Math.floor((bw-14)/6); c.fillText(label.length>mc?label.slice(0,mc-1)+'…':label, x1+7, CH/2+3); } });
+                if (bw>26) { c.fillStyle='#fff'; c.font='500 9px Inter'; c.textAlign='left'; const label=l.text||'tap to type'; const mc=Math.floor((bw-14)/6); c.fillText(label.length>mc?label.slice(0,mc-1)+'…':label, x1+7, CH/2+3); } });
         } else if (lane==='video') {
             videoSegments.forEach((s,i)=>{ const v=videoLayers[s.vidIdx]; if (!v) return; const x1=this.t2x(s.start),x2=this.t2x(s.start+s.dur),bw=Math.max(10,x2-x1);
                 const isSel = selectedLayer&&selectedLayer.type==='video'&&selectedLayer.refIdx===s.vidIdx;
@@ -1412,7 +1332,7 @@ async function handleGenerate() {
     if (!chars.length && !hasVideoForGen) { toast('Add an image or video first.'); return; }
     if (pvPlaying) pausePreview();
     if (tapCatchActive) stopTapCatch(); if (autoCapActive) stopAutoCaption();
-    selectLayer(null);
+    selectLayer(null); closeInlineEditor();
 
     if (audioCtx) { try { await audioCtx.close(); } catch(e){} }
     audioCtx=new (window.AudioContext||window.webkitAudioContext)();
@@ -1497,10 +1417,13 @@ async function toggleLoopPreview() {
     if (loopPreviewActive) { stopLoopPreview(); return; }
     if (!audioBuffer||!chars.length) { toast('Upload audio + a character first'); return; }
     if (isPlaying) { toast('Stop recording first'); return; }
-    loopPreviewActive=true; document.getElementById('loopPreviewBtn').classList.add('stop'); document.getElementById('loopPreviewLabel').textContent='■ Stop Preview';
+    loopPreviewActive=true;
     await playPreview(); if (loopPreviewDur>0) loopPreviewTimer=setTimeout(stopLoopPreview, loopPreviewDur*1000);
 }
-function stopLoopPreview() { loopPreviewActive=false; if (loopPreviewTimer) clearTimeout(loopPreviewTimer); loopPreviewTimer=null; if (pvPlaying) pausePreview(); document.getElementById('loopPreviewBtn').classList.remove('stop'); document.getElementById('loopPreviewLabel').textContent='▶ Preview 5s'; }
+function stopLoopPreview() { loopPreviewActive=false; if (loopPreviewTimer) clearTimeout(loopPreviewTimer); loopPreviewTimer=null; if (pvPlaying) pausePreview(); }
+
+// live-updating quick-add time badge even when not playing (drag playhead etc.)
+setInterval(()=>{ if (audioDuration>0) updateQbTime(); }, 200);
 
 drawIdle();
 

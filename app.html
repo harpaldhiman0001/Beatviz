@@ -143,15 +143,17 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
 .canvas-empty .ce-title { font-size: 15px; font-weight: 700; color: var(--text-2); }
 .canvas-badge { position: absolute; top: 14px; right: 14px; background: rgba(0,0,0,.75); border-radius: var(--radius-sm); padding: 4px 11px; font-size: 10px; font-weight: 700; color: rgba(255,255,255,.55); }
 
-.timeline-wrap { background: var(--bg-panel); border-top: 1px solid var(--border); height: 132px; position: relative; flex-shrink: 0; user-select: none; }
+.timeline-wrap { background: var(--bg-panel); border-top: 1px solid var(--border); height: 140px; position: relative; flex-shrink: 0; user-select: none; }
+.timeline-wrap.tl-disabled { opacity: .5; }
 .timeline-wrap .tl-topright { position: absolute; top: 5px; right: 12px; display: flex; align-items: center; gap: 9px; z-index: 6; }
 .timeline-wrap .tl-hint { font-size: 9px; color: var(--text-4); }
 .timeline-wrap .tl-zoom { display: flex; align-items: center; gap: 4px; }
 .timeline-wrap .tl-zoom button { width: 22px; height: 22px; border-radius: var(--radius-xs); border: 1px solid var(--border-strong); background: var(--bg-card); color: var(--text-3); cursor: pointer; font-size:13px; }
 .timeline-wrap .tl-zoom .tl-lbl { font-size: 9px; color: var(--text-3); min-width: 30px; text-align: center; }
-.timeline-wrap .tl-scroll { overflow-x: auto; height: 132px; }
-.timeline-wrap #tlCanvas { display: block; height: 132px; }
+.timeline-wrap .tl-scroll { overflow-x: auto; height: 140px; position: relative; }
+.timeline-wrap #tlCanvas { display: block; height: 140px; cursor: crosshair; }
 .timeline-wrap .tl-tip { position: absolute; top: -28px; background: var(--bg-card); border: 1px solid var(--border-strong); border-radius: var(--radius-sm); padding: 3px 10px; font-size: 10.5px; font-weight: 700; color: var(--text-2); pointer-events: none; white-space: nowrap; transform: translateX(-50%); z-index: 10; display: none; }
+.timeline-wrap .tl-empty-banner { position:absolute; left:0; right:0; top:28px; text-align:center; font-size:11px; color:var(--text-3); pointer-events:none; }
 
 .status-bar { padding: 6px 16px; border-top: 1px solid var(--border); background: var(--bg-panel); display: flex; align-items: center; gap: 12px; min-height: 34px; }
 .status-bar .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-4); }
@@ -224,13 +226,13 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
 .paywall .pw-btn { width: 100%; padding: 15px; border-radius: var(--radius-md); border: none; background: linear-gradient(135deg,var(--accent),#8b7bff); color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; }
 .paywall .pw-note2 { font-size: 10.5px; color: var(--text-3); text-align: center; }
 
-/* CONTEXT MENUS */
 .ctx-menu { position: fixed; z-index: 9999; background: var(--bg-card); border: 1px solid var(--border-strong); border-radius: var(--radius-md); padding: 4px 0; box-shadow: var(--shadow-2); display: none; min-width: 175px; }
 .ctx-menu .ctx-title { font-size: 8.5px; font-weight: 700; color: var(--text-3); padding: 5px 12px; text-transform: uppercase; letter-spacing: .4px; border-bottom: 1px solid var(--border); margin-bottom: 2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .ctx-menu button { width: 100%; padding: 7px 12px; background: none; border: none; color: var(--text-2); font-size: 11px; font-weight: 600; cursor: pointer; text-align: left; }
 .ctx-menu button:hover { background: var(--accent-soft); color: var(--text-1); }
 .ctx-menu button.danger { color: var(--red); }
 .ctx-menu button.danger:hover { background: var(--red-soft); }
+.ctx-menu button:disabled { opacity: .35; cursor: not-allowed; }
 .ctx-menu .ctx-sep { border-top: 1px solid var(--border); margin: 3px 0; }
 .move-popup { position: fixed; z-index: 9999; background: var(--bg-card); border: 1.5px solid var(--accent); border-radius: var(--radius-md); padding: 14px 16px; box-shadow: var(--shadow-2); display: none; min-width: 220px; }
 .move-popup .mp-label { font-size: 9px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: .4px; margin-bottom: 8px; }
@@ -403,7 +405,7 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
                 </div>
                 <div>
                     <div class="sec-head">Lyrics <span id="lyricCount"></span></div>
-                    <div class="lyric-list" id="lyricsList"><div class="lyric-empty">Play audio then tap <strong>Add lyric</strong>, or click the timeline strip below the video.</div></div>
+                    <div class="lyric-list" id="lyricsList"><div class="lyric-empty">Upload audio first — then click the timeline strip below the video to add lyrics.</div></div>
                 </div>
                 <div>
                     <div class="sec-head">Lyric Style</div>
@@ -456,7 +458,7 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
             <div class="canvas-badge" id="canvasBadge">1280×720 · HD</div>
         </div>
 
-        <div class="timeline-wrap" id="timelineWrap">
+        <div class="timeline-wrap tl-disabled" id="timelineWrap">
             <div class="tl-topright">
                 <span class="tl-hint">Drag edges to resize · drag middle to move · right-click for menu</span>
                 <div class="tl-zoom"><button onclick="TL.zoomBy(0.7)">−</button><span class="tl-lbl" id="tlZoomLbl">Fit</span><button onclick="TL.zoomBy(1.5)">+</button></div>
@@ -497,7 +499,6 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
     </aside>
 </div>
 
-<!-- LYRIC CONTEXT MENU -->
 <div class="ctx-menu" id="lyricContextMenu">
     <div class="ctx-title" id="lcmTitle"></div>
     <button onclick="lcmEdit()">✏️ Edit</button>
@@ -761,16 +762,24 @@ async function addAudioTrack(file) {
     if (!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)();
     const name=file.name.replace(/\.[^.]+$/,''); const ab=await file.arrayBuffer();
     let buf; try { buf=await audioCtx.decodeAudioData(ab); } catch(err) { toast('Could not decode '+name); return; }
-    if (audioTracks.length===0) { audioBuffer=buf; audioDuration=buf.duration; document.getElementById('audioName').textContent=name; TL.draw(0); }
+    const isFirst = audioTracks.length===0;
+    if (isFirst) { audioBuffer=buf; audioDuration=buf.duration; document.getElementById('audioName').textContent=name; }
     audioTracks.push({buffer:buf,name,volume:1,muted:false});
     renderAudioTrackList(); checkReady();
     const lastEnd = audioSegments.length ? audioSegments[audioSegments.length-1].start+audioSegments[audioSegments.length-1].dur : 0;
     audioSegments.push({trackIdx:audioTracks.length-1,start:lastEnd,dur:buf.duration});
     if (chars.length && audioDuration>0) { const each=audioDuration/chars.length; imgSegments=chars.map((_,i)=>({charIdx:i,start:i*each,dur:each})); }
-    TL.draw(pvOffset); toast(`${name} — ${fmt(buf.duration)}`);
+    if (isFirst) {
+        // CRITICAL: enable timeline interactivity now that we have a real duration
+        document.getElementById('timelineWrap').classList.remove('tl-disabled');
+        TL.resize();  // force full re-measure + redraw, not just draw()
+    } else {
+        TL.draw(pvOffset);
+    }
+    toast(`${name} — ${fmt(buf.duration)} — click the timeline below to add lyrics`);
 }
 function renderAudioTrackList() { document.getElementById('audioTrackList').innerHTML = audioTracks.map((t,i)=>`<div class="track-item"><span style="flex:1;overflow:hidden;text-overflow:ellipsis">${t.name}</span><span>${fmt(t.buffer.duration)}</span><button onclick="removeAudioTrack(${i})">✕</button></div>`).join(''); }
-function removeAudioTrack(i) { audioTracks.splice(i,1); if (audioTracks.length) { audioBuffer=audioTracks[0].buffer; audioDuration=audioBuffer.duration; } else { audioBuffer=null; audioDuration=0; document.getElementById('audioName').textContent='Drop your track here'; } renderAudioTrackList(); checkReady(); }
+function removeAudioTrack(i) { audioTracks.splice(i,1); if (audioTracks.length) { audioBuffer=audioTracks[0].buffer; audioDuration=audioBuffer.duration; } else { audioBuffer=null; audioDuration=0; document.getElementById('audioName').textContent='Drop your track here'; document.getElementById('timelineWrap').classList.add('tl-disabled'); } renderAudioTrackList(); checkReady(); TL.resize(); }
 
 async function loadVideos(e) { const files=Array.from(e.target.files||[]); for (const f of files) await addVideoLayer(f); e.target.value=''; }
 async function addVideoLayer(file) {
@@ -781,7 +790,9 @@ async function addVideoLayer(file) {
     videoLayers.push({el:video,name,url,mode:'full',opacity:1,aspect,audioEnabled:false});
     const lastEnd = videoSegments.length ? videoSegments[videoSegments.length-1].start+videoSegments[videoSegments.length-1].dur : 0;
     videoSegments.push({vidIdx:videoLayers.length-1,start:lastEnd,dur});
-    renderVideoLayerList(); if (!audioDuration && video.duration) audioDuration=video.duration; checkReady(); TL.draw(pvOffset);
+    renderVideoLayerList();
+    if (!audioDuration && video.duration) { audioDuration=video.duration; document.getElementById('timelineWrap').classList.remove('tl-disabled'); TL.resize(); }
+    checkReady(); TL.draw(pvOffset);
     toast(`${name} added`);
 }
 function renderVideoLayerList() { document.getElementById('videoLayerList').innerHTML = videoLayers.map((v,i)=>`<div class="track-item"><span style="flex:1;overflow:hidden;text-overflow:ellipsis">🎬 ${v.name}</span><button onclick="removeVideoLayer(${i})">✕</button></div>`).join(''); }
@@ -799,18 +810,23 @@ function drawVideoLayers(elapsed) {
 }
 
 // ============================ LYRICS: add / edit / delete ============================
-function stampLyric() {
-    if (!audioBuffer && !videoLayers.length) { toast('Load audio first'); return; }
-    const t=getPvTime(); if (pvPlaying) pausePreview();
+function stampLyricAt(t) {
+    if (pvPlaying) pausePreview();
+    pvOffset = Math.max(0, Math.min(audioDuration, t));
+    updatePvUI();
     document.getElementById('lyricInputWrap').style.display='flex';
-    document.getElementById('litTime').textContent='at '+fmt(t);
+    document.getElementById('litTime').textContent='at '+fmt(pvOffset);
     document.getElementById('stampBtn').classList.add('on');
     document.getElementById('lyricTextIn').value=''; document.getElementById('lyricTextIn').focus();
-    document.getElementById('stampLabel').textContent='Add lyric at '+fmt(t);
+    document.getElementById('stampLabel').textContent='Add lyric at '+fmt(pvOffset);
+}
+function stampLyric() {
+    if (!audioBuffer && !videoLayers.length) { toast('Load audio first'); return; }
+    stampLyricAt(getPvTime());
 }
 function saveLyric() {
-    const text=document.getElementById('lyricTextIn').value.trim(); if (!text) return;
-    const t=getPvTime();
+    const text=document.getElementById('lyricTextIn').value.trim(); if (!text) { toast('Type some lyric text first'); return; }
+    const t=pvOffset;
     const nxt=lyrics.find(l=>l.time>t+0.05);
     const end=Math.min(audioDuration||t+4, nxt?Math.min(nxt.time,t+4):t+4);
     const idx=lyrics.findIndex(l=>Math.abs(l.time-t)<0.3);
@@ -827,7 +843,7 @@ function saveLyricText(i, el) { const text=el.textContent.trim(); if (text) lyri
 function renderLyrics() {
     document.getElementById('lyricCount').textContent = lyrics.length ? `(${lyrics.length})` : '';
     const el=document.getElementById('lyricsList');
-    if (!lyrics.length) { el.innerHTML=`<div class="lyric-empty">Play audio then tap <strong>Add lyric</strong>, or click the timeline strip below the video.</div>`; return; }
+    if (!lyrics.length) { el.innerHTML=`<div class="lyric-empty">${audioDuration>0?'Click the timeline strip below the video to add lyrics.':'Upload audio first — then click the timeline strip below the video to add lyrics.'}</div>`; return; }
     el.innerHTML = lyrics.map((l,i)=>{ const isSel=i===selectedLyricIdx; const endT=l.endTime;
         return `<div class="lyric-row ${isSel?'active':''}" onclick="selectLyric(${i})" oncontextmenu="event.preventDefault();selectedLyricIdx=${i};renderLyrics();showLyricContextMenu(event.clientX,event.clientY,${i})">
             <div class="lr-top">
@@ -845,29 +861,20 @@ function renderLyrics() {
         </div>`; }).join('');
 }
 
-// COPY / PASTE / MOVE LYRICS (real clipboard system)
-function copyLyric(i) {
-    if (i<0||i>=lyrics.length) return;
-    copiedLyric = { ...lyrics[i] };
-    toast('Copied lyric — click empty timeline or "Paste after" to paste');
-}
+function copyLyric(i) { if (i<0||i>=lyrics.length) return; copiedLyric={...lyrics[i]}; toast('Copied — click empty timeline or "Paste after" to paste'); }
 function pasteAfterLyric(afterIdx) {
     if (!copiedLyric) { toast('Nothing copied — Copy a lyric first'); return; }
-    const refEnd = lyrics[afterIdx].endTime;
-    const dur = copiedLyric.endTime - copiedLyric.time;
-    const newStart = Math.min(audioDuration-dur, refEnd+0.5);
-    lyrics.splice(afterIdx+1, 0, { text: copiedLyric.text, time:+newStart.toFixed(2), endTime:+(newStart+dur).toFixed(2), ds:{beatCount:0,jumpAmt:0,spinAng:0,spinDir:1,phase:Math.random()*Math.PI*2} });
-    lyrics.sort((a,b)=>a.time-b.time);
-    selectedLyricIdx = lyrics.findIndex(l=>Math.abs(l.time-newStart)<0.1);
-    copiedLyric = null; renderLyrics(); TL.draw(pvOffset); toast('Pasted at '+fmt(newStart));
+    const refEnd=lyrics[afterIdx].endTime; const dur=copiedLyric.endTime-copiedLyric.time;
+    const newStart=Math.min(audioDuration-dur, refEnd+0.5);
+    lyrics.splice(afterIdx+1,0,{text:copiedLyric.text,time:+newStart.toFixed(2),endTime:+(newStart+dur).toFixed(2),ds:{beatCount:0,jumpAmt:0,spinAng:0,spinDir:1,phase:Math.random()*Math.PI*2}});
+    lyrics.sort((a,b)=>a.time-b.time); selectedLyricIdx=lyrics.findIndex(l=>Math.abs(l.time-newStart)<0.1);
+    copiedLyric=null; renderLyrics(); TL.draw(pvOffset); toast('Pasted at '+fmt(newStart));
 }
 function pasteAtPlayhead() {
     if (!copiedLyric) { toast('Nothing copied'); return; }
-    const t = pvOffset||0; const dur = copiedLyric.endTime-copiedLyric.time;
-    const newStart = Math.max(0, Math.min(audioDuration-dur, t));
-    lyrics.push({ text: copiedLyric.text, time:+newStart.toFixed(2), endTime:+(newStart+dur).toFixed(2), ds:{beatCount:0,jumpAmt:0,spinAng:0,spinDir:1,phase:Math.random()*Math.PI*2} });
-    lyrics.sort((a,b)=>a.time-b.time);
-    selectedLyricIdx = lyrics.findIndex(l=>Math.abs(l.time-newStart)<0.1);
+    const t=pvOffset||0; const dur=copiedLyric.endTime-copiedLyric.time; const newStart=Math.max(0,Math.min(audioDuration-dur,t));
+    lyrics.push({text:copiedLyric.text,time:+newStart.toFixed(2),endTime:+(newStart+dur).toFixed(2),ds:{beatCount:0,jumpAmt:0,spinAng:0,spinDir:1,phase:Math.random()*Math.PI*2}});
+    lyrics.sort((a,b)=>a.time-b.time); selectedLyricIdx=lyrics.findIndex(l=>Math.abs(l.time-newStart)<0.1);
     copiedLyric=null; renderLyrics(); TL.draw(pvOffset); toast('Pasted at '+fmt(newStart));
 }
 let moveTargetIdx=-1;
@@ -882,21 +889,19 @@ function confirmMoveLyric() {
     if (moveTargetIdx<0||moveTargetIdx>=lyrics.length) { closeMovePopup(); return; }
     const raw=(document.getElementById('moveTimeInput').value||'').trim(); let newTime=0;
     if (raw.includes(':')) { const parts=raw.split(':'); newTime=(parseInt(parts[0])||0)*60+(parseFloat(parts[1])||0); } else newTime=parseFloat(raw)||0;
-    newTime = Math.max(0, Math.min(audioDuration-0.3, newTime));
+    newTime=Math.max(0,Math.min(audioDuration-0.3,newTime));
     const l=lyrics[moveTargetIdx]; const dur=Math.max(0.5,l.endTime-l.time);
     l.time=+newTime.toFixed(2); l.endTime=+(newTime+dur).toFixed(2);
-    lyrics.sort((a,b)=>a.time-b.time);
-    selectedLyricIdx=lyrics.findIndex(ly=>Math.abs(ly.time-newTime)<0.1);
+    lyrics.sort((a,b)=>a.time-b.time); selectedLyricIdx=lyrics.findIndex(ly=>Math.abs(ly.time-newTime)<0.1);
     closeMovePopup(); renderLyrics(); TL.draw(pvOffset); seekPreview(newTime); toast('Moved to '+fmt(newTime));
 }
 function closeMovePopup() { moveTargetIdx=-1; document.getElementById('moveLyricPopup').style.display='none'; }
 
-// LYRIC CONTEXT MENU
 let lcmIdx=-1;
 function showLyricContextMenu(x,y,idx) {
     lcmIdx=idx; const menu=document.getElementById('lyricContextMenu'); const l=lyrics[idx];
-    const title=document.getElementById('lcmTitle'); if (title) title.textContent = l.text.slice(0,22)+(l.text.length>22?'…':'');
-    document.getElementById('lcmPasteBtn').style.opacity = copiedLyric ? '1' : '.4';
+    const title=document.getElementById('lcmTitle'); if (title) title.textContent=l.text.slice(0,22)+(l.text.length>22?'…':'');
+    document.getElementById('lcmPasteBtn').disabled = !copiedLyric;
     menu.style.display='block'; menu.style.left=Math.min(x,window.innerWidth-190)+'px'; menu.style.top=Math.min(y,window.innerHeight-180)+'px';
 }
 function hideLyricContextMenu() { lcmIdx=-1; document.getElementById('lyricContextMenu').style.display='none'; }
@@ -950,52 +955,76 @@ function toggleFX(fx,btn) { if (activeFX.has(fx)) activeFX.delete(fx); else acti
 const TEMPLATES={edm:{style:'neon',dance:'jump',lyricStyle:'neon',color:'#f472b6'},chill:{style:'forest',dance:'sway',lyricStyle:'subtitle',color:'#06b6d4'},bollywood:{style:'stage',dance:'groove',lyricStyle:'karaoke',color:'#fbbf24'}};
 function applyTemplate(key) { const t=TEMPLATES[key]; if(!t)return; pickStyle(t.style,null); pickDance(t.dance,null); pickLS(t.lyricStyle,null); document.getElementById('lyricColor').value=t.color; toast(`${key} template applied`); }
 
-// ============================ TIMELINE — real drag/resize/context-menu ============================
+// ============================ TIMELINE — HiDPI-safe drag/resize/context-menu ============================
 const TL = {
-    c:null, x:null, wrap:null, W:0, H:132, zoom:1, minZoom:1, maxZoom:20, dragging:null, ghostX:-1, ghostT:0,
-    init(){ this.c=document.getElementById('tlCanvas'); this.x=this.c.getContext('2d'); this.wrap=document.getElementById('tlScroll'); this.resize();
+    c:null, x:null, wrap:null, W:0, H:140, zoom:1, minZoom:1, maxZoom:20, dragging:null, dpr:1,
+    init(){
+        this.c=document.getElementById('tlCanvas'); this.x=this.c.getContext('2d'); this.wrap=document.getElementById('tlScroll');
+        this.resize();
         this.c.addEventListener('mousedown', e=>this.onDown(e));
         this.c.addEventListener('mousemove', e=>this.onMove(e));
         this.c.addEventListener('mouseup', ()=>this.onUp());
         this.c.addEventListener('mouseleave', ()=>{this.onUp(); this.onLeave();});
-        this.c.addEventListener('contextmenu', e=>{ e.preventDefault(); const r=this.c.getBoundingClientRect(); const mx=e.clientX-r.left, my=e.clientY-r.top;
-            const h=this.hit(mx,my); if (h) { selectedLyricIdx=h.idx; renderLyrics(); showLyricContextMenu(e.clientX,e.clientY,h.idx); }
-            else if (copiedLyric && audioDuration>0) { const t=Math.max(0,Math.min(audioDuration,this.x2t(mx))); pvOffset=t; seekPreview(t); pasteAtPlayhead(); } });
+        this.c.addEventListener('contextmenu', e=>{
+            e.preventDefault(); if (!audioDuration) return;
+            const {mx,my}=this.getXY(e);
+            const h=this.hit(mx,my);
+            if (h) { selectedLyricIdx=h.idx; renderLyrics(); showLyricContextMenu(e.clientX,e.clientY,h.idx); }
+            else if (copiedLyric) { const t=this.x2t(mx); pvOffset=t; seekPreview(t); pasteAtPlayhead(); }
+        });
         this.wrap.addEventListener('wheel', e => { if (!audioDuration) return; if (e.ctrlKey||e.metaKey) { e.preventDefault(); this.zoomBy(e.deltaY>0?0.85:1.18); } }, {passive:false});
-        window.addEventListener('resize', ()=>this.resize()); },
-    resize(){ const vw=this.wrap?this.wrap.clientWidth:this.c.offsetWidth; this.viewportW=vw||1; this.W=Math.max(this.viewportW,Math.round(this.viewportW*this.zoom)); this.c.width=this.W; this.c.height=this.H; this.c.style.width=this.W+'px';
+        window.addEventListener('resize', ()=>this.resize());
+    },
+    // Convert a mouse event to canvas-local logical coordinates, robust to any CSS scaling
+    getXY(e){ const r=this.c.getBoundingClientRect(); const scaleX=this.c.width/r.width, scaleY=this.c.height/r.height;
+        return { mx:(e.clientX-r.left)*scaleX, my:(e.clientY-r.top)*scaleY }; },
+    resize(){
+        const vw = this.wrap ? this.wrap.clientWidth : (this.c.offsetWidth||600);
+        this.viewportW = Math.max(vw,1);
+        this.W = Math.max(this.viewportW, Math.round(this.viewportW*this.zoom));
+        // set BOTH internal resolution and CSS size explicitly and equal (1:1, no HiDPI mismatch)
+        this.c.width = this.W; this.c.height = this.H;
+        this.c.style.width = this.W+'px'; this.c.style.height = this.H+'px';
         const lbl=document.getElementById('tlZoomLbl'); if (lbl) lbl.textContent = this.zoom<=1?'Fit':Math.round(this.zoom*100)+'%';
-        this.draw(pvOffset); },
+        this.draw(pvOffset);
+    },
     zoomBy(f){ this.zoom=Math.max(this.minZoom,Math.min(this.maxZoom,this.zoom*f)); this.resize(); },
     t2x(t){ return audioDuration ? (t/audioDuration)*this.W : 0; },
     x2t(x){ return audioDuration ? Math.max(0,Math.min(audioDuration, x/this.W*audioDuration)) : 0; },
     hit(mx,my){
         if (!lyrics.length) return null;
+        const y0=28, y1=84; // bar vertical band, matches draw()
+        if (my<y0 || my>y1) return null;
         for (let i=lyrics.length-1;i>=0;i--) { const l=lyrics[i]; const x1=this.t2x(l.time), x2=this.t2x(l.endTime);
-            if (my<30||my>82) continue;
-            if (mx>=x1 && mx<=x1+8) return {idx:i, handle:'left'};
-            if (mx>=x2-8 && mx<=x2) return {idx:i, handle:'right'};
+            if (mx>=x1 && mx<=x1+10) return {idx:i, handle:'left'};
+            if (mx>=x2-10 && mx<=x2) return {idx:i, handle:'right'};
             if (mx>x1 && mx<x2) return {idx:i, handle:'body'}; }
         return null;
     },
     onDown(e){
-        const r=this.c.getBoundingClientRect(); const mx=e.clientX-r.left, my=e.clientY-r.top;
-        if (!audioDuration) return;
+        if (!audioDuration) { toast('Upload audio first to use the timeline'); return; }
+        const {mx,my}=this.getXY(e);
         if (my<26) { seekPreview(this.x2t(mx)); this.dragging={handle:'playhead'}; this.c.style.cursor='col-resize'; return; }
         const h=this.hit(mx,my);
-        if (h) { selectedLyricIdx=h.idx;
-            if (h.handle==='left'||h.handle==='right') { this.dragging={...h,startX:mx,origStart:lyrics[h.idx].time,origEnd:lyrics[h.idx].endTime}; this.c.style.cursor='ew-resize'; }
-            else { this.dragging={...h,startX:mx,origStart:lyrics[h.idx].time,origEnd:lyrics[h.idx].endTime}; this.c.style.cursor='grabbing'; }
-            renderLyrics(); return; }
-        // empty space click -> add or paste
+        if (h) {
+            selectedLyricIdx=h.idx;
+            this.dragging={...h, startX:mx, origStart:lyrics[h.idx].time, origEnd:lyrics[h.idx].endTime};
+            this.c.style.cursor = (h.handle==='left'||h.handle==='right') ? 'ew-resize' : 'grabbing';
+            renderLyrics(); return;
+        }
         const t=this.x2t(mx);
-        if (copiedLyric) { const dur=copiedLyric.endTime-copiedLyric.time; const newT=Math.max(0,Math.min(audioDuration-dur,t));
+        if (copiedLyric) {
+            const dur=copiedLyric.endTime-copiedLyric.time; const newT=Math.max(0,Math.min(audioDuration-dur,t));
             lyrics.push({text:copiedLyric.text,time:+newT.toFixed(2),endTime:+(newT+dur).toFixed(2),ds:{beatCount:0,jumpAmt:0,spinAng:0,spinDir:1,phase:Math.random()*Math.PI*2}});
-            lyrics.sort((a,b)=>a.time-b.time); copiedLyric=null; renderLyrics(); this.draw(pvOffset); toast('Pasted at '+fmt(newT)); return; }
-        pvOffset=t; seekPreview(t); selectedLyricIdx=-1; renderLyrics(); stampLyric();
+            lyrics.sort((a,b)=>a.time-b.time); copiedLyric=null; renderLyrics(); this.draw(pvOffset); toast('Pasted at '+fmt(newT)); return;
+        }
+        selectedLyricIdx=-1; renderLyrics();
+        stampLyricAt(t);
+        this.draw(t);
     },
     onMove(e){
-        const r=this.c.getBoundingClientRect(); const mx=e.clientX-r.left, my=e.clientY-r.top;
+        if (!audioDuration) return;
+        const {mx,my}=this.getXY(e);
         const tip=document.getElementById('tlTip');
         if (this.dragging?.handle==='playhead') { const t=this.x2t(mx); seekPreview(t); if(tip){tip.style.display='block';tip.style.left=Math.min(this.W-50,Math.max(30,mx))+'px';tip.textContent=fmt(t);} this.c.style.cursor='col-resize'; return; }
         if (this.dragging && this.dragging.handle!=='playhead') {
@@ -1007,29 +1036,29 @@ const TL = {
             if (tip) { tip.style.display='block'; tip.style.left=Math.min(this.W-70,Math.max(40,mx))+'px'; tip.textContent=fmt(l.time)+' – '+fmt(l.endTime); }
             renderLyrics(); this.draw(pvOffset); return;
         }
-        if (!audioDuration) return;
         const h=this.hit(mx,my);
-        this.c.style.cursor = h ? (h.handle==='left'||h.handle==='right' ? 'ew-resize' : 'grab') : 'cell';
+        this.c.style.cursor = h ? (h.handle==='left'||h.handle==='right' ? 'ew-resize' : 'grab') : 'crosshair';
         if (tip) tip.style.display='none';
     },
     onUp(){ const tip=document.getElementById('tlTip'); if (tip) tip.style.display='none';
         if (this.dragging && this.dragging.handle!=='playhead') { lyrics.sort((a,b)=>a.time-b.time); renderLyrics(); }
-        this.dragging=null; this.c.style.cursor='pointer'; },
+        this.dragging=null; this.c.style.cursor='crosshair'; },
     onLeave(){ this.c.style.cursor='default'; },
     draw(currentTime){
         if (!this.c) return; const c=this.x, CW=this.W, CH=this.H;
         c.clearRect(0,0,CW,CH); c.fillStyle='#0d0f16'; c.fillRect(0,0,CW,CH); c.fillStyle='#11141c'; c.fillRect(0,0,CW,26);
-        if (!audioDuration) { c.fillStyle='#454858'; c.font='11px Inter'; c.textAlign='center'; c.fillText('Load audio to enable the timeline', CW/2, CH/2); return; }
+        if (!audioDuration) { c.fillStyle='#454858'; c.font='12px Inter'; c.textAlign='center'; c.fillText('Upload audio to enable the timeline', CW/2, CH/2); return; }
         const ts=Math.ceil(audioDuration); let step=5; if(ts>300)step=60; else if(ts>120)step=30; else if(ts>60)step=15;
         c.strokeStyle='#1c1c2a'; c.fillStyle='#6c6f82'; c.font='9px Inter'; c.textAlign='center'; c.lineWidth=1;
         for (let t=0;t<=audioDuration;t+=step) { const x=this.t2x(t); c.globalAlpha=.5; c.beginPath(); c.moveTo(x,0); c.lineTo(x,CH); c.stroke(); c.globalAlpha=1; c.fillText(fmt(t),x,13); }
+        if (!lyrics.length) { c.fillStyle='#6c6f82'; c.font='11px Inter'; c.textAlign='center'; c.fillText('Click anywhere below the ruler to add a lyric at that time', CW/2, 60); }
         const cols=['#6d5ef5','#06b6d4','#f472b6','#2ecc8f','#f2b544'];
         lyrics.forEach((l,i)=>{
-            const x1=this.t2x(l.time), x2=this.t2x(l.endTime), bw=Math.max(10,x2-x1); const col=cols[i%cols.length]; const isSel=i===selectedLyricIdx; const y=30,bh=52;
+            const x1=this.t2x(l.time), x2=this.t2x(l.endTime), bw=Math.max(12,x2-x1); const col=cols[i%cols.length]; const isSel=i===selectedLyricIdx; const y=28,bh=56;
             c.fillStyle=col+(isSel?'cc':'88'); c.beginPath(); c.roundRect(x1,y,bw,bh,4); c.fill();
             c.strokeStyle=col; c.lineWidth=isSel?2:1; c.beginPath(); c.roundRect(x1,y,bw,bh,4); c.stroke();
-            c.fillStyle=col+'ee'; c.fillRect(x1,y,6,bh); c.fillRect(x2-6,y,6,bh);
-            if (bw>28) { c.fillStyle='#fff'; c.font=(isSel?'600 ':'500 ')+'10px Inter'; c.textAlign='left'; const mc=Math.floor((bw-16)/6.5); c.fillText(l.text.length>mc?l.text.slice(0,mc-1)+'…':l.text, x1+9, y+bh/2+4); }
+            c.fillStyle=col+'ee'; c.fillRect(x1,y,7,bh); c.fillRect(x2-7,y,7,bh);
+            if (bw>30) { c.fillStyle='#fff'; c.font=(isSel?'600 ':'500 ')+'11px Inter'; c.textAlign='left'; const mc=Math.floor((bw-18)/7); c.fillText(l.text.length>mc?l.text.slice(0,mc-1)+'…':l.text, x1+10, y+bh/2+4); }
         });
         const px=this.t2x(currentTime||0);
         if (px>=-2 && px<=CW+2) { c.strokeStyle='#ef4444'; c.lineWidth=2; c.globalAlpha=.92; c.beginPath(); c.moveTo(px,0); c.lineTo(px,CH); c.stroke(); c.globalAlpha=1;

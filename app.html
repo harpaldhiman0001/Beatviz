@@ -2697,16 +2697,20 @@ async function startAudioFrom(offset = 0) {
             else banner.classList.remove('show');
         }
 ['click', 'touchstart', 'keydown'].forEach(evt => {
-    document.addEventListener(evt, () => {
-        // Do not resume sound after explicit Pause or Stop.
-        if (playbackState !== 'playing') return;
+    document.addEventListener(
+        evt,
+        () => {
+            // Do not resume audio after the user has paused or stopped.
+            if (playbackState !== 'playing') return;
 
-        const c = getSharedAudioCtx();
+            const c = getSharedAudioCtx();
 
-        if (c.state === 'suspended') {
-            c.resume().catch(() => {});
-        }
-    }, { capture: true });
+            if (c.state === 'suspended') {
+                c.resume().catch(() => {});
+            }
+        },
+        { capture: true }
+    );
 });
 
         let appMode = 'character';

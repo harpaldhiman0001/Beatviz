@@ -2878,31 +2878,23 @@ async function startAudioFrom(offset = 0) {
 
 function selectLayer(layer, autoFitImage = true) {
     selectedLayer = layer;
-
     const propsWrap = document.getElementById('layerPropsWrap');
     const hint = document.getElementById('layerHint');
     const fitRow = document.getElementById('layerFitRow');
 
     propsWrap.style.display = layer ? 'block' : 'none';
     hint.classList.toggle('show', !!layer);
+    if (fitRow) fitRow.style.display = layer && layer.type === 'img' ? 'flex' : 'none';
 
-    // Show Fit-to-Full only for image layers.
-    if (fitRow) {
-        fitRow.style.display = layer && layer.type === 'img' ? 'flex' : 'none';
-    }
+    if (!layer) { drawIdle(); return; }
 
-    if (!layer) {
-        drawIdle();
-        return;
-    }
-
-    // When an image is clicked, automatically fit it to the full canvas.
-    if (layer.type === 'img' && autoFitImage) {
+    // Only auto-refit on click if the image somehow isn't placed yet
+    // (normal case: it's already full-size from upload, so this is a no-op).
+    if (layer.type === 'img' && autoFitImage && !chars[layer.refIdx]?.userPlaced) {
         fitLayerToFull(false);
     }
 
     const r = layerRect(layer);
-
     if (r) {
         document.getElementById('lpX').value = Math.round(r.x);
         document.getElementById('lpY').value = Math.round(r.y);
@@ -2913,7 +2905,6 @@ function selectLayer(layer, autoFitImage = true) {
 
     const hidden = isLayerHidden(layer);
     const visibleBtn = document.getElementById('lpVisBtn');
-
     if (visibleBtn) {
         visibleBtn.textContent = hidden ? '🙈 Hidden — click to show' : '👁 Visible — click to hide';
         visibleBtn.classList.toggle('is-hidden', hidden);
@@ -2923,7 +2914,7 @@ function selectLayer(layer, autoFitImage = true) {
     renderCG();
     renderVideoLayerList();
     renderTextLayerList();
-    drawIdle();
+    drawIdle(); // ← this is what makes clicking "real-time" — canvas redraws instantly
 }
 
 function toggleLayerVisibility() {
@@ -3397,13 +3388,23 @@ function loadChars(e) {
             img.src = ev.target.result;
             img.onload = () => {
                 const newImageIndex = chars.length;
+
                 chars.push({
                     img,
                     url: ev.target.result,
                     name: f.name,
                     fileSize: f.size,
-                    fingerprint: { name: f.name, size: f.size },
-                    ds: { beatCount: 0, jumpAmt: 0, spinAng: 0, spinDir: 1, phase: Math.random() * Math.PI * 2 },
+                    fingerprint: {
+                        name: f.name,
+                        size: f.size
+                    },
+                    ds: {
+                        beatCount: 0,
+                        jumpAmt: 0,
+                        spinAng: 0,
+                        spinDir: 1,
+                        phase: Math.random() * Math.PI * 2
+                    },
                     userPlaced: false,
                     opacity: 1,
                     hidden: false
@@ -3413,19 +3414,51 @@ function loadChars(e) {
                 checkReady();
                 resequenceImages();
 
-                if (files.length === 1 || newImageIndex === 0) {
-                    selectLayer({ type: 'img', refIdx: newImageIndex }, true);
-                    toast('Image added and fitted to screen.');
-                } else {
-                    drawIdle();
-                    toast('Image added.');
-                }
+                // Every uploaded image gets fit to the full canvas immediately —
+                // no manual "Fit to Full" click needed.
+                fitImageIndexToFull(newImageIndex);
+
+                // Select the most recently added image so it's the one shown/editable.
+                selectLayer({ type: 'img', refIdx: newImageIndex }, false);
+
+                toast('Image added at full size.');
             }; // closes img.onload
-        };     // ← ADD THIS: closes reader.onload
+        }; // closes reader.onload
         reader.readAsDataURL(f);
-    });        // closes forEach callback + forEach(...) call
+    });
     e.target.value = '';
     if (files.length > room) toast('Max 20 images.');
+}
+
+// Fits a specific image (by index) to the canvas without requiring selection first.
+function fitImageIndexToFull(idx) {
+    const imageLayer = chars[idx];
+    if (!imageLayer || !imageLayer.img) return;
+
+    const imageWidth = imageLayer.img.naturalWidth || imageLayer.img.width;
+    const imageHeight = imageLayer.img.naturalHeight || imageLayer.img.height;
+    if (!imageWidth || !imageHeight) return;
+
+    const imageAspect = imageWidth / imageHeight;
+    const canvasAspect = W / H;
+
+    let fittedWidth, fittedHeight;
+    if (imageAspect >= canvasAspect) {
+        fittedWidth = W;
+        fittedHeight = W / imageAspect;
+    } else {
+        fittedHeight = H;
+        fittedWidth = H * imageAspect;
+    }
+
+    imageLayer.px = W / 2;
+    imageLayer.py = H / 2;
+    imageLayer.pw = fittedWidth;
+    imageLayer.ph = fittedHeight;
+    imageLayer.userPlaced = true; // prevents initCharPlace from resetting this later
+    imageLayer.hidden = false;
+
+    drawIdle();
 }
 
         function resequenceImages() {

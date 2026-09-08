@@ -2604,16 +2604,21 @@ function updatePlaybackUI() {
     }
 }
 
-function startAudioFrom(offset = 0) {
-    if (!audioTracks.length) return;
+async function startAudioFrom(offset = 0) {
+    if (!audioTracks.length) return false;
 
     const audioCtx = getSharedAudioCtx();
 
     if (audioCtx.state === 'suspended') {
-        audioCtx.resume().catch(() => {});
+        try {
+            await audioCtx.resume();
+        } catch (err) {
+            toast('Browser blocked audio. Click Play or Resume again.');
+            return false;
+        }
     }
 
-    // The start time for this fresh Play or Resume session.
+    // Set this after AudioContext has resumed.
     playbackStartContextTime = audioCtx.currentTime;
 
     audioTracks.forEach((track, trackIndex) => {
@@ -2623,9 +2628,9 @@ function startAudioFrom(offset = 0) {
         const trackStart = segment ? segment.start : 0;
         const trackDuration = segment ? segment.dur : track.buffer.duration;
 
-        // Track starts later in the timeline.
         if (offset < trackStart) {
             const delay = trackStart - offset;
+
             const source = audioCtx.createBufferSource();
             const gain = audioCtx.createGain();
 
@@ -2635,14 +2640,15 @@ function startAudioFrom(offset = 0) {
             source.connect(gain);
             gain.connect(audioCtx.destination);
 
-            source.onended = () => activeAudioSources.delete(source);
+            source.onended = () => {
+                activeAudioSources.delete(source);
+            };
 
             activeAudioSources.add(source);
             source.start(audioCtx.currentTime + delay, 0, trackDuration);
             return;
         }
 
-        // Track finished before the requested position.
         if (offset >= trackStart + trackDuration) return;
 
         const sourceOffset = offset - trackStart;
@@ -2657,11 +2663,15 @@ function startAudioFrom(offset = 0) {
         source.connect(gain);
         gain.connect(audioCtx.destination);
 
-        source.onended = () => activeAudioSources.delete(source);
+        source.onended = () => {
+            activeAudioSources.delete(source);
+        };
 
         activeAudioSources.add(source);
         source.start(0, sourceOffset, remainingDuration);
     });
+
+    return true;
 }
 
         function getSharedAudioCtx() { if (!sharedAudioCtx || sharedAudioCtx.state === 'closed') sharedAudioCtx = new(window
@@ -2688,10 +2698,11 @@ function startAudioFrom(offset = 0) {
         }
 ['click', 'touchstart', 'keydown'].forEach(evt => {
     document.addEventListener(evt, () => {
-        // Never resume audio when the app is paused or explicitly stopped.
+        // Do not resume sound while explicitly paused or stopped.
         if (playbackState !== 'playing') return;
 
         const c = getSharedAudioCtx();
+
         if (c.state === 'suspended') {
             c.resume().catch(() => {});
         }
@@ -4746,7 +4757,7 @@ function togglePreview() {
                 'inline-block' : 'none'; }
 
         // ---- TOGGLE PAUSE: reliable suspend/resume ----
-function togglePause() {
+async function togglePause() {
     if (playbackState === 'playing') {
         pauseAllAudio();
         return;
@@ -4757,10 +4768,17 @@ function togglePause() {
         isPlaying = true;
         isPaused = false;
 
-        // Resume exactly from saved pausedAt time.
-        startAudioFrom(pausedAt);
-        startRenderLoop(pausedAt);
+        const resumed = await startAudioFrom(pausedAt);
 
+        if (!resumed) {
+            playbackState = 'paused';
+            isPlaying = false;
+            isPaused = true;
+            updatePlaybackUI();
+            return;
+        }
+
+        startRenderLoop(pausedAt);
         updatePlaybackUI();
     }
 }
@@ -4795,7 +4813,7 @@ function togglePause() {
     renderFrameId = requestAnimationFrame(render);
 }
 
-function handleGenerate() {
+async function handleGenerate() {
     if (playbackState === 'playing' || playbackState === 'paused') {
         stopAllAudio(true);
         drawIdle();
@@ -4809,9 +4827,17 @@ function handleGenerate() {
     isPlaying = true;
     isPaused = false;
 
-    startAudioFrom(0);
-    startRenderLoop(0);
+    const started = await startAudioFrom(0);
 
+    if (!started) {
+        playbackState = 'stopped';
+        isPlaying = false;
+        isPaused = false;
+        updatePlaybackUI();
+        return;
+    }
+
+    startRenderLoop(0);
     updatePlaybackUI();
 }
 
@@ -4822,8 +4848,7 @@ function handleGenerate() {
 
         function pauseVideoLayers() { videoLayers.forEach(v => v.el && v.el.pause()); }
 
-        function resumeVideoLayers() { videoLayers.forEach(v => { if (!v.el) return; if (v.el.paused) v.el.play().catch(
-                    () => {}); }); }
+        function resumeVideoLayers() { videoLayers.forEach(v => { if (!v.el) return; if (v.el.paused) v.el.play().catch(() => {}); }); }
 
         function pickRecorderMime() {
             const mp4 = ['video/mp4;codecs=avc1.640028,mp4a.40.2', 'video/mp4'];

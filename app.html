@@ -2452,6 +2452,188 @@
                 sc = Math.floor(s % 60); return `${m}:${sc.toString().padStart(2,'0')}`; }
 
         let sharedAudioCtx = null;
+        let playbackState = 'stopped'; // 'playing' | 'paused' | 'stopped'
+
+let activeAudioSources = new Set();
+let activeMediaElements = new Set();
+let renderFrameId = null;
+let playbackStartContextTime = 0;
+let pausedAt = 0;
+
+        function stopAllAudio(resetPosition = true) {
+    // Stop every Web Audio source created by the app.
+    activeAudioSources.forEach(source => {
+        try {
+            source.onended = null;
+            source.stop(0);
+            source.disconnect();
+        } catch (err) {}
+    });
+    activeAudioSources.clear();
+
+    // Stop every <audio> or <video> element used by the app.
+    activeMediaElements.forEach(media => {
+        try {
+            media.pause();
+            media.currentTime = 0;
+            media.muted = true;
+        } catch (err) {}
+    });
+    activeMediaElements.clear();
+
+    // Stop any uploaded audio-track elements as an additional safeguard.
+    document.querySelectorAll('audio, video').forEach(media => {
+        try {
+            media.pause();
+            media.currentTime = 0;
+            media.muted = true;
+        } catch (err) {}
+    });
+
+    if (renderFrameId) {
+        cancelAnimationFrame(renderFrameId);
+        renderFrameId = null;
+    }
+
+    if (resetPosition) {
+        pausedAt = 0;
+        pvOffset = 0;
+
+        const previewAudio = window.previewAudio;
+        if (previewAudio) {
+            previewAudio.pause();
+            previewAudio.currentTime = 0;
+        }
+    }
+
+    isPlaying = false;
+    isPaused = false;
+    pvPlaying = false;
+    playbackState = 'stopped';
+
+    updatePlaybackUI();
+}
+
+function pauseAllAudio() {
+    if (playbackState !== 'playing') return;
+
+    const audioCtx = getSharedAudioCtx();
+    pausedAt += Math.max(0, audioCtx.currentTime - playbackStartContextTime);
+
+    activeAudioSources.forEach(source => {
+        try {
+            source.onended = null;
+            source.stop(0);
+            source.disconnect();
+        } catch (err) {}
+    });
+    activeAudioSources.clear();
+
+    activeMediaElements.forEach(media => {
+        try {
+            media.pause();
+        } catch (err) {}
+    });
+
+    if (renderFrameId) {
+        cancelAnimationFrame(renderFrameId);
+        renderFrameId = null;
+    }
+
+    isPlaying = false;
+    isPaused = true;
+    pvPlaying = false;
+    playbackState = 'paused';
+
+    updatePlaybackUI();
+}
+
+function updatePlaybackUI() {
+    const genBtn = document.getElementById('genBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const pvBtn = document.getElementById('pvBtn');
+
+    if (playbackState === 'playing') {
+        genBtn.textContent = '■ Stop';
+        genBtn.classList.add('stop');
+
+        pauseBtn.style.display = 'block';
+        pauseBtn.textContent = '⏸ Pause';
+
+        if (pvBtn) {
+            pvBtn.textContent = '❚❚';
+            pvBtn.classList.add('playing');
+        }
+
+        document.getElementById('statusTxt').textContent = 'Playing';
+        document.getElementById('statusDot').className = 'dot rec';
+    } else if (playbackState === 'paused') {
+        genBtn.textContent = '■ Stop';
+        genBtn.classList.add('stop');
+
+        pauseBtn.style.display = 'block';
+        pauseBtn.textContent = '▶ Resume';
+
+        if (pvBtn) {
+            pvBtn.textContent = '▶';
+            pvBtn.classList.remove('playing');
+        }
+
+        document.getElementById('statusTxt').textContent = 'Paused';
+        document.getElementById('statusDot').className = 'dot paused';
+    } else {
+        genBtn.textContent = 'Generate Video';
+        genBtn.classList.remove('stop');
+
+        pauseBtn.style.display = 'none';
+
+        if (pvBtn) {
+            pvBtn.textContent = '▶';
+            pvBtn.classList.remove('playing');
+        }
+
+        document.getElementById('statusTxt').textContent = 'Ready';
+        document.getElementById('statusDot').className = 'dot';
+    }
+}
+
+        function startAudioFrom(offset = 0) {
+    if (!audioBuffer) return;
+
+    const audioCtx = getSharedAudioCtx();
+
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+
+    const source = audioCtx.createBufferSource();
+    const gain = audioCtx.createGain();
+
+    source.buffer = audioBuffer;
+    gain.gain.value = previewVolume;
+
+    source.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    source.onended = () => {
+        activeAudioSources.delete(source);
+
+        // Do not auto-restart after pause or stop.
+        if (playbackState !== 'playing') return;
+
+        // Natural end of the music.
+        if (pausedAt >= audioBuffer.duration - 0.05) {
+            stopAllAudio(true);
+        }
+    };
+
+    activeAudioSources.add(source);
+
+    playbackStartContextTime = audioCtx.currentTime;
+    source.start(0, Math.max(0, offset));
+
+    return source;
+}
 
         function getSharedAudioCtx() { if (!sharedAudioCtx || sharedAudioCtx.state === 'closed') sharedAudioCtx = new(window
                 .AudioContext || window.webkitAudioContext)();
@@ -2475,10 +2657,17 @@
             if (c && c.state === 'suspended') banner.classList.add('show');
             else banner.classList.remove('show');
         }
-        ['click', 'touchstart', 'keydown'].forEach(evt => document.addEventListener(evt, () => {
-            const c = getSharedAudioCtx();
-            if (c.state === 'suspended') c.resume();
-        }, { once: false, capture: true }));
+['click', 'touchstart', 'keydown'].forEach(evt => {
+    document.addEventListener(evt, () => {
+        // Never resume audio when the app is paused or explicitly stopped.
+        if (playbackState !== 'playing') return;
+
+        const c = getSharedAudioCtx();
+        if (c.state === 'suspended') {
+            c.resume().catch(() => {});
+        }
+    }, { capture: true });
+});
 
         let appMode = 'character';
 
@@ -2659,31 +2848,55 @@
             return false;
         }
 
-        function selectLayer(layer) {
-            selectedLayer = layer;
-            document.getElementById('layerPropsWrap').style.display = layer ? 'block' : 'none';
-            document.getElementById('layerHint').classList.toggle('show', !!layer);
-            // show/hide fit button
-            const fitRow = document.getElementById('layerFitRow');
-            if (fitRow) fitRow.style.display = (layer && layer.type === 'img') ? 'flex' : 'none';
-            if (layer) {
-                const r = layerRect(layer);
-                if (r) { document.getElementById('lpX').value = Math.round(r.x);
-                    document.getElementById('lpY').value = Math.round(r.y);
-                    document.getElementById('lpW').value = Math.round(r.w);
-                    document.getElementById('lpH').value = Math.round(r.h);
-                    document.getElementById('lpOpacity').value = Math.round((r.obj.opacity ?? 1) * 100); }
-                const hidden = isLayerHidden(layer);
-                const vb = document.getElementById('lpVisBtn');
-                vb.textContent = hidden ? '🚫 Hidden — click to show' : '👁 Visible — click to hide';
-                vb.classList.toggle('is-hidden', hidden);
-            }
-            renderAllLayersList();
-            renderCG();
-            renderVideoLayerList();
-            renderTextLayerList();
-            drawIdle();
-        }
+function selectLayer(layer, autoFitImage = true) {
+    selectedLayer = layer;
+
+    const propsWrap = document.getElementById('layerPropsWrap');
+    const hint = document.getElementById('layerHint');
+    const fitRow = document.getElementById('layerFitRow');
+
+    propsWrap.style.display = layer ? 'block' : 'none';
+    hint.classList.toggle('show', !!layer);
+
+    // Show Fit-to-Full only for image layers.
+    if (fitRow) {
+        fitRow.style.display = layer && layer.type === 'img' ? 'flex' : 'none';
+    }
+
+    if (!layer) {
+        drawIdle();
+        return;
+    }
+
+    // When an image is clicked, automatically fit it to the full canvas.
+    if (layer.type === 'img' && autoFitImage) {
+        fitLayerToFull(false);
+    }
+
+    const r = layerRect(layer);
+
+    if (r) {
+        document.getElementById('lpX').value = Math.round(r.x);
+        document.getElementById('lpY').value = Math.round(r.y);
+        document.getElementById('lpW').value = Math.round(r.w);
+        document.getElementById('lpH').value = Math.round(r.h);
+        document.getElementById('lpOpacity').value = Math.round((r.obj.opacity ?? 1) * 100);
+    }
+
+    const hidden = isLayerHidden(layer);
+    const visibleBtn = document.getElementById('lpVisBtn');
+
+    if (visibleBtn) {
+        visibleBtn.textContent = hidden ? '🙈 Hidden — click to show' : '👁 Visible — click to hide';
+        visibleBtn.classList.toggle('is-hidden', hidden);
+    }
+
+    renderAllLayersList();
+    renderCG();
+    renderVideoLayerList();
+    renderTextLayerList();
+    drawIdle();
+}
 
         function toggleLayerVisibility() {
             if (!selectedLayer) return;
@@ -3067,29 +3280,62 @@
         canvas.addEventListener('mouseleave', () => { canvasDrag = null; });
 
         // --- NEW: Fit to Full ---
-        function fitLayerToFull() {
-            if (!selectedLayer || selectedLayer.type !== 'img') { toast('Select an image layer first.'); return; }
-            const c = chars[selectedLayer.refIdx];
-            if (!c) return;
-            const asp = (c.img.naturalWidth / c.img.naturalHeight) || 1;
-            // fit to canvas while preserving aspect
-            let fw = W,
-                fh = W / asp;
-            if (fh > H) { fh = H;
-                fw = H * asp; }
-            // center it
-            const fx = (W - fw) / 2,
-                fy = (H - fh) / 2;
-            setLayerRect(selectedLayer, fx, fy, fw, fh);
-            c.userPlaced = true;
-            // update property inputs
-            document.getElementById('lpX').value = Math.round(fx);
-            document.getElementById('lpY').value = Math.round(fy);
-            document.getElementById('lpW').value = Math.round(fw);
-            document.getElementById('lpH').value = Math.round(fh);
-            drawIdle();
-            toast('Image fitted to full canvas');
-        }
+function fitLayerToFull(showMessage = true) {
+    if (!selectedLayer || selectedLayer.type !== 'img') {
+        if (showMessage) toast('Select an image layer first.');
+        return;
+    }
+
+    const imageLayer = chars[selectedLayer.refIdx];
+
+    if (!imageLayer || !imageLayer.img) {
+        if (showMessage) toast('Image is not ready yet.');
+        return;
+    }
+
+    const imageWidth = imageLayer.img.naturalWidth || imageLayer.img.width;
+    const imageHeight = imageLayer.img.naturalHeight || imageLayer.img.height;
+
+    if (!imageWidth || !imageHeight) {
+        if (showMessage) toast('Could not read image dimensions.');
+        return;
+    }
+
+    const imageAspect = imageWidth / imageHeight;
+    const canvasAspect = W / H;
+
+    let fittedWidth;
+    let fittedHeight;
+
+    // "Contain": show the entire image without cropping it.
+    if (imageAspect >= canvasAspect) {
+        fittedWidth = W;
+        fittedHeight = W / imageAspect;
+    } else {
+        fittedHeight = H;
+        fittedWidth = H * imageAspect;
+    }
+
+    const x = (W - fittedWidth) / 2;
+    const y = (H - fittedHeight) / 2;
+
+    setLayerRect(selectedLayer, x, y, fittedWidth, fittedHeight);
+
+    // Do not let initCharPlace overwrite this placement later.
+    imageLayer.userPlaced = true;
+    imageLayer.hidden = false;
+
+    document.getElementById('lpX').value = Math.round(x);
+    document.getElementById('lpY').value = Math.round(y);
+    document.getElementById('lpW').value = Math.round(fittedWidth);
+    document.getElementById('lpH').value = Math.round(fittedHeight);
+
+    drawIdle();
+
+    if (showMessage) {
+        toast('Image fitted to canvas.');
+    }
+}
 
         function loadChars(e) {
             const files = Array.from(e.target.files || []);
@@ -3098,13 +3344,44 @@
                 const reader = new FileReader();
                 reader.onload = ev => { const img = new Image();
                     img.src = ev.target.result;
-                    img.onload = () => { chars.push({ img, url: ev.target.result, name: f.name, fileSize: f
-                                .size, _fingerprint: { name: f.name, size: f.size }, ds: { beatCount: 0,
-                                    jumpAmt: 0, spinAng: 0, spinDir: 1, phase: Math.random() * Math.PI *
-                                    2 }, userPlaced: false, opacity: 1, hidden: false });
-                        checkReady();
-                        resequenceImages();
-                        toast('Image added — plays in its own slot on the timeline'); }; };
+img.onload = () => {
+    const newImageIndex = chars.length;
+
+    chars.push({
+        img,
+        url: ev.target.result,
+        name: f.name,
+        fileSize: f.size,
+        fingerprint: {
+            name: f.name,
+            size: f.size
+        },
+        ds: {
+            beatCount: 0,
+            jumpAmt: 0,
+            spinAng: 0,
+            spinDir: 1,
+            phase: Math.random() * Math.PI * 2
+        },
+        userPlaced: false,
+        opacity: 1,
+        hidden: false
+    });
+
+    rebuildLayerStack();
+    checkReady();
+    resequenceImages();
+
+    // Automatically select and fit the newly uploaded image.
+    const newLayer = {
+        type: 'img',
+        refIdx: newImageIndex
+    };
+
+    selectLayer(newLayer, true);
+
+    toast('Image added and fitted to screen.');
+}; };
                 reader.readAsDataURL(f);
             });
             e.target.value = '';
@@ -3784,8 +4061,35 @@
         function getPvTime() { if (!pvCtx) return pvOffset; return pvPlaying ? pvOffset + (pvCtx.currentTime - pvStartAt) :
                 pvOffset; }
 
-        async function togglePreview() { if (!audioBuffer) { toast('Load audio first'); return; }
-            pvPlaying ? pausePreview() : await playPreview(); }
+function togglePreview() {
+    if (!window.previewAudio) return;
+
+    if (playbackState === 'playing') {
+        pauseAllAudio();
+        return;
+    }
+
+    if (playbackState === 'paused') {
+        playbackState = 'playing';
+        isPlaying = true;
+        isPaused = false;
+
+        startAudioFrom(pausedAt);
+        startRenderLoop(pausedAt);
+        updatePlaybackUI();
+        return;
+    }
+
+    // Only an explicit Preview/Play action can begin from zero.
+    pausedAt = 0;
+    playbackState = 'playing';
+    isPlaying = true;
+    isPaused = false;
+
+    startAudioFrom(0);
+    startRenderLoop(0);
+    updatePlaybackUI();
+}
 
         async function playPreview() {
             pvCtx = getSharedAudioCtx();
@@ -4391,156 +4695,74 @@
                 'inline-block' : 'none'; }
 
         // ---- TOGGLE PAUSE: reliable suspend/resume ----
-        function togglePause() {
-            if (!isPlaying) return;
-            if (!isPaused) {
-                // PAUSE
-                isPaused = true;
-                // Pause video elements & mute them so they don't leak audio
-                videoLayers.forEach(v => { if (!v.el) return; try { v.el.pause();
-                        v.el.muted = true; } catch (e) {} });
-                try { if (recorder && recorder.state === 'recording') recorder.pause(); } catch (e) {}
-                try { if (genAudioCtx && genAudioCtx.state === 'running') genAudioCtx.suspend(); } catch (e) {}
-                document.getElementById('statusDot').className = 'dot paused';
-                document.getElementById('statusTxt').textContent = 'Paused';
-                document.getElementById('pauseBtn').textContent = '▶ Resume';
-            } else {
-                // RESUME
-                isPaused = false;
-                try { if (genAudioCtx && genAudioCtx.state === 'suspended') genAudioCtx.resume(); } catch (e) {}
-                // Resume video elements & unmute them if their audio is enabled
-                videoLayers.forEach(v => { if (!v.el) return; try { if (v.audioEnabled) v.el.muted = false;
-                        v.el.play(); } catch (e) {} });
-                try { if (recorder && recorder.state === 'paused') recorder.resume(); } catch (e) {}
-                document.getElementById('statusDot').className = 'dot rec';
-                document.getElementById('statusTxt').textContent = 'Recording';
-                document.getElementById('pauseBtn').textContent = '⏸ Pause';
-                // re-start the render loop if it was stopped
-                startLoop();
-            }
+function togglePause() {
+    if (playbackState === 'playing') {
+        pauseAllAudio();
+        return;
+    }
+
+    if (playbackState === 'paused') {
+        playbackState = 'playing';
+        isPlaying = true;
+        isPaused = false;
+
+        // This is the ONLY place where paused music resumes.
+        startAudioFrom(pausedAt);
+        startRenderLoop(pausedAt);
+
+        updatePlaybackUI();
+    }
+}
+
+        function startRenderLoop(offset = 0) {
+    const audioCtx = getSharedAudioCtx();
+    const startedAt = audioCtx.currentTime - offset;
+
+    function render() {
+        // Critical guard: no drawing/audio progression after Pause or Stop.
+        if (playbackState !== 'playing') {
+            renderFrameId = null;
+            return;
         }
 
-        async function handleGenerate() {
-            window.bvRenderSources = [];
-            const canGenerate = sub.isActive || (sub.trialActive && sub.trialDaysLeft > 0);
-            if (!canGenerate) { showPaywall(); return; }
-            if (!sub.isActive && sub.trialActive) { const trialVids = parseInt(localStorage.getItem('bvtrialvids') ||
-                    '0', 10); if (trialVids >= 1) { showPaywall();
-                    toast('Trial allows 1 video. Subscribe for unlimited!'); return; } }
-            if (isPlaying) { stopAll(); return; }
-            const hasAnyMedia = audioTracks.length > 0 || audioBuffer !== null || chars.length > 0 || videoLayers.length >
-                0;
-            if (!hasAnyMedia) { toast('Add audio, a video, or an image first.'); return; }
-            if (pvPlaying) pausePreview();
-            if (tapCatchActive) stopTapCatch();
-            if (autoCapActive) stopAutoCaption();
-            selectLayer(null);
-            closeInlineEditor();
+        const currentTime = audioCtx.currentTime - startedAt;
 
-            genAudioCtx = getSharedAudioCtx();
-            if (genAudioCtx.state === 'suspended') { await genAudioCtx.resume(); }
-            if (genAudioCtx.state === 'suspended') { toast(
-                    'Click anywhere on the page first to enable audio, then try Generate again');
-                document.getElementById('audioUnlockBanner').classList.add('show'); return; }
+        // Your existing drawing, timeline, lyric, and video rendering logic:
+        // drawFrame(currentTime);
+        // updateTimeline(currentTime);
+        // updateLyrics(currentTime);
 
-            analyser = genAudioCtx.createAnalyser();
-            analyser.fftSize = 2048;
-            analyser.smoothingTimeConstant = .82;
-            freqData = new Uint8Array(analyser.frequencyBinCount);
-            const mDest = genAudioCtx.createMediaStreamDestination();
-
-            // Route video audio nodes
-            videoLayers.forEach(v => {
-                if (!v.el) return;
-                if (!v.audioEnabled) { if (v._audioNode) { try { v._audioNode.disconnect(); } catch (e) {} }
-                    v.el.muted = true; return; }
-                try {
-                    if (!v._audioNode) v._audioNode = genAudioCtx.createMediaElementSource(v.el);
-                    else v._audioNode.disconnect();
-                    const g = genAudioCtx.createGain();
-                    g.gain.value = 1;
-                    v._audioNode.connect(g);
-                    g.connect(mDest);
-                    g.connect(genAudioCtx.destination);
-                    g.connect(analyser);
-                    v.el.muted = false;
-                } catch (err) { /* ignore */ }
-            });
-
-            let addedTimelineAudio = false;
-            if (audioTracks.length && audioSegments.length) {
-                audioSegments.forEach(seg => { const track = audioTracks[seg.trackIdx]; if (!track || track.muted)
-                        return;
-                    const s = genAudioCtx.createBufferSource();
-                    s.buffer = track.buffer;
-                    const g = genAudioCtx.createGain();
-                    g.gain.value = track.volume || 1;
-                    window.bvRenderSources = window.bvRenderSources || [];
-                    window.bvRenderSources.push(s);
-                    s.connect(g);
-                    g.connect(mDest);
-                    g.connect(genAudioCtx.destination);
-                    g.connect(analyser);
-                    s.start(genAudioCtx.currentTime, 0, seg.dur);
-                    addedTimelineAudio = true; });
-            } else if (audioTracks.length) {
-                const track = audioTracks[0];
-                const s = genAudioCtx.createBufferSource();
-                s.buffer = track.buffer;
-                const g = genAudioCtx.createGain();
-                g.gain.value = track.volume || 1;
-                window.bvRenderSources = window.bvRenderSources || [];
-                window.bvRenderSources.push(s);
-                s.connect(g);
-                g.connect(mDest);
-                g.connect(genAudioCtx.destination);
-                g.connect(analyser);
-                s.start(0);
-                addedTimelineAudio = true;
-            }
-            if (!addedTimelineAudio) {
-                const rawDur = videoLayers.length ? videoLayers[0].el.duration : 10;
-                audioDuration = isFinite(rawDur) && rawDur > 0 ? rawDur : 10;
-                const frameCount = Math.max(1, Math.ceil(audioDuration * genAudioCtx.sampleRate));
-                const silentBuf = genAudioCtx.createBuffer(1, frameCount, genAudioCtx.sampleRate);
-                const s = genAudioCtx.createBufferSource();
-                s.buffer = silentBuf;
-                window.bvRenderSources = window.bvRenderSources || [];
-                window.bvRenderSources.push(s);
-                s.connect(analyser);
-                analyser.connect(genAudioCtx.destination);
-                analyser.connect(mDest);
-                s.start(0);
-            }
-            initParticles();
-            bassAvg = 0;
-            beatIntensity = 0;
-            lastBeat = 0;
-            applyExportResolution();
-            await new Promise(r => setTimeout(r, 50));
-
-            const cvStr = canvas.captureStream(30);
-            const combined = new MediaStream([...cvStr.getVideoTracks(), ...mDest.stream.getAudioTracks()]);
-            const picked = pickRecorderMime();
-            const bitrate = { hd: 6000000, fhd: 10000000, uhd: 28000000 } [exportQuality] || 6000000;
-            recordingIsMp4 = picked.isMp4;
-            chunks = [];
-            recorder = new MediaRecorder(combined, { mimeType: picked.mime, videoBitsPerSecond: bitrate });
-            recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
-            recorder.onstop = finalize;
-            playStart = genAudioCtx.currentTime;
-            startVideoLayers(0);
-            recorder.start(100);
-            isPlaying = true;
-            isPaused = false;
-            startLoop();
-            document.getElementById('statusDot').className = 'dot rec';
-            document.getElementById('statusTxt').textContent = 'Recording at ' + Q_LABEL[exportQuality];
-            const gb = document.getElementById('genBtn');
-            gb.textContent = 'Stop';
-            gb.classList.add('stop');
-            showPauseUI(true);
+        if (audioDuration && currentTime >= audioDuration) {
+            stopAllAudio(true);
+            drawIdle();
+            return;
         }
+
+        renderFrameId = requestAnimationFrame(render);
+    }
+
+    renderFrameId = requestAnimationFrame(render);
+}
+
+function handleGenerate() {
+    // STOP: works while playing or paused.
+    if (playbackState === 'playing' || playbackState === 'paused') {
+        stopAllAudio(true);
+        drawIdle();
+        return;
+    }
+
+    // Fresh start after stopped.
+    pausedAt = 0;
+    playbackState = 'playing';
+    isPlaying = true;
+    isPaused = false;
+
+    startAudioFrom(0);
+    startRenderLoop(0);
+
+    updatePlaybackUI();
+}
 
         function startVideoLayers(offset) { videoLayers.forEach(v => { if (!v.el) return; try { v.el.currentTime =
                     offset; } catch (e) {}

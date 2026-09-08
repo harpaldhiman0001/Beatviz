@@ -55,14 +55,13 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
 .mode-switcher button { padding: 6px 14px; border-radius: 8px; border: none; background: none; color: var(--text-3); font-size: 11.5px; font-weight: 600; cursor: pointer; }
 .mode-switcher button.active { background: var(--accent); color: #fff; }
 
-.app-main { display: grid; grid-template-columns: 56px 280px 1fr 250px; height: calc(100vh - var(--topbar-h)); overflow: hidden; }
+.app-main { display: grid; grid-template-columns: 56px 290px 1fr 250px; height: calc(100vh - var(--topbar-h)); overflow: hidden; }
 
 .left-toolbar { background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding: 14px 0 8px; gap: 3px; overflow-y: auto; }
 .ltool { width: 42px; height: 42px; border-radius: var(--radius-sm); border: none; background: transparent; color: var(--text-3); cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 8px; font-weight: 600; }
 .ltool svg { width: 18px; height: 18px; }
 .ltool:hover { color: var(--text-1); background: var(--bg-hover); }
 .ltool.active { color: var(--accent); background: var(--accent-soft); }
-.ltool-divider { width: 28px; height: 1px; background: var(--border); margin: 6px 0; }
 
 .sidebar { background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
 .sidebar-tabs { display: flex; border-bottom: 1px solid var(--border); background: var(--bg-app); padding: 6px; gap: 2px; }
@@ -113,7 +112,6 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
 .char-grid .char-item.selected { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
 .char-grid .char-item img { width: 100%; height: 100%; object-fit: cover; }
 .char-grid .char-item .del { position: absolute; top: 3px; right: 3px; width: 20px; height: 20px; border-radius: 50%; background: rgba(0,0,0,.8); border: none; color: #fff; font-size: 10px; cursor: pointer; }
-.char-grid .char-item .zbadge { position:absolute; bottom:3px; left:3px; font-size:8px; font-weight:700; background:rgba(0,0,0,.75); color:#fff; padding:1px 5px; border-radius:4px; }
 
 .track-item { display: flex; align-items: center; gap: 6px; padding: 5px 8px; background: var(--bg-card); border-radius: var(--radius-xs); margin: 2px 10px; font-size: 10px; color: var(--text-2); cursor:pointer; border:1px solid transparent; }
 .track-item.selected { border-color: var(--accent); background: var(--accent-soft); }
@@ -128,14 +126,37 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
 .layer-order-row button { flex:1; padding:7px; border-radius:var(--radius-sm); border:1px solid var(--border-strong); background:var(--bg-card); color:var(--text-2); font-size:10px; font-weight:600; cursor:pointer; }
 .layer-order-row button:hover { border-color:var(--accent); color:#c3baff; }
 
+.lyric-mode-tabs { display:flex; gap:4px; padding: 8px 10px 4px; }
+.lyric-mode-tabs button { flex:1; padding:7px 4px; border-radius: var(--radius-sm); border:1px solid var(--border-strong); background:var(--bg-card); color:var(--text-3); font-size:9.5px; font-weight:700; cursor:pointer; }
+.lyric-mode-tabs button.active { border-color: var(--accent); background: var(--accent-soft); color:#c3baff; }
+.lyric-mode-pane { display:none; padding: 4px 10px 10px; }
+.lyric-mode-pane.active { display:block; }
+
+.tapcatch-btn { width:100%; padding:14px; border-radius: var(--radius-md); border:2px solid var(--gold); background: var(--gold-soft); color:#ffd166; font-size:13px; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition: all .15s var(--ease); }
+.tapcatch-btn:hover:not(:disabled) { background: var(--gold); color:#241a00; transform: translateY(-1px); }
+.tapcatch-btn:disabled { opacity:.35; cursor:not-allowed; }
+.tapcatch-btn.active { background: var(--red); border-color: var(--red); color:#fff; animation: pulseRec 1s infinite; }
+@keyframes pulseRec { 0%,100%{box-shadow:0 0 0 0 rgba(240,82,92,.5)} 50%{box-shadow:0 0 0 8px rgba(240,82,92,0)} }
+.tapcatch-hint { font-size: 9.5px; color: var(--text-3); text-align:center; line-height:1.6; margin-top:6px; }
+.tapcatch-count { font-size:10px; color:var(--gold); text-align:center; margin-top:4px; font-weight:700; }
+
+.autocap-btn { width:100%; padding:11px; border-radius: var(--radius-sm); border:1.5px solid var(--cyan); background: var(--cyan-soft); color:#67e8f9; font-size:11.5px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:7px; }
+.autocap-btn:hover:not(:disabled) { background: var(--cyan); color:#04202a; }
+.autocap-btn:disabled { opacity:.35; cursor:not-allowed; }
+.autocap-btn.listening { background: var(--red); border-color: var(--red); color:#fff; animation: pulseRec 1s infinite; }
+.autocap-note { font-size: 9px; color: var(--text-3); text-align:center; line-height:1.6; margin-top:6px; padding: 0 4px; }
+.autocap-note b { color: var(--text-2); }
+
 .lyric-list { display: flex; flex-direction: column; gap: 4px; padding: 6px 8px; max-height: 220px; overflow-y: auto; }
 .lyric-row { display: flex; flex-direction: column; padding: 8px 12px; background: var(--bg-card); border-radius: var(--radius-sm); border: 1px solid var(--border); cursor: pointer; gap: 6px; }
 .lyric-row.active { border-color: var(--accent); background: var(--accent-soft); }
+.lyric-row.placeholder-row { border-left: 3px solid var(--gold); }
 .lyric-row .lr-top { display: flex; align-items: center; gap: 8px; width: 100%; }
 .lyric-row .lr-time { font-size: 10px; font-weight: 700; color: var(--accent); background: var(--accent-soft); padding: 3px 8px; border-radius: 5px; cursor: pointer; flex-shrink:0; }
 .lyric-row .lr-time.end { color: #c3baff; background: rgba(139,123,255,.1); }
 .lyric-row .lr-arrow { color: var(--text-4); font-size: 9px; }
 .lyric-row .lr-text { flex: 1; font-size: 13px; color: var(--text-2); outline: none; padding: 3px 5px; border-radius: 4px; min-width:0; }
+.lyric-row .lr-text.empty-text { color: var(--gold); font-style:italic; }
 .lyric-row .lr-del { width: 22px; height: 22px; border-radius: 5px; border: 1px solid var(--border); background: none; color: var(--text-3); cursor: pointer; flex-shrink:0; }
 .lyric-row .lr-del:hover { border-color: var(--red); color: var(--red); background: var(--red-soft); }
 .lyric-row .lr-actions { display: flex; gap: 5px; flex-wrap: wrap; padding-top: 5px; border-top: 1px solid var(--border); }
@@ -155,8 +176,10 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
 .canvas-badge { position: absolute; top: 14px; right: 14px; background: rgba(0,0,0,.75); border-radius: var(--radius-sm); padding: 4px 11px; font-size: 10px; font-weight: 700; color: rgba(255,255,255,.55); }
 .layer-hint { position:absolute; top:14px; left:14px; background:rgba(0,0,0,.75); border-radius:var(--radius-sm); padding:4px 11px; font-size:9.5px; color:rgba(255,255,255,.6); display:none; }
 .layer-hint.show { display:block; }
+.tapcatch-live-badge { position:absolute; top:14px; left:50%; transform:translateX(-50%); background:rgba(240,82,92,.92); border-radius:100px; padding:6px 16px; font-size:11px; font-weight:800; color:#fff; display:none; align-items:center; gap:7px; }
+.tapcatch-live-badge.show { display:flex; }
+.tapcatch-live-badge .dotpulse { width:8px; height:8px; border-radius:50%; background:#fff; animation: pulseRec 1s infinite; }
 
-/* MULTI-TRACK TIMELINE */
 .timeline-wrap { background: var(--bg-panel); border-top: 1px solid var(--border); height: 236px; position: relative; flex-shrink: 0; user-select: none; display:flex; flex-direction:column; }
 .timeline-wrap.tl-disabled .tl-tracks { opacity: .45; pointer-events:none; }
 .tl-topbar { display:flex; align-items:center; justify-content:space-between; padding: 6px 12px; border-bottom: 1px solid var(--border); flex-shrink:0; }
@@ -258,7 +281,7 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
 .move-popup .mp-btns .cancel { border: 1px solid var(--border-strong); background: none; color: var(--text-3); }
 
 .hidden { display: none !important; }
-@media (max-width: 1024px) { .app-main { grid-template-columns: 48px 240px 1fr 210px; } }
+@media (max-width: 1024px) { .app-main { grid-template-columns: 48px 250px 1fr 210px; } }
 @media (max-width: 768px) {
     .app-main { grid-template-columns: 1fr !important; }
     .left-toolbar, .right-panel { display: none !important; }
@@ -360,7 +383,7 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
                 <div>
                     <div class="sec-head">All Layers <span class="sec-badge">click to select</span></div>
                     <div id="allLayersList" style="padding:6px 8px;display:flex;flex-direction:column;gap:4px"></div>
-                    <div style="font-size:10px;color:var(--text-3);padding:0 12px 10px;line-height:1.6">Click a layer here or on the canvas to select it. Drag its corner handles to resize, drag its body to reposition. Use the order buttons to move it above or below other layers.</div>
+                    <div style="font-size:10px;color:var(--text-3);padding:0 12px 10px;line-height:1.6">Click a layer here or on the canvas to select it. Drag corner handles to resize, drag body to move. Use order buttons to stack layers above/below each other.</div>
                 </div>
                 <div id="layerPropsWrap" style="display:none">
                     <div class="sec-head">Selected Layer</div>
@@ -421,12 +444,38 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
                             <div class="mp-bar" id="pvBar"><div class="mp-fill" id="pvFill"></div></div>
                             <span class="mp-time" id="pvTime">0:00 / 0:00</span>
                         </div>
-                        <div style="font-size:9px;color:var(--text-3);text-align:center">Space play/pause · use "Add Lyric" on the timeline below</div>
                     </div>
                 </div>
+
+                <div class="lyric-mode-tabs">
+                    <button class="active" data-lm="manual" onclick="setLyricMode('manual',this)">✍️ Manual</button>
+                    <button data-lm="tapcatch" onclick="setLyricMode('tapcatch',this)">👆 Tap-to-Catch</button>
+                    <button data-lm="auto" onclick="setLyricMode('auto',this)">🤖 Auto-Caption</button>
+                </div>
+
+                <div class="lyric-mode-pane active" id="lm-manual">
+                    <button id="addLyricBtn" onclick="addLyricAtPlayhead()" disabled style="width:100%;padding:10px;border-radius:var(--radius-sm);border:2px dashed var(--border-strong);background:transparent;color:var(--text-3);font-size:12px;font-weight:600;cursor:pointer">＋ Add Lyric at Playhead</button>
+                    <div style="font-size:9.5px;color:var(--text-3);text-align:center;margin-top:6px">Type each line yourself while the track plays.</div>
+                </div>
+
+                <div class="lyric-mode-pane" id="lm-tapcatch">
+                    <button id="tapCatchBtn" class="tapcatch-btn" onclick="toggleTapCatch()" disabled>
+                        <span id="tapCatchIcon">👆</span><span id="tapCatchLabel">Start Tap-to-Catch</span>
+                    </button>
+                    <div class="tapcatch-hint">Press <b>Play</b>, then tap this button (or hit <b>L</b>) every time a new lyric line starts. Empty placeholders drop on the timeline instantly — fill in the words afterward without losing the beat.</div>
+                    <div class="tapcatch-count" id="tapCatchCount"></div>
+                </div>
+
+                <div class="lyric-mode-pane" id="lm-auto">
+                    <button id="autoCapBtn" class="autocap-btn" onclick="toggleAutoCaption()" disabled>
+                        <span id="autoCapIcon">🤖</span><span id="autoCapLabel">Start Auto-Caption</span>
+                    </button>
+                    <div class="autocap-note">Plays your track through the speakers while your browser's built-in speech recognizer listens and drafts timed lines automatically. Works best in <b>Chrome</b>, needs mic permission, and works best with clear vocals — always review the results afterward.</div>
+                </div>
+
                 <div>
                     <div class="sec-head">Lyrics <span id="lyricCount"></span></div>
-                    <div class="lyric-list" id="lyricsList"><div class="lyric-empty">Upload audio, then use the <strong>Add Lyric</strong> button on the timeline below the video.</div></div>
+                    <div class="lyric-list" id="lyricsList"><div class="lyric-empty">Upload audio, then add lyrics manually, with Tap-to-Catch, or Auto-Caption above.</div></div>
                 </div>
                 <div>
                     <div class="sec-head">Lyric Style</div>
@@ -470,12 +519,13 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
             </div>
             <div class="canvas-badge" id="canvasBadge">1280×720 · HD</div>
             <div class="layer-hint" id="layerHint">Drag to move · drag corner to resize</div>
+            <div class="tapcatch-live-badge" id="tapCatchLiveBadge"><span class="dotpulse"></span><span id="tapCatchLiveText">Tap-to-Catch active — tap on every lyric line</span></div>
         </div>
 
         <div class="timeline-wrap tl-disabled" id="timelineWrap">
             <div class="tl-topbar">
                 <div class="tl-actions">
-                    <button class="tl-btn primary" id="addLyricBtn" onclick="addLyricAtPlayhead()" disabled>＋ Add Lyric</button>
+                    <button class="tl-btn primary" id="addLyricBtnTL" onclick="addLyricAtPlayhead()" disabled>＋ Add Lyric</button>
                     <button class="tl-btn" id="pasteNextBtn" onclick="pasteNextInSequence()" disabled>📋 Paste Next</button>
                 </div>
                 <span class="tl-hint">drag clip edges to trim · drag body to move · click lyric to edit</span>
@@ -566,6 +616,7 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
                 <div class="pf"><div class="pf-ck">✓</div>All aspect ratios — YouTube, TikTok, Instagram</div>
                 <div class="pf"><div class="pf-ck">✓</div>Zero watermark on your videos</div>
                 <div class="pf"><div class="pf-ck">✓</div>Full HD / Ultra HD MP4 export</div>
+                <div class="pf"><div class="pf-ck">✓</div>Tap-to-Catch &amp; Auto-Caption lyric tools</div>
             </div>
         </div>
         <div class="pw-acts">
@@ -674,30 +725,22 @@ let copiedLyric=null;
 let lastPasteRefIdx=-1;
 let activeFX=new Set();
 
-// ============================ UNIFIED LAYER STACK (images + videos, resizable/stackable) ============================
-// Every visual item (char/image OR video) also lives in `layerStack` (array of {type:'img'|'video', refIdx}),
-// ordered back-to-front. Selecting/dragging/resizing operates through this stack.
 let layerStack = [];
-let selectedLayer = null; // { type, refIdx }
+let selectedLayer = null;
 
 function layerRect(layer) {
-    if (layer.type==='img') { const c=chars[layer.refIdx]; if (!c) return null;
-        if (!c.userPlaced) initCharPlace(c);
-        return { x:c.px-c.pw/2, y:c.py-c.ph/2, w:c.pw, h:c.ph, obj:c }; }
-    if (layer.type==='video') { const v=videoLayers[layer.refIdx]; if (!v) return null;
-        if (v.px===undefined) initVideoPlace(v);
-        return { x:v.px-v.pw/2, y:v.py-v.ph/2, w:v.pw, h:v.ph, obj:v }; }
+    if (layer.type==='img') { const c=chars[layer.refIdx]; if (!c) return null; if (!c.userPlaced) initCharPlace(c); return { x:c.px-c.pw/2, y:c.py-c.ph/2, w:c.pw, h:c.ph, obj:c }; }
+    if (layer.type==='video') { const v=videoLayers[layer.refIdx]; if (!v) return null; if (v.px===undefined) initVideoPlace(v); return { x:v.px-v.pw/2, y:v.py-v.ph/2, w:v.pw, h:v.ph, obj:v }; }
     return null;
 }
 function setLayerRect(layer, x, y, w, h) {
     if (layer.type==='img') { const c=chars[layer.refIdx]; if(!c)return; c.px=x+w/2; c.py=y+h/2; c.pw=w; c.ph=h; c.userPlaced=true; }
     if (layer.type==='video') { const v=videoLayers[layer.refIdx]; if(!v)return; v.px=x+w/2; v.py=y+h/2; v.pw=w; v.ph=h; }
 }
-function initCharPlace(c) { const asp=(c.img.naturalWidth/c.img.naturalHeight)||1; const scale=parseFloat(document.getElementById('sScale')?.value||0.7); c.ph=H*scale; c.pw=c.ph*asp; c.px=W/2; c.py=(BASEY[style_]||0.8)*H - c.ph/2 + c.ph/2; c.userPlaced=false; }
+function initCharPlace(c) { const asp=(c.img.naturalWidth/c.img.naturalHeight)||1; const scale=parseFloat(document.getElementById('sScale')?.value||0.7); c.ph=H*scale; c.pw=c.ph*asp; c.px=W/2; c.py=(BASEY[style_]||0.8)*H; c.userPlaced=false; }
 function initVideoPlace(v) { v.pw=W; v.ph=H; v.px=W/2; v.py=H/2; }
 
 function rebuildLayerStack() {
-    // preserve relative order of existing entries, append new ones at top (front)
     const existing = layerStack.filter(l => (l.type==='img'&&chars[l.refIdx]) || (l.type==='video'&&videoLayers[l.refIdx]));
     const knownImg = new Set(existing.filter(l=>l.type==='img').map(l=>l.refIdx));
     const knownVid = new Set(existing.filter(l=>l.type==='video').map(l=>l.refIdx));
@@ -714,11 +757,7 @@ function selectLayer(layer) {
     selectedLayer = layer;
     document.getElementById('layerPropsWrap').style.display = layer ? 'block' : 'none';
     document.getElementById('layerHint').classList.toggle('show', !!layer);
-    if (layer) {
-        const r = layerRect(layer);
-        if (r) { document.getElementById('lpX').value=Math.round(r.x); document.getElementById('lpY').value=Math.round(r.y); document.getElementById('lpW').value=Math.round(r.w); document.getElementById('lpH').value=Math.round(r.h);
-            document.getElementById('lpOpacity').value = Math.round((r.obj.opacity ?? 1)*100); }
-    }
+    if (layer) { const r = layerRect(layer); if (r) { document.getElementById('lpX').value=Math.round(r.x); document.getElementById('lpY').value=Math.round(r.y); document.getElementById('lpW').value=Math.round(r.w); document.getElementById('lpH').value=Math.round(r.h); document.getElementById('lpOpacity').value = Math.round((r.obj.opacity ?? 1)*100); } }
     renderAllLayersList(); renderCG(); renderVideoLayerList(); drawIdle();
 }
 function applyLayerProps() {
@@ -738,10 +777,8 @@ function sendLayerToBack() { if (!selectedLayer) return; const i=layerStack.find
 function renderAllLayersList() {
     const el=document.getElementById('allLayersList'); if (!el) return;
     if (!layerStack.length) { el.innerHTML='<div style="font-size:11px;color:var(--text-3);padding:8px">No layers yet — add an image or video.</div>'; return; }
-    el.innerHTML = layerStack.slice().reverse().map((l)=>{
-        const isSel = selectedLayer && selectedLayer.type===l.type && selectedLayer.refIdx===l.refIdx;
-        return `<div class="track-item ${isSel?'selected':''}" onclick='selectLayer(${JSON.stringify(l)})' style="cursor:pointer"><span style="flex:1">${layerLabel(l)}</span></div>`;
-    }).join('');
+    el.innerHTML = layerStack.slice().reverse().map((l)=>{ const isSel = selectedLayer && selectedLayer.type===l.type && selectedLayer.refIdx===l.refIdx;
+        return `<div class="track-item ${isSel?'selected':''}" onclick='selectLayer(${JSON.stringify(l)})' style="cursor:pointer"><span style="flex:1">${layerLabel(l)}</span></div>`; }).join('');
 }
 
 function checkReady() {
@@ -787,18 +824,13 @@ function drawBg(beat) {
 const BASEY={stage:.8,neon:.87,ocean:.52,space:.82,retro:.8,forest:.66};
 const STYLECOLORS={stage:'#8b5cf6',space:'#a5b4fc',retro:'#00ff64',neon:'#f472b6',forest:'#34d399',ocean:'#22d3ee'};
 
-// Draws ALL layers (images + videos) in stack order, back to front, honoring resize/position/opacity
 function drawLayersStacked(beat, elapsed) {
     rebuildLayerStack();
-    layerStack.forEach((layer, stackIdx) => {
-        if (layer.type==='img') drawImageLayer(layer, beat, elapsed, stackIdx);
-        else if (layer.type==='video') drawVideoLayerItem(layer, elapsed);
-    });
+    layerStack.forEach((layer) => { if (layer.type==='img') drawImageLayer(layer, beat, elapsed); else if (layer.type==='video') drawVideoLayerItem(layer, elapsed); });
 }
-function drawImageLayer(layer, beat, elapsed, idx) {
+function drawImageLayer(layer, beat, elapsed) {
     const c = chars[layer.refIdx]; if (!c) return;
     if (!c.userPlaced) initCharPlace(c);
-    // respect per-character segment visibility if segments are defined
     if (imgSegments.length) { const seg = imgSegments.find(s=>s.charIdx===layer.refIdx); if (seg && !(elapsed>=seg.start && elapsed<seg.start+seg.dur)) return; }
     const {dx,dy,rot,scx,scy} = getDance(c, beat, elapsed, layer.refIdx);
     const floatY = danceMode==='none' ? 0 : Math.sin(Date.now()*0.0022+layer.refIdx*1.3)*8;
@@ -837,7 +869,8 @@ function getDance(c,beat,elapsed,idx) {
 function drawLyricsOverlay(elapsed,beat) {
     if (!lyrics.length) return;
     const hit=getCurrentLyric(elapsed); if (!hit) return;
-    const l=hit.lyric; const dur=l.endTime-l.time, age=elapsed-l.time, progress=Math.min(1,age/Math.max(dur,0.1));
+    const l=hit.lyric; if (!l.text) return;
+    const dur=l.endTime-l.time, age=elapsed-l.time, progress=Math.min(1,age/Math.max(dur,0.1));
     const fi=Math.min(1,age/.2), fo=progress>.82?1-(progress-.82)/.18:1; const alpha=Math.min(fi,fo); if (alpha<.01) return;
     const text=l.text, lsz=parseFloat(document.getElementById('sLyricSz').value), lcol=document.getElementById('lyricColor').value, ypos=parseFloat(document.getElementById('lyricPos').value);
     const fs=lsz*(1+beatIntensity*.05); ctx.font=`600 ${fs}px Inter, sans-serif`; ctx.textAlign='center';
@@ -848,21 +881,14 @@ function drawLyricsOverlay(elapsed,beat) {
 }
 function getCurrentLyric(t) { for (let i=0;i<lyrics.length;i++) { const l=lyrics[i]; if (t>=l.time && t<l.endTime) return {lyric:l,idx:i}; } return null; }
 
-// Draw selection outline + resize handles for the currently selected layer
 function drawSelectionHandles() {
     if (!selectedLayer) return;
     const r = layerRect(selectedLayer); if (!r) return;
-    ctx.save();
-    ctx.strokeStyle = '#6d5ef5'; ctx.lineWidth = 2; ctx.setLineDash([6,4]);
-    ctx.strokeRect(r.x, r.y, r.w, r.h);
-    ctx.setLineDash([]);
-    const hs = 9;
-    const corners = [[r.x,r.y],[r.x+r.w,r.y],[r.x,r.y+r.h],[r.x+r.w,r.y+r.h]];
+    ctx.save(); ctx.strokeStyle = '#6d5ef5'; ctx.lineWidth = 2; ctx.setLineDash([6,4]); ctx.strokeRect(r.x, r.y, r.w, r.h); ctx.setLineDash([]);
+    const hs = 9; const corners = [[r.x,r.y],[r.x+r.w,r.y],[r.x,r.y+r.h],[r.x+r.w,r.y+r.h]];
     corners.forEach(([cx,cy])=>{ ctx.fillStyle='#6d5ef5'; ctx.beginPath(); ctx.arc(cx,cy,hs/2,0,Math.PI*2); ctx.fill(); ctx.strokeStyle='#fff'; ctx.lineWidth=1.5; ctx.stroke(); });
     ctx.restore();
 }
-
-// ============================ CANVAS MOUSE: select / drag / resize layers ============================
 let canvasDrag = null;
 function canvasGetXY(e) { const r=canvas.getBoundingClientRect(); const sx=canvas.width/r.width, sy=canvas.height/r.height; return { x:(e.clientX-r.left)*sx, y:(e.clientY-r.top)*sy }; }
 function hitTestHandle(r, x, y) {
@@ -871,11 +897,7 @@ function hitTestHandle(r, x, y) {
     if (Math.hypot(x-r.x,y-(r.y+r.h))<hs) return 'bl'; if (Math.hypot(x-(r.x+r.w),y-(r.y+r.h))<hs) return 'br';
     return null;
 }
-function hitTestLayer(x,y) {
-    for (let i=layerStack.length-1;i>=0;i--) { const layer=layerStack[i]; const r=layerRect(layer); if (!r) continue;
-        if (x>=r.x && x<=r.x+r.w && y>=r.y && y<=r.y+r.h) return layer; }
-    return null;
-}
+function hitTestLayer(x,y) { for (let i=layerStack.length-1;i>=0;i--) { const layer=layerStack[i]; const r=layerRect(layer); if (!r) continue; if (x>=r.x && x<=r.x+r.w && y>=r.y && y<=r.y+r.h) return layer; } return null; }
 canvas.addEventListener('mousedown', e => {
     const {x,y} = canvasGetXY(e);
     if (selectedLayer) { const r=layerRect(selectedLayer); if (r) { const h=hitTestHandle(r,x,y); if (h) { canvasDrag={mode:'resize',handle:h,startX:x,startY:y,orig:{...r}}; return; } } }
@@ -886,7 +908,7 @@ canvas.addEventListener('mousedown', e => {
 canvas.addEventListener('mousemove', e => {
     if (!canvasDrag) return;
     const {x,y} = canvasGetXY(e); const dx=x-canvasDrag.startX, dy=y-canvasDrag.startY;
-    if (canvasDrag.mode==='move') { setLayerRect(selectedLayer, canvasDrag.orig.x+dx, canvasDrag.orig.y+dy, canvasDrag.orig.w, canvasDrag.orig.h); }
+    if (canvasDrag.mode==='move') setLayerRect(selectedLayer, canvasDrag.orig.x+dx, canvasDrag.orig.y+dy, canvasDrag.orig.w, canvasDrag.orig.h);
     else if (canvasDrag.mode==='resize') {
         let {x:ox,y:oy,w:ow,h:oh}=canvasDrag.orig; let nx=ox,ny=oy,nw=ow,nh=oh;
         if (canvasDrag.handle==='br') { nw=Math.max(20,ow+dx); nh=Math.max(20,oh+dy); }
@@ -895,8 +917,7 @@ canvas.addEventListener('mousemove', e => {
         else if (canvasDrag.handle==='tl') { nw=Math.max(20,ow-dx); nh=Math.max(20,oh-dy); nx=ox+ow-nw; ny=oy+oh-nh; }
         setLayerRect(selectedLayer, nx, ny, nw, nh);
     }
-    document.getElementById('lpX').value=Math.round(layerRect(selectedLayer).x); document.getElementById('lpY').value=Math.round(layerRect(selectedLayer).y);
-    document.getElementById('lpW').value=Math.round(layerRect(selectedLayer).w); document.getElementById('lpH').value=Math.round(layerRect(selectedLayer).h);
+    const r2=layerRect(selectedLayer); document.getElementById('lpX').value=Math.round(r2.x); document.getElementById('lpY').value=Math.round(r2.y); document.getElementById('lpW').value=Math.round(r2.w); document.getElementById('lpH').value=Math.round(r2.h);
     drawIdle();
 });
 canvas.addEventListener('mouseup', () => { canvasDrag=null; });
@@ -932,14 +953,20 @@ async function addAudioTrack(file) {
     const lastEnd = audioSegments.length ? audioSegments[audioSegments.length-1].start+audioSegments[audioSegments.length-1].dur : 0;
     audioSegments.push({trackIdx:audioTracks.length-1,start:lastEnd,dur:buf.duration});
     if (chars.length && audioDuration>0) { const each=audioDuration/chars.length; imgSegments=chars.map((_,i)=>({charIdx:i,start:i*each,dur:each})); }
-    if (isFirst) { document.getElementById('timelineWrap').classList.remove('tl-disabled'); document.getElementById('addLyricBtn').disabled=false; TL.resize(); }
-    else TL.draw(pvOffset);
+    if (isFirst) {
+        document.getElementById('timelineWrap').classList.remove('tl-disabled');
+        document.getElementById('addLyricBtn').disabled=false; document.getElementById('addLyricBtnTL').disabled=false;
+        document.getElementById('tapCatchBtn').disabled=false; document.getElementById('autoCapBtn').disabled=false;
+        TL.resize();
+    } else TL.draw(pvOffset);
     toast(`${name} — ${fmt(buf.duration)}`);
 }
 function renderAudioTrackList() { document.getElementById('audioTrackList').innerHTML = audioTracks.map((t,i)=>`<div class="track-item"><span style="flex:1;overflow:hidden;text-overflow:ellipsis">${t.name}</span><span>${fmt(t.buffer.duration)}</span><button onclick="removeAudioTrack(${i})">✕</button></div>`).join(''); }
 function removeAudioTrack(i) {
     audioTracks.splice(i,1); audioSegments=audioSegments.filter(s=>s.trackIdx!==i); audioSegments.forEach(s=>{if(s.trackIdx>i)s.trackIdx--;});
-    if (audioTracks.length) { audioBuffer=audioTracks[0].buffer; audioDuration=audioBuffer.duration; } else { audioBuffer=null; audioDuration=0; document.getElementById('audioName').textContent='Drop your track here'; document.getElementById('timelineWrap').classList.add('tl-disabled'); document.getElementById('addLyricBtn').disabled=true; }
+    if (audioTracks.length) { audioBuffer=audioTracks[0].buffer; audioDuration=audioBuffer.duration; }
+    else { audioBuffer=null; audioDuration=0; document.getElementById('audioName').textContent='Drop your track here'; document.getElementById('timelineWrap').classList.add('tl-disabled');
+        document.getElementById('addLyricBtn').disabled=true; document.getElementById('addLyricBtnTL').disabled=true; document.getElementById('tapCatchBtn').disabled=true; document.getElementById('autoCapBtn').disabled=true; }
     renderAudioTrackList(); checkReady(); TL.resize();
 }
 
@@ -953,7 +980,8 @@ async function addVideoLayer(file) {
     const lastEnd = videoSegments.length ? videoSegments[videoSegments.length-1].start+videoSegments[videoSegments.length-1].dur : 0;
     videoSegments.push({vidIdx:videoLayers.length-1,start:lastEnd,dur});
     renderVideoLayerList();
-    if (!audioDuration && video.duration) { audioDuration=video.duration; document.getElementById('timelineWrap').classList.remove('tl-disabled'); document.getElementById('addLyricBtn').disabled=false; TL.resize(); }
+    if (!audioDuration && video.duration) { audioDuration=video.duration; document.getElementById('timelineWrap').classList.remove('tl-disabled');
+        document.getElementById('addLyricBtn').disabled=false; document.getElementById('addLyricBtnTL').disabled=false; document.getElementById('tapCatchBtn').disabled=false; document.getElementById('autoCapBtn').disabled=false; TL.resize(); }
     checkReady(); TL.draw(pvOffset);
     toast(`${name} added as its own layer — drag on canvas to reposition`);
 }
@@ -966,7 +994,19 @@ function removeVideoLayer(i) {
     checkReady(); TL.draw(pvOffset);
 }
 
-// ============================ ADD / EDIT LYRICS ============================
+// ============================ LYRIC INPUT MODES: Manual / Tap-to-Catch / Auto-Caption ============================
+let currentLyricMode = 'manual';
+function setLyricMode(mode, btn) {
+    if (tapCatchActive) toggleTapCatch();
+    if (autoCapActive) toggleAutoCaption();
+    currentLyricMode = mode;
+    document.querySelectorAll('.lyric-mode-tabs button').forEach(b=>b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    document.querySelectorAll('.lyric-mode-pane').forEach(p=>p.classList.remove('active'));
+    document.getElementById('lm-'+mode).classList.add('active');
+}
+
+// ---- MANUAL ----
 function addLyricAtPlayhead() {
     if (!audioDuration) { toast('Upload audio first'); return; }
     const text = prompt('Type the lyric text for '+fmt(pvOffset)+':', '');
@@ -984,6 +1024,87 @@ function insertLyric(t, text) {
     selectedLyricIdx=newIdx; lastPasteRefIdx=newIdx;
     renderLyrics(); TL.draw(pvOffset); toast('Lyric added at '+fmt(t)); updatePasteNextBtn();
 }
+
+// ---- TAP-TO-CATCH ----
+let tapCatchActive = false;
+async function toggleTapCatch() {
+    if (!audioDuration) { toast('Upload audio first'); return; }
+    if (tapCatchActive) { stopTapCatch(); return; }
+    tapCatchActive = true;
+    document.getElementById('tapCatchBtn').classList.add('active');
+    document.getElementById('tapCatchIcon').textContent='⏹';
+    document.getElementById('tapCatchLabel').textContent='Stop Tap-to-Catch';
+    document.getElementById('tapCatchLiveBadge').classList.add('show');
+    if (!pvPlaying) await playPreview();
+    toast('Tap-to-Catch active — tap the button or press L on every line');
+}
+function stopTapCatch() {
+    tapCatchActive = false;
+    document.getElementById('tapCatchBtn').classList.remove('active');
+    document.getElementById('tapCatchIcon').textContent='👆';
+    document.getElementById('tapCatchLabel').textContent='Start Tap-to-Catch';
+    document.getElementById('tapCatchLiveBadge').classList.remove('show');
+    if (pvPlaying) pausePreview();
+    updateTapCatchCount();
+}
+function tapCatchHit() {
+    if (!tapCatchActive) { toggleTapCatch(); return; }
+    const t = getPvTime();
+    // drop an EMPTY placeholder — text filled in afterward
+    const nxt = lyrics.find(l=>l.time>t+0.05);
+    const end = Math.min(audioDuration||t+3, nxt?Math.min(nxt.time,t+3):t+3);
+    lyrics.push({time:t, endTime:end, text:'', isPlaceholder:true, ds:{beatCount:0,jumpAmt:0,spinAng:0,spinDir:1,phase:Math.random()*Math.PI*2}});
+    lyrics.sort((a,b)=>a.time-b.time);
+    renderLyrics(); TL.draw(pvOffset); updateTapCatchCount();
+}
+function updateTapCatchCount() {
+    const n = lyrics.filter(l=>l.isPlaceholder).length;
+    const el = document.getElementById('tapCatchCount');
+    if (el) el.textContent = n ? `${n} placeholder${n>1?'s':''} caught — fill in the text below` : '';
+}
+
+// ---- AUTO-CAPTION (Web Speech API) ----
+let autoCapActive = false, speechRec = null;
+function toggleAutoCaption() {
+    if (!audioDuration) { toast('Upload audio first'); return; }
+    if (autoCapActive) { stopAutoCaption(); return; }
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) { toast('Speech recognition is not supported in this browser. Try Chrome.'); return; }
+    speechRec = new SR();
+    speechRec.continuous = true; speechRec.interimResults = false; speechRec.lang = 'en-US';
+    speechRec.onresult = (e) => {
+        const t = getPvTime();
+        for (let i=e.resultIndex; i<e.results.length; i++) {
+            if (!e.results[i].isFinal) continue;
+            const text = e.results[i][0].transcript.trim(); if (!text) continue;
+            const nxt = lyrics.find(l=>l.time>t+0.05);
+            const end = Math.min(audioDuration||t+4, nxt?Math.min(nxt.time,t+4):t+4);
+            lyrics.push({time:t, endTime:end, text, autoGenerated:true, ds:{beatCount:0,jumpAmt:0,spinAng:0,spinDir:1,phase:Math.random()*Math.PI*2}});
+            lyrics.sort((a,b)=>a.time-b.time); renderLyrics(); TL.draw(pvOffset);
+        }
+    };
+    speechRec.onerror = (e) => { if (e.error==='not-allowed') { toast('Microphone permission denied — needed for Auto-Caption'); stopAutoCaption(); } };
+    speechRec.onend = () => { if (autoCapActive) { try { speechRec.start(); } catch(e){} } };
+    try { speechRec.start(); } catch(e) { toast('Could not start speech recognition'); return; }
+    autoCapActive = true;
+    document.getElementById('autoCapBtn').classList.add('listening');
+    document.getElementById('autoCapIcon').textContent='⏹';
+    document.getElementById('autoCapLabel').textContent='Stop Auto-Caption';
+    document.getElementById('tapCatchLiveBadge').classList.add('show');
+    document.getElementById('tapCatchLiveText').textContent='Auto-Caption listening — play your track now';
+    if (!pvPlaying) playPreview();
+    toast('Listening — play your track through your speakers now');
+}
+function stopAutoCaption() {
+    autoCapActive = false;
+    if (speechRec) { try { speechRec.onend=null; speechRec.stop(); } catch(e){} speechRec=null; }
+    document.getElementById('autoCapBtn').classList.remove('listening');
+    document.getElementById('autoCapIcon').textContent='🤖';
+    document.getElementById('autoCapLabel').textContent='Start Auto-Caption';
+    document.getElementById('tapCatchLiveBadge').classList.remove('show');
+    toast('Auto-Caption stopped — review the lines it caught below');
+}
+
 function deleteLyric(i) { lyrics.splice(i,1); if (selectedLyricIdx>=lyrics.length) selectedLyricIdx=lyrics.length-1; if (lastPasteRefIdx>=lyrics.length) lastPasteRefIdx=lyrics.length-1; renderLyrics(); TL.draw(pvOffset); }
 function selectLyric(i) { selectedLyricIdx=i; lastPasteRefIdx=i; seekPreview(lyrics[i].time); renderLyrics(); updatePasteNextBtn(); }
 let editTargetIdx=-1;
@@ -999,21 +1120,23 @@ function openEditPopupFor(i) {
 function confirmEditLyric() {
     if (editTargetIdx<0||editTargetIdx>=lyrics.length) { closeEditPopup(); return; }
     const val=document.getElementById('editLyricInput').value.trim();
-    if (!val) { lyrics.splice(editTargetIdx,1); toast('Lyric removed (empty text)'); } else lyrics[editTargetIdx].text=val;
-    closeEditPopup(); renderLyrics(); TL.draw(pvOffset);
+    if (!val) { lyrics.splice(editTargetIdx,1); toast('Lyric removed (empty text)'); }
+    else { lyrics[editTargetIdx].text=val; delete lyrics[editTargetIdx].isPlaceholder; delete lyrics[editTargetIdx].autoGenerated; }
+    closeEditPopup(); renderLyrics(); TL.draw(pvOffset); updateTapCatchCount();
 }
 function closeEditPopup() { editTargetIdx=-1; document.getElementById('editLyricPopup').style.display='none'; }
 function renderLyrics() {
     document.getElementById('lyricCount').textContent = lyrics.length ? `(${lyrics.length})` : '';
     const el=document.getElementById('lyricsList');
-    if (!lyrics.length) { el.innerHTML=`<div class="lyric-empty">Upload audio, then use the <strong>Add Lyric</strong> button on the timeline below the video.</div>`; return; }
-    el.innerHTML = lyrics.map((l,i)=>{ const isSel=i===selectedLyricIdx; const endT=l.endTime;
-        return `<div class="lyric-row ${isSel?'active':''}" onclick="openEditPopupFor(${i})" oncontextmenu="event.preventDefault();selectedLyricIdx=${i};renderLyrics();showLyricContextMenu(event.clientX,event.clientY,${i})">
+    if (!lyrics.length) { el.innerHTML=`<div class="lyric-empty">Upload audio, then add lyrics manually, with Tap-to-Catch, or Auto-Caption above.</div>`; return; }
+    el.innerHTML = lyrics.map((l,i)=>{ const isSel=i===selectedLyricIdx; const endT=l.endTime; const isPh=l.isPlaceholder && !l.text;
+        return `<div class="lyric-row ${isSel?'active':''} ${l.isPlaceholder?'placeholder-row':''}" onclick="openEditPopupFor(${i})" oncontextmenu="event.preventDefault();selectedLyricIdx=${i};renderLyrics();showLyricContextMenu(event.clientX,event.clientY,${i})">
             <div class="lr-top">
                 <span class="lr-time" onclick="event.stopPropagation();seekPreview(${l.time})">${fmt(l.time)}</span>
                 <span class="lr-arrow">→</span>
                 <span class="lr-time end" onclick="event.stopPropagation();seekPreview(${endT})">${fmt(endT)}</span>
-                <span class="lr-text" onclick="event.stopPropagation();openEditPopupFor(${i})">${l.text.replace(/</g,'&lt;')}</span>
+                <span class="lr-text ${isPh?'empty-text':''}" onclick="event.stopPropagation();openEditPopupFor(${i})">${isPh?'(tap to type this line)':l.text.replace(/</g,'&lt;')}</span>
+                ${l.autoGenerated?'<span class="placeholder-badge" style="color:#67e8f9;background:rgba(34,211,238,.15)">AI</span>':''}
                 <button class="lr-del" onclick="event.stopPropagation();deleteLyric(${i})">✕</button>
             </div>
             <div class="lr-actions">
@@ -1023,7 +1146,8 @@ function renderLyrics() {
             </div>
         </div>`; }).join('');
 }
-function copyLyric(i) { if (i<0||i>=lyrics.length) return; copiedLyric={...lyrics[i]}; lastPasteRefIdx=i; document.getElementById('tlClipBanner').classList.add('show'); updatePasteNextBtn(); toast('Copied "'+lyrics[i].text.slice(0,24)+'"'); }
+
+function copyLyric(i) { if (i<0||i>=lyrics.length) return; copiedLyric={...lyrics[i]}; lastPasteRefIdx=i; document.getElementById('tlClipBanner').classList.add('show'); updatePasteNextBtn(); toast('Copied "'+(lyrics[i].text||'(empty)').slice(0,24)+'"'); }
 function clearClipboard() { copiedLyric=null; document.getElementById('tlClipBanner').classList.remove('show'); updatePasteNextBtn(); renderLyrics(); }
 function updatePasteNextBtn() { const b=document.getElementById('pasteNextBtn'); if (b) b.disabled = !copiedLyric; }
 function pasteNextInSequence() { if (!copiedLyric) { toast('Copy a lyric first'); return; } if (lastPasteRefIdx<0||lastPasteRefIdx>=lyrics.length) { pasteAtPlayhead(); return; } pasteAfterLyric(lastPasteRefIdx); }
@@ -1064,7 +1188,7 @@ function closeMovePopup() { moveTargetIdx=-1; document.getElementById('moveLyric
 let lcmIdx=-1;
 function showLyricContextMenu(x,y,idx) {
     lcmIdx=idx; const menu=document.getElementById('lyricContextMenu'); const l=lyrics[idx];
-    const title=document.getElementById('lcmTitle'); if (title) title.textContent=l.text.slice(0,22)+(l.text.length>22?'…':'');
+    const title=document.getElementById('lcmTitle'); if (title) title.textContent=(l.text||'(empty)').slice(0,22)+((l.text||'').length>22?'…':'');
     document.getElementById('lcmPasteBtn').disabled = !copiedLyric;
     menu.style.display='block'; menu.style.left=Math.min(x,window.innerWidth-190)+'px'; menu.style.top=Math.min(y,window.innerHeight-180)+'px';
 }
@@ -1079,13 +1203,12 @@ document.addEventListener('keydown', e => {
     if (e.key==='Escape') { hideLyricContextMenu(); closeMovePopup(); closeEditPopup(); }
     if (e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.isContentEditable) return;
     if (e.code==='Space') { e.preventDefault(); togglePreview(); }
-    if (e.key.toLowerCase()==='l') addLyricAtPlayhead();
+    if (e.key.toLowerCase()==='l') { if (tapCatchActive) tapCatchHit(); else addLyricAtPlayhead(); }
     if ((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='c' && selectedLyricIdx>=0) copyLyric(selectedLyricIdx);
     if ((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='v' && copiedLyric) pasteNextInSequence();
     if (e.key==='Delete' && selectedLayer) { if (selectedLayer.type==='img') removeChar(selectedLayer.refIdx); else removeVideoLayer(selectedLayer.refIdx); }
 });
 
-// PREVIEW PLAYER
 let pvCtx=null, pvAnalyser=null, pvSrc=null, pvStartAt=0;
 function getPvTime() { if (!pvCtx) return pvOffset; return pvPlaying ? pvOffset+(pvCtx.currentTime-pvStartAt) : pvOffset; }
 async function togglePreview() { if (!audioBuffer) { toast('Load audio first'); return; } pvPlaying ? pausePreview() : await playPreview(); }
@@ -1096,7 +1219,7 @@ async function playPreview() {
     const buf=audioBuffer; if (!buf) { toast('No audio loaded'); return; }
     pvSrc=pvCtx.createBufferSource(); pvSrc.buffer=buf; pvSrc.connect(pvAnalyser); pvAnalyser.connect(pvCtx.destination);
     pvOffset=Math.min(pvOffset,audioDuration-.1); pvSrc.start(0,pvOffset); pvStartAt=pvCtx.currentTime; pvPlaying=true;
-    pvSrc.onended = () => { if (pvPlaying) { pvPlaying=false; pvOffset=0; updatePvUI(); } };
+    pvSrc.onended = () => { if (pvPlaying) { pvPlaying=false; pvOffset=0; updatePvUI(); if (tapCatchActive) stopTapCatch(); if (autoCapActive) stopAutoCaption(); } };
     updatePvUI(); tickPreview();
 }
 function pausePreview() { pvOffset=Math.min(getPvTime(),audioDuration); try { pvSrc?.stop(); } catch(e){} pvPlaying=false; updatePvUI(); }
@@ -1118,7 +1241,6 @@ function toggleFX(fx,btn) { if (activeFX.has(fx)) activeFX.delete(fx); else acti
 const TEMPLATES={edm:{style:'neon',dance:'jump',lyricStyle:'neon',color:'#f472b6'},chill:{style:'forest',dance:'sway',lyricStyle:'subtitle',color:'#06b6d4'},bollywood:{style:'stage',dance:'groove',lyricStyle:'karaoke',color:'#fbbf24'}};
 function applyTemplate(key) { const t=TEMPLATES[key]; if(!t)return; pickStyle(t.style,null); pickDance(t.dance,null); pickLS(t.lyricStyle,null); document.getElementById('lyricColor').value=t.color; toast(`${key} template applied`); }
 
-// ============================ MULTI-TRACK TIMELINE (separate lanes: lyrics/video/images/audio) ============================
 const TL = {
     canvases: {}, ctxs: {}, wraps: {}, W:0, zoom:1, minZoom:1, maxZoom:20, dragging:null, rowH:34,
     lanes: ['lyrics','video','images','audio'],
@@ -1217,9 +1339,7 @@ const TL = {
         const {mx}=this.getXY(e,lane);
         if (lane==='lyrics') { const h=this.hitLyric(mx); if (h) { selectedLyricIdx=h.idx; renderLyrics(); showLyricContextMenu(e.clientX,e.clientY,h.idx); } else if (copiedLyric) { const t=this.x2t(mx); pvOffset=t; seekPreview(t); pasteAtPlayhead(); } }
     },
-    draw(currentTime){
-        this.lanes.forEach(lane=>this.drawLane(lane,currentTime));
-    },
+    draw(currentTime){ this.lanes.forEach(lane=>this.drawLane(lane,currentTime)); },
     drawLane(lane, currentTime){
         const c=this.ctxs[lane]; if (!c) return; const CW=this.W, CH=this.rowH;
         c.clearRect(0,0,CW,CH); c.fillStyle='#0d0f16'; c.fillRect(0,0,CW,CH);
@@ -1228,12 +1348,12 @@ const TL = {
         c.strokeStyle='#1c1c2a'; c.lineWidth=1;
         for (let t=0;t<=audioDuration;t+=step) { const x=this.t2x(t); c.globalAlpha=.4; c.beginPath(); c.moveTo(x,0); c.lineTo(x,CH); c.stroke(); c.globalAlpha=1; }
         if (lane==='lyrics') {
-            if (!lyrics.length) { c.fillStyle='#6c6f82'; c.font='10px Inter'; c.textAlign='center'; c.fillText('Click "＋ Add Lyric" above', CW/2, CH/2+3); }
+            if (!lyrics.length) { c.fillStyle='#6c6f82'; c.font='10px Inter'; c.textAlign='center'; c.fillText('Add lyrics using the panel on the left', CW/2, CH/2+3); }
             const cols=['#6d5ef5','#06b6d4','#f472b6','#2ecc8f','#f2b544'];
-            lyrics.forEach((l,i)=>{ const x1=this.t2x(l.time),x2=this.t2x(l.endTime),bw=Math.max(10,x2-x1); const col=cols[i%cols.length]; const isSel=i===selectedLyricIdx;
+            lyrics.forEach((l,i)=>{ const x1=this.t2x(l.time),x2=this.t2x(l.endTime),bw=Math.max(10,x2-x1); const col= l.isPlaceholder && !l.text ? '#f2b544' : cols[i%cols.length]; const isSel=i===selectedLyricIdx;
                 c.fillStyle=col+(isSel?'cc':'88'); c.beginPath(); c.roundRect(x1,3,bw,CH-6,4); c.fill();
                 c.strokeStyle=col; c.lineWidth=isSel?2:1; c.beginPath(); c.roundRect(x1,3,bw,CH-6,4); c.stroke();
-                if (bw>26) { c.fillStyle='#fff'; c.font='500 9px Inter'; c.textAlign='left'; const mc=Math.floor((bw-14)/6); c.fillText(l.text.length>mc?l.text.slice(0,mc-1)+'…':l.text, x1+7, CH/2+3); } });
+                if (bw>26) { c.fillStyle='#fff'; c.font='500 9px Inter'; c.textAlign='left'; const label=l.text||'…'; const mc=Math.floor((bw-14)/6); c.fillText(label.length>mc?label.slice(0,mc-1)+'…':label, x1+7, CH/2+3); } });
         } else if (lane==='video') {
             videoSegments.forEach((s,i)=>{ const v=videoLayers[s.vidIdx]; if (!v) return; const x1=this.t2x(s.start),x2=this.t2x(s.start+s.dur),bw=Math.max(10,x2-x1);
                 const isSel = selectedLayer&&selectedLayer.type==='video'&&selectedLayer.refIdx===s.vidIdx;
@@ -1291,6 +1411,7 @@ async function handleGenerate() {
     if (!audioBuffer && !hasVideoForGen) { toast('Add audio or upload a video first.'); return; }
     if (!chars.length && !hasVideoForGen) { toast('Add an image or video first.'); return; }
     if (pvPlaying) pausePreview();
+    if (tapCatchActive) stopTapCatch(); if (autoCapActive) stopAutoCaption();
     selectLayer(null);
 
     if (audioCtx) { try { await audioCtx.close(); } catch(e){} }

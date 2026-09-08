@@ -2609,14 +2609,7 @@ async function startAudioFrom(offset = 0) {
 
     const audioCtx = getSharedAudioCtx();
 
-    if (audioCtx.state === 'suspended') {
-        try {
-            await audioCtx.resume();
-        } catch (err) {
-            toast('Browser blocked audio. Click Play or Resume again.');
-            return false;
-        }
-    }
+
 
     // Set this after AudioContext has resumed.
     playbackStartContextTime = audioCtx.currentTime;

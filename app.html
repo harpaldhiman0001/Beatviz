@@ -135,7 +135,6 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
 .layer-vis-row button { flex:1; padding:8px; border-radius:var(--radius-sm); border:1.5px solid var(--border-strong); background:var(--bg-card); color:var(--text-2); font-size:10.5px; font-weight:700; cursor:pointer; }
 .layer-vis-row button.is-hidden { border-color: var(--red); color: var(--red); background: var(--red-soft); }
 
-/* TEXT / TITLE tool */
 .text-layer-item { padding: 8px 10px; background: var(--bg-card); border-radius: var(--radius-sm); border:1px solid var(--border); margin: 4px 10px; cursor:pointer; }
 .text-layer-item.selected { border-color: var(--accent); background: var(--accent-soft); }
 .add-text-btn { width:calc(100% - 20px); margin:6px 10px; padding:12px; border-radius: var(--radius-md); border:2px dashed var(--border-strong); background:transparent; color:var(--text-2); font-size:12.5px; font-weight:700; cursor:pointer; }
@@ -144,9 +143,37 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
 .font-picker button { padding:8px 4px; border-radius:var(--radius-sm); border:1.5px solid var(--border-strong); background:var(--bg-card); color:var(--text-2); font-size:12px; cursor:pointer; }
 .font-picker button.active { border-color: var(--accent); background: var(--accent-soft); color:#c3baff; }
 
+.project-io-row { display:flex; gap:8px; padding: 10px 14px; }
+.project-io-row button { flex:1; padding:10px; border-radius: var(--radius-md); border:1.5px solid var(--border-strong); background:var(--bg-card); color:var(--text-2); font-size:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; }
+.project-io-row button.save-btn { border-color: var(--accent); background: var(--accent-soft); color:#c3baff; }
+.project-io-row button.save-btn:hover { background: var(--accent); color:#fff; }
+.project-io-row button.load-btn { border-color: var(--cyan); background: var(--cyan-soft); color:#67e8f9; }
+.project-io-row button.load-btn:hover { background: var(--cyan); color:#04202a; }
+.project-io-hint { font-size:9.5px; color:var(--text-3); padding:0 14px 10px; line-height:1.6; }
+
+.reattach-overlay { position:fixed; inset:0; background:rgba(4,5,8,.92); backdrop-filter: blur(16px); z-index:300; display:none; align-items:center; justify-content:center; padding:24px; }
+.reattach-overlay.show { display:flex; }
+.reattach-box { background: var(--bg-panel); border:1px solid var(--border-strong); border-radius: var(--radius-xl); width:100%; max-width:480px; padding:28px; box-shadow: var(--shadow-2); max-height:85vh; overflow-y:auto; }
+.reattach-box h2 { font-size:19px; font-weight:800; margin-bottom:6px; }
+.reattach-box p.ra-sub { font-size:12.5px; color:var(--text-3); line-height:1.6; margin-bottom:20px; }
+.ra-item { display:flex; align-items:center; gap:10px; padding:12px; background:var(--bg-card); border-radius:var(--radius-md); border:1px solid var(--border); margin-bottom:8px; }
+.ra-item .ra-icon { font-size:20px; flex-shrink:0; }
+.ra-item .ra-info { flex:1; min-width:0; }
+.ra-item .ra-name { font-size:12.5px; font-weight:700; color:var(--text-1); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.ra-item .ra-status { font-size:10px; color:var(--text-3); }
+.ra-item .ra-status.done { color: var(--green); }
+.ra-item button { padding:7px 14px; border-radius: var(--radius-sm); border:1.5px solid var(--accent); background: var(--accent-soft); color:#c3baff; font-size:11px; font-weight:700; cursor:pointer; flex-shrink:0; }
+.ra-item.matched { border-color: var(--green); }
+.ra-item.matched button { border-color: var(--green); background: var(--green-soft); color: var(--green); }
+.ra-actions { display:flex; gap:8px; margin-top:20px; }
+.ra-actions button { flex:1; padding:12px; border-radius: var(--radius-md); font-size:13px; font-weight:700; cursor:pointer; }
+.ra-actions .ra-continue { border:none; background: linear-gradient(135deg,var(--accent),#8b7bff); color:#fff; }
+.ra-actions .ra-continue:disabled { opacity:.4; cursor:not-allowed; }
+.ra-actions .ra-cancel { border:1px solid var(--border-strong); background:none; color:var(--text-3); }
+
 .lyric-quickbar { padding: 10px 14px; display:flex; flex-direction:column; gap:8px; background:var(--bg-panel); }
 .lyric-quickbar .qb-row { display:flex; gap:8px; align-items:center; }
-.lyric-quickbar input[type=text] { flex:1; background: var(--bg-card); border: 1.5px solid var(--border-strong); border-radius: var(--radius-sm); color: var(--text-1); font-size: 13px; padding: 10px 12px; outline:none; transition: border-color .15s var(--ease); }
+.lyric-quickbar input[type=text] { flex:1; background: var(--bg-card); border: 1.5px solid var(--border-strong); border-radius: var(--radius-sm); color: var(--text-1); font-size: 13px; padding: 10px 12px; outline:none; }
 .lyric-quickbar input[type=text]:focus { border-color: var(--accent); }
 .lyric-quickbar .qb-time { font-size:10.5px; font-weight:700; color:var(--accent); background:var(--accent-soft); padding:6px 10px; border-radius:var(--radius-sm); white-space:nowrap; }
 .lyric-quickbar .qb-hint { font-size:9.5px; color:var(--text-3); text-align:center; }
@@ -341,6 +368,15 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
 
             <div class="sidebar-pane active" id="pane-upload">
                 <div>
+                    <div class="sec-head">Project File <span class="sec-badge">saves to your computer</span></div>
+                    <div class="project-io-row">
+                        <button class="save-btn" onclick="saveProjectToFile()">💾 Save Project</button>
+                        <button class="load-btn" onclick="document.getElementById('loadProjectIn').click()">📂 Load Project</button>
+                        <input type="file" id="loadProjectIn" accept=".json,.beatviz" style="display:none" onchange="loadProjectFromFile(event)">
+                    </div>
+                    <div class="project-io-hint">Save downloads a project file — pick the folder yourself when your browser asks (e.g. Desktop). Load re-opens it later; you'll just re-attach your audio/video/image files since they stay on your device, then keep editing exactly where you left off.</div>
+                </div>
+                <div>
                     <div class="sec-head">Audio Track <span class="sec-badge">MP3 · WAV</span></div>
                     <div class="drop-zone" onclick="document.getElementById('audioIn').click()">
                         <div class="dz-bg"><img src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=400&h=180&fit=crop&auto=format" alt=""></div>
@@ -370,7 +406,6 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
                         </div>
                     </div>
                     <div class="char-grid" id="charGrid"></div>
-                    <div style="font-size:9.5px;color:var(--text-3);padding:0 12px 8px;line-height:1.5">Images play one at a time across the song, in upload order — like slides. Go to <b>Layers</b> to make several appear together instead.</div>
                 </div>
                 <div>
                     <div class="sec-head">Video Format</div>
@@ -395,7 +430,7 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
                 <div>
                     <div class="sec-head">All Layers <span class="sec-badge">front → back</span></div>
                     <div id="allLayersList" style="padding:6px 8px;display:flex;flex-direction:column;gap:4px"></div>
-                    <div style="font-size:10px;color:var(--text-3);padding:0 12px 10px;line-height:1.6">Top of this list = front of the frame. A layer on top fully covers anything behind it. Click a layer to select, drag on canvas to move/resize, or hide it without deleting.</div>
+                    <div style="font-size:10px;color:var(--text-3);padding:0 12px 10px;line-height:1.6">Top of this list = front of the frame. Click a layer to select, drag on canvas to move/resize, or hide it without deleting.</div>
                 </div>
                 <div id="layerPropsWrap" style="display:none">
                     <div class="sec-head">Selected Layer</div>
@@ -422,7 +457,7 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
 
             <div class="sidebar-pane" id="pane-text">
                 <div>
-                    <div class="sec-head">Title / Text Layers <span class="sec-badge">like a title card</span></div>
+                    <div class="sec-head">Title / Text Layers</div>
                     <button class="add-text-btn" onclick="addTextLayer()">＋ Add Text / Title</button>
                     <div id="textLayerList"></div>
                 </div>
@@ -612,6 +647,18 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
     </aside>
 </div>
 
+<div class="reattach-overlay" id="reattachOverlay">
+    <div class="reattach-box">
+        <h2>📎 Re-attach your media</h2>
+        <p class="ra-sub">This project needs the original files to continue editing. They never left your computer, so pick each one from where you saved it.</p>
+        <div id="reattachList"></div>
+        <div class="ra-actions">
+            <button class="ra-continue" id="raContinueBtn" onclick="finishProjectLoad()" disabled>Continue Editing</button>
+            <button class="ra-cancel" onclick="cancelProjectLoad()">Cancel</button>
+        </div>
+    </div>
+</div>
+
 <div class="paywall" id="paywall">
     <div class="pw-box">
         <button class="pw-close" onclick="hidePaywall()">✕</button>
@@ -695,29 +742,14 @@ async function initiatePayment() {
 function toast(m) { const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),3200); }
 function fmt(s) { if (!isFinite(s)||isNaN(s)) return '0:00'; s=Math.max(0,s); const m=Math.floor(s/60), sc=Math.floor(s%60); return `${m}:${sc.toString().padStart(2,'0')}`; }
 
-// ============================ AUDIO UNLOCK (fixes "no sound" from browser autoplay policy) ============================
-// Browsers block AudioContext from making sound until a real user gesture (click/tap/keypress) unlocks it.
-// We create ONE shared context up front, try to resume it on every possible interaction, and show a visible
-// banner if it's still suspended so the user has an obvious, one-click way to enable sound.
 let sharedAudioCtx = null;
-function getSharedAudioCtx() {
-    if (!sharedAudioCtx || sharedAudioCtx.state === 'closed') sharedAudioCtx = new (window.AudioContext||window.webkitAudioContext)();
-    return sharedAudioCtx;
-}
+function getSharedAudioCtx() { if (!sharedAudioCtx || sharedAudioCtx.state === 'closed') sharedAudioCtx = new (window.AudioContext||window.webkitAudioContext)(); return sharedAudioCtx; }
 function unlockAudioNow() {
-    const c = getSharedAudioCtx();
-    if (c.state === 'suspended') c.resume();
-    // Play a silent buffer to fully unlock on iOS/Safari too
+    const c = getSharedAudioCtx(); if (c.state === 'suspended') c.resume();
     try { const buf = c.createBuffer(1,1,22050); const src = c.createBufferSource(); src.buffer=buf; src.connect(c.destination); src.start(0); } catch(e){}
-    document.getElementById('audioUnlockBanner').classList.remove('show');
-    toast('Sound enabled');
+    document.getElementById('audioUnlockBanner').classList.remove('show'); toast('Sound enabled');
 }
-function checkAudioUnlockState() {
-    const c = sharedAudioCtx;
-    const banner = document.getElementById('audioUnlockBanner');
-    if (c && c.state === 'suspended') banner.classList.add('show');
-    else banner.classList.remove('show');
-}
+function checkAudioUnlockState() { const c = sharedAudioCtx; const banner = document.getElementById('audioUnlockBanner'); if (c && c.state === 'suspended') banner.classList.add('show'); else banner.classList.remove('show'); }
 ['click','touchstart','keydown'].forEach(evt => document.addEventListener(evt, () => { const c=getSharedAudioCtx(); if (c.state==='suspended') c.resume(); }, {once:false, capture:true}));
 
 let appMode='character';
@@ -893,12 +925,10 @@ function drawBg(beat) {
 const BASEY={stage:.8,neon:.87,ocean:.52,space:.82,retro:.8,forest:.66};
 const STYLECOLORS={stage:'#8b5cf6',space:'#a5b4fc',retro:'#00ff64',neon:'#f472b6',forest:'#34d399',ocean:'#22d3ee'};
 
-// Draws layers back-to-front; a HIDDEN layer is skipped entirely (so anything behind it becomes visible),
-// and any VISIBLE opaque layer on top fully occludes what's underneath simply because it draws later.
 function drawLayersStacked(beat, elapsed) {
     rebuildLayerStack();
     layerStack.forEach((layer) => {
-        if (isLayerHidden(layer)) return; // hidden layers don't draw -> whatever is behind shows through
+        if (isLayerHidden(layer)) return;
         if (layer.type==='img') drawImageLayer(layer, beat, elapsed);
         else if (layer.type==='video') drawVideoLayerItem(layer, elapsed);
         else if (layer.type==='text') drawTextLayerItem(layer, elapsed);
@@ -1016,19 +1046,16 @@ function loadChars(e) {
     files.slice(0,room).forEach(f=>{
         const reader=new FileReader();
         reader.onload=ev=>{ const img=new Image(); img.src=ev.target.result;
-            img.onload=()=>{ chars.push({img,url:ev.target.result,name:f.name,ds:{beatCount:0,jumpAmt:0,spinAng:0,spinDir:1,phase:Math.random()*Math.PI*2},userPlaced:false,opacity:1,hidden:false});
+            img.onload=()=>{ chars.push({img,url:ev.target.result,name:f.name,fileSize:f.size,_fingerprint:{name:f.name,size:f.size},ds:{beatCount:0,jumpAmt:0,spinAng:0,spinDir:1,phase:Math.random()*Math.PI*2},userPlaced:false,opacity:1,hidden:false});
                 checkReady();
-                resequenceImages(); // AUTO-SEQUENCE: each image gets its own fixed slot across the song, one after another
+                resequenceImages();
                 toast('Image added — plays in its own slot on the timeline'); }; };
         reader.readAsDataURL(f);
     });
     e.target.value=''; if (files.length>room) toast('Max 5 images.');
 }
-// Rebuilds imgSegments so every image occupies an equal, sequential slice of the full song duration —
-// exactly like "Image 1 / Image 2 / Image 3 / Image 4" back-to-back in the reference screenshot.
 function resequenceImages() {
-    if (!chars.length) { imgSegments=[]; return; }
-    if (!audioDuration) { imgSegments=[]; return; }
+    if (!chars.length || !audioDuration) { if (!chars.length) imgSegments=[]; return; }
     const each = audioDuration / chars.length;
     imgSegments = chars.map((_,i)=>({charIdx:i, start:i*each, dur:each}));
     TL.draw(pvOffset);
@@ -1049,7 +1076,7 @@ async function addAudioTrack(file) {
     let buf; try { buf=await c.decodeAudioData(ab); } catch(err) { toast('Could not decode '+name); return; }
     const isFirst = audioTracks.length===0;
     if (isFirst) { audioBuffer=buf; audioDuration=buf.duration; document.getElementById('audioName').textContent=name; }
-    audioTracks.push({buffer:buf,name,volume:1,muted:false});
+    audioTracks.push({buffer:buf,name,volume:1,muted:false,fileSize:file.size,_fingerprint:{name:file.name,size:file.size}});
     renderAudioTrackList(); checkReady();
     const lastEnd = audioSegments.length ? audioSegments[audioSegments.length-1].start+audioSegments[audioSegments.length-1].dur : 0;
     audioSegments.push({trackIdx:audioTracks.length-1,start:lastEnd,dur:buf.duration});
@@ -1075,13 +1102,7 @@ function removeAudioTrack(i) {
         document.getElementById('qbInput').disabled=true; document.getElementById('tapCatchBtn').disabled=true; document.getElementById('autoCapBtn').disabled=true; }
     renderAudioTrackList(); checkReady(); TL.resize();
 }
-
-// Preview volume (master, for the mini-player) — separate from per-track mixer volumes
-function setPreviewVolume(val) {
-    previewVolume = val/100;
-    document.getElementById('mpVolLabel').textContent = val+'%';
-    if (pvGainNode) pvGainNode.gain.value = previewVolume;
-}
+function setPreviewVolume(val) { previewVolume = val/100; document.getElementById('mpVolLabel').textContent = val+'%'; if (pvGainNode) pvGainNode.gain.value = previewVolume; }
 
 async function loadVideos(e) { const files=Array.from(e.target.files||[]); for (const f of files) await addVideoLayer(f); e.target.value=''; }
 async function addVideoLayer(file) {
@@ -1089,8 +1110,7 @@ async function addVideoLayer(file) {
     const video=document.createElement('video'); video.src=url; video.muted=true; video.preload='auto';
     await new Promise((res,rej)=>{ video.onloadedmetadata=res; video.onerror=rej; setTimeout(res,3000); });
     const aspect=(video.videoWidth/video.videoHeight)||16/9; const dur=video.duration||10;
-    videoLayers.push({el:video,name,url,aspect,audioEnabled:false,opacity:1,hidden:false});
-    // AUTO-SEQUENCE: each new video clip is appended right after the previous one ends (one-by-one, not stacked)
+    videoLayers.push({el:video,name,url,aspect,audioEnabled:false,opacity:1,hidden:false,fileSize:file.size,_fingerprint:{name:file.name,size:file.size}});
     const lastEnd = videoSegments.length ? videoSegments[videoSegments.length-1].start+videoSegments[videoSegments.length-1].dur : 0;
     videoSegments.push({vidIdx:videoLayers.length-1,start:lastEnd,dur});
     renderVideoLayerList();
@@ -1111,12 +1131,9 @@ function removeVideoLayer(i) {
     checkReady(); TL.draw(pvOffset);
 }
 
-// ============================ TEXT / TITLE LAYERS ============================
 function addTextLayer() {
-    const t = { content:'Your Title Here', font:'Inter', color:'#ffffff', size:48, bold:true, shadow:true, opacity:1, hidden:false,
-        px: W/2, py: H*0.18, pw: 400, ph: 70 };
+    const t = { content:'Your Title Here', font:'Inter', color:'#ffffff', size:48, bold:true, shadow:true, opacity:1, hidden:false, px: W/2, py: H*0.18, pw: 400, ph: 70 };
     textLayers.push(t);
-    const lastEnd = textSegments.length ? textSegments[textSegments.length-1].start+textSegments[textSegments.length-1].dur : 0;
     textSegments.push({textIdx: textLayers.length-1, start:0, dur: audioDuration||8});
     checkReady(); renderTextLayerList(); TL.draw(pvOffset);
     selectLayer({type:'text', refIdx: textLayers.length-1});
@@ -1156,6 +1173,134 @@ function setTextFont(font, btn) {
     document.querySelectorAll('.font-picker button').forEach(b=>b.classList.remove('active'));
     if (btn) btn.classList.add('active');
     drawIdle();
+}
+
+// ============================ SAVE / LOAD PROJECT (real file, saved to the user's computer) ============================
+async function saveProjectToFile() {
+    if (!audioTracks.length && !videoLayers.length && !chars.length) { toast('Add some audio, video, or images before saving'); return; }
+    const data = {
+        formatVersion: 1, appName: 'BeatViz', savedAt: new Date().toISOString(),
+        settings: { style: style_, lyricsStyle, danceMode, camShakeOn, aspectRatio: currentAR, exportQuality },
+        lyrics: lyrics.map(l => ({ time:l.time, endTime:l.endTime, text:l.text })),
+        textLayers: textLayers.map(t => ({ content:t.content, font:t.font, color:t.color, size:t.size, bold:t.bold, shadow:t.shadow, opacity:t.opacity, hidden:t.hidden, px:t.px, py:t.py, pw:t.pw, ph:t.ph })),
+        textSegments: textSegments.map(s => ({ textIdx:s.textIdx, start:s.start, dur:s.dur })),
+        images: chars.map(c => ({ fingerprint: c._fingerprint, px:c.px, py:c.py, pw:c.pw, ph:c.ph, opacity:c.opacity, hidden:c.hidden, userPlaced:c.userPlaced })),
+        imgSegments: imgSegments.map(s => ({ charIdx:s.charIdx, start:s.start, dur:s.dur })),
+        videos: videoLayers.map(v => ({ fingerprint: v._fingerprint, px:v.px, py:v.py, pw:v.pw, ph:v.ph, opacity:v.opacity, hidden:v.hidden, audioEnabled:v.audioEnabled })),
+        videoSegments: videoSegments.map(s => ({ vidIdx:s.vidIdx, start:s.start, dur:s.dur })),
+        audioTracks: audioTracks.map(t => ({ fingerprint: t._fingerprint, volume:t.volume, muted:t.muted })),
+        audioSegments: audioSegments.map(s => ({ trackIdx:s.trackIdx, start:s.start, dur:s.dur })),
+        audioDuration
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const stamp = new Date().toISOString().slice(0,16).replace(/[:T]/g,'-');
+    a.href = url; a.download = `beatviz-project-${stamp}.json`;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(url), 2000);
+    toast('Project saved — choose where to keep it on your computer');
+}
+
+let pendingProjectData = null;
+let reattachSlots = [];
+function loadProjectFromFile(e) {
+    const file = e.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+        let data; try { data = JSON.parse(ev.target.result); } catch(err) { toast('This file is not a valid BeatViz project'); return; }
+        if (!data || data.appName !== 'BeatViz') { toast('This file is not a valid BeatViz project'); return; }
+        pendingProjectData = data; openReattachFlow(data);
+    };
+    reader.readAsText(file); e.target.value = '';
+}
+function openReattachFlow(data) {
+    reattachSlots = [];
+    (data.audioTracks||[]).forEach((t,i)=>reattachSlots.push({ kind:'audio', idx:i, fingerprint:t.fingerprint, file:null }));
+    (data.videos||[]).forEach((v,i)=>reattachSlots.push({ kind:'video', idx:i, fingerprint:v.fingerprint, file:null }));
+    (data.images||[]).forEach((im,i)=>reattachSlots.push({ kind:'image', idx:i, fingerprint:im.fingerprint, file:null }));
+    renderReattachList();
+    document.getElementById('reattachOverlay').classList.add('show');
+}
+function renderReattachList() {
+    const el = document.getElementById('reattachList');
+    if (!reattachSlots.length) { el.innerHTML = '<div style="font-size:12px;color:var(--text-3);padding:10px">No media files were used in this project — click Continue.</div>'; }
+    else {
+        el.innerHTML = reattachSlots.map((slot,i) => {
+            const icon = slot.kind==='audio' ? '🎵' : slot.kind==='video' ? '🎬' : '🖼';
+            const matched = !!slot.file;
+            return `<div class="ra-item ${matched?'matched':''}">
+                <span class="ra-icon">${icon}</span>
+                <div class="ra-info"><div class="ra-name">${slot.fingerprint?.name || 'Unknown file'}</div><div class="ra-status ${matched?'done':''}">${matched ? '✓ Attached' : 'Not attached yet'}</div></div>
+                <button onclick="pickReattachFile(${i})">${matched?'Change':'Choose file'}</button>
+            </div>`;
+        }).join('');
+    }
+    updateReattachContinueBtn();
+}
+function pickReattachFile(slotIdx) {
+    const inp = document.createElement('input'); inp.type='file';
+    const slot = reattachSlots[slotIdx];
+    inp.accept = slot.kind==='audio' ? 'audio/*' : slot.kind==='video' ? 'video/*' : 'image/*';
+    inp.onchange = (e) => { const f=e.target.files[0]; if (f) { reattachSlots[slotIdx].file=f; renderReattachList(); } };
+    inp.click();
+}
+function updateReattachContinueBtn() { document.getElementById('raContinueBtn').disabled = !reattachSlots.every(s=>!!s.file); }
+function cancelProjectLoad() { pendingProjectData=null; reattachSlots=[]; document.getElementById('reattachOverlay').classList.remove('show'); }
+
+async function finishProjectLoad() {
+    const data = pendingProjectData; if (!data) return;
+    document.getElementById('reattachOverlay').classList.remove('show');
+    toast('Loading project…');
+    chars=[]; videoLayers=[]; audioTracks=[]; textLayers=[]; lyrics=[]; imgSegments=[]; videoSegments=[]; audioSegments=[]; textSegments=[]; audioBuffer=null; audioDuration=0; selectLayer(null);
+
+    const audioSlots = reattachSlots.filter(s=>s.kind==='audio');
+    for (const slot of audioSlots) { if (slot.file) await addAudioTrack(slot.file); }
+    (data.audioTracks||[]).forEach((t,i)=>{ if (audioTracks[i]) { audioTracks[i].volume=t.volume??1; audioTracks[i].muted=!!t.muted; } });
+    if (data.audioSegments && data.audioSegments.length) audioSegments = data.audioSegments.map(s=>({...s}));
+    if (data.audioDuration) audioDuration = data.audioDuration;
+    renderAudioTrackList();
+
+    const videoSlots = reattachSlots.filter(s=>s.kind==='video');
+    for (const slot of videoSlots) { if (slot.file) await addVideoLayer(slot.file); }
+    (data.videos||[]).forEach((v,i)=>{ if (videoLayers[i]) Object.assign(videoLayers[i], { px:v.px, py:v.py, pw:v.pw, ph:v.ph, opacity:v.opacity??1, hidden:!!v.hidden, audioEnabled:!!v.audioEnabled }); });
+    if (data.videoSegments && data.videoSegments.length) videoSegments = data.videoSegments.map(s=>({...s}));
+    renderVideoLayerList();
+
+    const imgSlots = reattachSlots.filter(s=>s.kind==='image');
+    for (const slot of imgSlots) {
+        if (!slot.file) continue;
+        await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = ev => { const img=new Image(); img.src=ev.target.result;
+                img.onload = () => { chars.push({ img, url: ev.target.result, name: slot.file.name, ds:{beatCount:0,jumpAmt:0,spinAng:0,spinDir:1,phase:Math.random()*Math.PI*2}, userPlaced:true, opacity:1, hidden:false }); resolve(); }; };
+            reader.readAsDataURL(slot.file);
+        });
+    }
+    (data.images||[]).forEach((im,i)=>{ if (chars[i]) Object.assign(chars[i], { px:im.px, py:im.py, pw:im.pw, ph:im.ph, opacity:im.opacity??1, hidden:!!im.hidden, userPlaced:!!im.userPlaced }); });
+    if (data.imgSegments && data.imgSegments.length) imgSegments = data.imgSegments.map(s=>({...s}));
+    renderCG();
+
+    textLayers = (data.textLayers||[]).map(t=>({ content:t.content, font:t.font||'Inter', color:t.color||'#ffffff', size:t.size||48, bold:!!t.bold, shadow:t.shadow!==false, opacity:t.opacity??1, hidden:!!t.hidden, px:t.px, py:t.py, pw:t.pw, ph:t.ph }));
+    textSegments = (data.textSegments||[]).map(s=>({...s}));
+    renderTextLayerList();
+
+    lyrics = (data.lyrics||[]).map(l=>({ time:l.time, endTime:l.endTime, text:l.text, ds:{beatCount:0,jumpAmt:0,spinAng:0,spinDir:1,phase:Math.random()*Math.PI*2} }));
+    renderLyrics();
+
+    if (data.settings) {
+        const s = data.settings;
+        if (s.style) pickStyle(s.style, document.querySelector(`[data-style="${s.style}"]`));
+        if (s.lyricsStyle) pickLS(s.lyricsStyle, document.querySelector(`[data-ls="${s.lyricsStyle}"]`));
+        if (s.danceMode) pickDance(s.danceMode, document.querySelector(`[data-dm="${s.danceMode}"]`));
+        if (s.aspectRatio) setAspectRatio(s.aspectRatio, document.querySelector(`[data-ar="${s.aspectRatio}"]`));
+        if (s.exportQuality) setQuality(s.exportQuality, document.querySelector(`[data-q="${s.exportQuality}"]`));
+    }
+    rebuildLayerStack(); checkReady();
+    if (audioDuration>0) { document.getElementById('timelineWrap').classList.remove('tl-disabled'); document.getElementById('qbInput').disabled=false; document.getElementById('tapCatchBtn').disabled=false; document.getElementById('autoCapBtn').disabled=false; TL.resize(); }
+    TL.draw(pvOffset);
+    pendingProjectData=null; reattachSlots=[];
+    toast('Project loaded — you can keep editing');
 }
 
 function quickAddLyric() {
@@ -1303,7 +1448,6 @@ document.addEventListener('keydown', e => {
     if (e.key==='Delete' && selectedLayer) { if (selectedLayer.type==='img') removeChar(selectedLayer.refIdx); else if (selectedLayer.type==='video') removeVideoLayer(selectedLayer.refIdx); else if (selectedLayer.type==='text') { textLayers.splice(selectedLayer.refIdx,1); selectLayer(null); renderTextLayerList(); checkReady(); } }
 });
 
-// ============================ PREVIEW PLAYER — with a real, audible gain node + audio meter ============================
 let pvCtx=null, pvAnalyser=null, pvSrc=null, pvStartAt=0, pvGainNode=null;
 function getPvTime() { if (!pvCtx) return pvOffset; return pvPlaying ? pvOffset+(pvCtx.currentTime-pvStartAt) : pvOffset; }
 async function togglePreview() { if (!audioBuffer) { toast('Load audio first'); return; } pvPlaying ? pausePreview() : await playPreview(); }
@@ -1321,9 +1465,7 @@ async function playPreview() {
     pvOffset=Math.min(pvOffset,audioDuration-.1); pvSrc.start(0,pvOffset); pvStartAt=pvCtx.currentTime; pvPlaying=true;
     pvSrc.onended = () => { if (pvPlaying) { pvPlaying=false; pvOffset=0; updatePvUI(); if (tapCatchActive) stopTapCatch(); if (autoCapActive) stopAutoCaption(); document.getElementById('audioMeter').classList.remove('show'); } };
     updatePvUI(); tickPreview();
-    document.getElementById('audioMeter').classList.add('show');
-    initAudioMeterBars();
-    toast('Playing — check your device volume if you don\\'t hear anything');
+    document.getElementById('audioMeter').classList.add('show'); initAudioMeterBars();
 }
 function pausePreview() { pvOffset=Math.min(getPvTime(),audioDuration); try { pvSrc?.stop(); } catch(e){} pvPlaying=false; updatePvUI(); document.getElementById('audioMeter').classList.remove('show'); }
 function seekPreview(t) { const was=pvPlaying; if (pvPlaying) pausePreview(); pvOffset=Math.max(0,Math.min(audioDuration,t)); if (was) playPreview(); else updatePvUI(); TL.draw(pvOffset); drawIdle(); }
@@ -1335,16 +1477,11 @@ function updatePvUI() {
     updateQbTime();
 }
 let meterFreqData = null;
-function initAudioMeterBars() {
-    const bars = document.getElementById('amBars'); if (!bars) return;
-    bars.innerHTML = Array.from({length:8},()=>'<div class="am-bar" style="height:2px"></div>').join('');
-    if (pvAnalyser) meterFreqData = new Uint8Array(pvAnalyser.frequencyBinCount);
-}
+function initAudioMeterBars() { const bars = document.getElementById('amBars'); if (!bars) return; bars.innerHTML = Array.from({length:8},()=>'<div class="am-bar" style="height:2px"></div>').join(''); if (pvAnalyser) meterFreqData = new Uint8Array(pvAnalyser.frequencyBinCount); }
 function updateAudioMeter() {
     if (!pvPlaying || !pvAnalyser || !meterFreqData) return;
     pvAnalyser.getByteFrequencyData(meterFreqData);
-    const bars = document.querySelectorAll('#amBars .am-bar');
-    const step = Math.floor(meterFreqData.length/bars.length)||1;
+    const bars = document.querySelectorAll('#amBars .am-bar'); const step = Math.floor(meterFreqData.length/bars.length)||1;
     bars.forEach((b,i)=>{ const v = meterFreqData[i*step]||0; b.style.height = Math.max(2, (v/255)*16)+'px'; });
 }
 function tickPreview() { if (!pvPlaying) return; updatePvUI(); drawIdle(); TL.draw(getPvTime()); updateAudioMeter(); requestAnimationFrame(tickPreview); }
@@ -1521,7 +1658,6 @@ function detectBeat() {
     if (inst>bassAvg*sens && now-lastBeat>180) { lastBeat=now; beatIntensity=Math.min(1,(inst-bassAvg*sens)*4); return beatIntensity; }
     beatIntensity=Math.max(0,beatIntensity-.055); return 0;
 }
-
 let rafId=null, playStart=0;
 function startLoop() { if (rafId) cancelAnimationFrame(rafId); rafId=requestAnimationFrame(loopFn); }
 function loopFn() {
@@ -1536,14 +1672,11 @@ function loopFn() {
     TL.draw(elapsed);
     if (isPlaying && genAudioCtx) {
         const pct=Math.min(100,elapsed/audioDuration*100); document.getElementById('progFill').style.width=pct+'%'; document.getElementById('timeDisp').textContent=`${fmt(elapsed)} / ${fmt(audioDuration)}`;
-        document.getElementById('audioMeter').classList.add('show'); if (!meterFreqData || meterFreqData.length!==freqData.length) meterFreqData=freqData;
+        document.getElementById('audioMeter').classList.add('show');
         const bars = document.querySelectorAll('#amBars .am-bar'); if (bars.length) { const step=Math.floor(freqData.length/bars.length)||1; bars.forEach((b,i)=>{ const v=freqData[i*step]||0; b.style.height=Math.max(2,(v/255)*16)+'px'; }); }
         if (elapsed>=audioDuration) stopAll();
     }
 }
-
-// The recording audio graph now reuses the SAME shared, already-unlocked AudioContext instead of creating
-// a brand new one — new contexts start "suspended" under browser autoplay rules and were the root cause of silence.
 let genAudioCtx = null;
 async function handleGenerate() {
     const canGenerate = sub.isActive || (sub.trialActive && sub.trialDaysLeft>0);
@@ -1626,7 +1759,7 @@ function finalize() {
     if (blobType==='video/mp4') { document.getElementById('dlWebm').style.display='none'; const b=document.getElementById('dlMp4'); b.style.display='flex'; b.textContent='MP4 '+Q_LABEL[exportQuality]; }
     else { const a=document.getElementById('dlWebm'); a.href=url; a.download='beatviz-'+exportQuality+'.webm'; a.style.display='flex'; const b=document.getElementById('dlMp4'); b.style.display='flex'; b.textContent='MP4 '+Q_LABEL[exportQuality]; }
     document.getElementById('statusDot').className='dot done'; document.getElementById('statusTxt').textContent='Done! Video ready.'; document.getElementById('progFill').style.width='100%';
-    toast('Video ready! Download below. Play it to confirm sound before sharing.');
+    toast('Video ready! Download below.');
     if (!sub.isActive && sub.trialActive) { const prev=parseInt(localStorage.getItem('bvtrialvids')||'0',10); localStorage.setItem('bvtrialvids', prev+1); }
 }
 async function exportMP4() {
@@ -1635,7 +1768,6 @@ async function exportMP4() {
     if (recordedBlob.type==='video/mp4') { const a=document.createElement('a'); a.href=URL.createObjectURL(recordedBlob); a.download=fname; a.click(); toast('MP4 saved!'); return; }
     toast('Download WebM and convert free at cloudconvert.com'); setTimeout(()=>window.open('https://cloudconvert.com/webm-to-mp4','_blank'),1200);
 }
-
 let loopPreviewActive=false, loopPreviewTimer=null, loopPreviewDur=5;
 async function toggleLoopPreview() {
     if (loopPreviewActive) { stopLoopPreview(); return; }
@@ -1647,7 +1779,6 @@ async function toggleLoopPreview() {
 function stopLoopPreview() { loopPreviewActive=false; if (loopPreviewTimer) clearTimeout(loopPreviewTimer); loopPreviewTimer=null; if (pvPlaying) pausePreview(); }
 
 setInterval(()=>{ if (audioDuration>0) updateQbTime(); checkAudioUnlockState(); }, 300);
-
 drawIdle();
 
 </script>

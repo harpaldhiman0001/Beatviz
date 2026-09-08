@@ -323,38 +323,9 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
 }
 
 
-/* ============================================================
-   MOBILE APP SHELL — replaces desktop UI below 768px
-   ============================================================ */
-.mobile-shell { display:none; }
-@media (max-width:768px) {
-  html,body { width:100%; height:100%; height:100dvh; overflow:hidden !important; background:#0a0a12; }
-  /* Critical: do not allow any desktop column to remain visible on a phone. */
-  #topbar, #appMain, .topbar, .app-main, .left-toolbar, .sidebar, .right-panel, .audio-unlock-banner { display:none !important; }
-  .mobile-shell { display:flex !important; position:fixed; inset:0; z-index:1000; flex-direction:column; background:#0a0a12; color:#f5f6fa; font-family:Inter,-apple-system,sans-serif; }
-  .ms-top { height:54px; flex-shrink:0; display:flex; align-items:center; justify-content:space-between; padding:0 14px; border-bottom:1px solid #22242f; background:#0f1018; }
-  .ms-logo { display:flex; align-items:center; gap:8px; font-size:16px; font-weight:800; }.ms-logo i{font-style:normal;color:#8b7bff}.ms-mark{width:29px;height:29px;border-radius:8px;background:linear-gradient(135deg,#6d5ef5,#8b7bff);display:flex;align-items:center;justify-content:center;font-size:14px}
-  .ms-plan { font-size:9px; font-weight:800; color:#7ff0c4; padding:4px 9px; border-radius:100px; background:rgba(46,204,143,.12); }
-  .ms-preview { flex:1; min-height:0; display:flex; align-items:center; justify-content:center; background:#000; position:relative; padding:6px; }
-  .ms-preview canvas { display:block; max-width:100%; max-height:100%; object-fit:contain; border-radius:7px; }
-  .ms-empty { position:absolute; text-align:center; color:#8b8e9f; font-size:13px; line-height:1.6; pointer-events:none; }.ms-empty strong{color:#f5f6fa}.ms-empty span{display:block;font-size:32px;margin-bottom:6px}
-  .ms-timeline { height:172px; min-height:172px; flex-shrink:0; background:#0f1018; border-top:2px solid #6d5ef5; display:flex; flex-direction:column; }
-  .ms-tl-head { height:35px; flex-shrink:0; display:flex; align-items:center; justify-content:space-between; padding:0 10px; border-bottom:1px solid #22242f; }
-  .ms-tl-head b{font-size:10px;color:#c3baff}.ms-tl-head span{font-size:9px;color:#6c6f82}
-  .ms-lanes { flex:1; overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; }
-  .ms-lane { display:flex; height:27px; min-width:100%; border-bottom:1px solid rgba(255,255,255,.04); }.ms-lane:last-child{border-bottom:0}
-  .ms-lane-label { width:58px; min-width:58px; display:flex; align-items:center; padding-left:7px; background:#0a0a12; color:#777b8f; font-size:8px; font-weight:800; }
-  .ms-lane-canvas { flex:1; min-width:calc(100vw - 58px); height:27px; display:block; }
-  .ms-tl-add { height:30px; flex-shrink:0; display:flex; gap:6px; padding:3px 8px; border-top:1px solid #22242f; }.ms-tl-add button{flex:1;border:1px solid #34384a;border-radius:6px;background:#171825;color:#a3a6b8;font:700 10px Inter}.ms-tl-add button.primary{border-color:#6d5ef5;background:rgba(109,94,245,.15);color:#c3baff}
-  .ms-action { height:58px; min-height:58px; flex-shrink:0; display:flex; gap:8px; align-items:center; padding:8px 12px; background:#0f1018; border-top:1px solid #22242f; }
-  .ms-play { width:42px;height:42px;flex-shrink:0;border-radius:10px;border:1px solid #34384a;background:#171825;color:#fff;font-size:16px; }.ms-generate{flex:1;height:42px;border:0;border-radius:10px;background:linear-gradient(135deg,#6d5ef5,#8b7bff);color:#fff;font:800 13px Inter}.ms-generate:disabled{opacity:.4}.ms-generate.stop{background:linear-gradient(135deg,#f0525c,#b23a3a)}
-  .ms-nav { height:62px; min-height:62px; flex-shrink:0; display:flex; gap:2px; padding:5px 4px calc(5px + env(safe-area-inset-bottom)); background:#12131b; border-top:1px solid #22242f; }.ms-nav button{flex:1;min-width:0;border:0;border-radius:8px;background:transparent;color:#777b8f;font:700 9px Inter;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}.ms-nav button span{font-size:19px}.ms-nav button.active{background:rgba(109,94,245,.16);color:#c3baff}
-  .ms-backdrop{display:none;position:fixed;inset:0;z-index:1010;background:rgba(0,0,0,.72);backdrop-filter:blur(3px)}.ms-backdrop.show{display:block}
-  .ms-sheet{position:fixed;z-index:1020;left:0;right:0;bottom:0;height:min(76dvh,640px);display:flex;flex-direction:column;background:#0f1018;border:1px solid #34384a;border-radius:22px 22px 0 0;box-shadow:0 -16px 50px rgba(0,0,0,.6);transform:translateY(105%);transition:transform .25s cubic-bezier(.16,1,.3,1);padding-bottom:env(safe-area-inset-bottom)}.ms-sheet.show{transform:translateY(0)}
-  .ms-handle{width:38px;height:4px;background:#34384a;border-radius:4px;margin:8px auto 3px}.ms-sheet-head{display:flex;align-items:center;justify-content:space-between;padding:5px 16px 10px;border-bottom:1px solid #22242f}.ms-sheet-head b{font-size:16px}.ms-sheet-head button{width:32px;height:32px;border-radius:50%;border:1px solid #34384a;background:#171825;color:#fff;font-size:18px}.ms-sheet-body{flex:1;overflow-y:auto;padding:12px;-webkit-overflow-scrolling:touch}
-  .ms-upload-choice{display:grid;grid-template-columns:1fr 1fr;gap:10px}.ms-upload-choice button{min-height:112px;border:1.5px dashed #3a3d50;border-radius:13px;background:#171825;color:#dce0ef;font:700 12px Inter;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}.ms-upload-choice button span{font-size:28px}.ms-upload-list{margin-top:12px;display:flex;flex-direction:column;gap:7px}.ms-file{display:flex;align-items:center;gap:9px;padding:11px;border:1px solid #2c2f3d;border-radius:10px;background:#171825;color:#c5c8d6;font:600 12px Inter}.ms-file i{font-style:normal;font-size:18px}.ms-file b{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ms-file button{border:0;background:transparent;color:#f0525c;font-size:17px}
-  .ms-lyric-time{text-align:center;color:#c3baff;font:800 17px monospace;padding:4px 0 10px}.ms-lyric-inputrow{display:flex;gap:8px}.ms-lyric-inputrow input{flex:1;min-width:0;height:46px;border-radius:10px;border:1.5px solid #3a3d50;background:#171825;color:#fff;padding:0 12px;font:500 15px Inter;outline:0}.ms-lyric-inputrow input:focus{border-color:#6d5ef5}.ms-lyric-inputrow button{width:72px;border:0;border-radius:10px;background:#6d5ef5;color:#fff;font:800 12px Inter}.ms-lyric-tools{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:10px 0}.ms-lyric-tools button{height:40px;border:1px solid #34384a;border-radius:8px;background:#171825;color:#c5c8d6;font:700 10px Inter}.ms-lyric-tools button.active{border-color:#f2b544;background:rgba(242,181,68,.12);color:#ffd166}.ms-lyrics-list{display:flex;flex-direction:column;gap:8px;padding-bottom:12px}.ms-lyric-item{background:#171825;border:1px solid #2c2f3d;border-radius:11px;overflow:hidden}.ms-lyric-item.selected{border-color:#6d5ef5}.ms-li-main{display:flex;align-items:center;gap:8px;padding:9px}.ms-li-main b{width:41px;color:#c3baff;font:800 10px monospace}.ms-li-main input{flex:1;min-width:0;border:0;outline:0;background:transparent;color:#fff;font:500 14px Inter}.ms-li-main button{width:28px;height:28px;border:1px solid #34384a;border-radius:7px;background:transparent;color:#c5c8d6}.ms-li-controls{display:flex;align-items:center;gap:5px;padding:7px 9px;border-top:1px solid #22242f;background:#12131b}.ms-li-controls span{font:700 9px Inter;color:#777b8f}.ms-li-controls button{min-width:35px;height:29px;border:1px solid #34384a;border-radius:7px;background:#1d1f2c;color:#fff;font:800 13px Inter}.ms-li-controls .copy{margin-left:auto;color:#67e8f9;border-color:#22d3ee;font-size:9px}.ms-li-controls .paste{color:#c3baff;border-color:#6d5ef5;font-size:9px}
-}
+/* VIDEO PLAYBACK FIX: active video audio control */
+.video-audio-toggle { min-width:30px; color:#67e8f9 !important; font-size:12px !important; }
+.video-audio-toggle.muted { color:#f0525c !important; }
 
 </style>
 </head>
@@ -729,18 +700,6 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
 
 <div class="toast" id="toast"></div>
 
-
-<!-- COMPLETE MOBILE APP SHELL -->
-<div class="mobile-shell" id="mobileShell">
-  <header class="ms-top"><div class="ms-logo"><span class="ms-mark">🎬</span>Beat<i>Viz</i></div><span class="ms-plan" id="msPlan">PRO</span></header>
-  <main class="ms-preview" id="msPreview"><canvas id="msCanvas"></canvas><div class="ms-empty" id="msEmpty"><span>🎬</span><strong>Start your video</strong><br>Upload audio and a photo</div></main>
-  <section class="ms-timeline"><div class="ms-tl-head"><b>Timeline</b><span id="msTime">0:00 / 0:00</span></div><div class="ms-lanes" id="msLanes"><div class="ms-lane"><div class="ms-lane-label">🎤 LYRICS</div><canvas class="ms-lane-canvas" id="msTlLyrics"></canvas></div><div class="ms-lane"><div class="ms-lane-label">🔤 TEXT</div><canvas class="ms-lane-canvas" id="msTlText"></canvas></div><div class="ms-lane"><div class="ms-lane-label">🎬 VIDEO</div><canvas class="ms-lane-canvas" id="msTlVideo"></canvas></div><div class="ms-lane"><div class="ms-lane-label">🖼 IMAGE</div><canvas class="ms-lane-canvas" id="msTlImages"></canvas></div><div class="ms-lane"><div class="ms-lane-label">🎵 AUDIO</div><canvas class="ms-lane-canvas" id="msTlAudio"></canvas></div></div><div class="ms-tl-add"><button class="primary" onclick="msOpenLyrics()">＋ Add lyric</button><button onclick="msFitTimeline()">Fit timeline</button></div></section>
-  <div class="ms-action"><button class="ms-play" id="msPlay" onclick="msTogglePlay()">▶</button><button class="ms-generate" id="msGenerate" onclick="handleGenerate()" disabled>Generate Video</button></div>
-  <nav class="ms-nav" id="msNav"><button class="active" onclick="msOpenUpload(this)"><span>📁</span>Upload</button><button onclick="msOpenLayers(this)"><span>🗂</span>Layers</button><button onclick="msOpenText(this)"><span>🔤</span>Text</button><button onclick="msOpenLyrics(this)"><span>🎤</span>Lyrics</button><button onclick="msOpenStyle(this)"><span>✨</span>Style</button></nav>
-</div>
-<div class="ms-backdrop" id="msBackdrop" onclick="msCloseSheet()"></div>
-<section class="ms-sheet" id="msSheet"><div class="ms-handle"></div><header class="ms-sheet-head"><b id="msSheetTitle">Upload</b><button onclick="msCloseSheet()">×</button></header><div class="ms-sheet-body" id="msSheetBody"></div></section>
-
 <script>
 
 const CONFIG = { SCRIPTURL: "https://script.google.com/macros/s/AKfycbxmlAuS2sftPJIuplMd5Scrv2PinK2D-IMVDM2CfxAsuJr2RzM7Yy-Jhh-Inoe5ptQzOQ/exec", RAZORPAYKEY: "rzp_live_TNjnMPpmLS7dJG" };
@@ -999,14 +958,20 @@ function drawImageLayer(layer, beat, elapsed) {
     ctx.shadowBlur=0; ctx.restore();
 }
 function drawVideoLayerItem(layer, elapsed) {
-    const v = videoLayers[layer.refIdx]; if (!v || !v.el) return;
-    if (v.px===undefined) initVideoPlace(v);
-    const seg = videoSegments.find(s=>s.vidIdx===layer.refIdx);
-    let drawTime = elapsed; if (seg) { if (elapsed<seg.start || elapsed>=seg.start+seg.dur) return; drawTime = elapsed-seg.start; }
-    if (drawTime<0) drawTime=0;
-    try { if (Math.abs(v.el.currentTime-drawTime)>0.05) v.el.currentTime=drawTime; } catch(e){}
-    ctx.save(); ctx.globalAlpha = v.opacity ?? 1;
-    ctx.drawImage(v.el, v.px-v.pw/2, v.py-v.ph/2, v.pw, v.ph);
+    const v = videoLayers[layer.refIdx];
+    if (!v || !v.el || v.hidden) return;
+    if (v.px === undefined) initVideoPlace(v);
+    const seg = videoSegments.find(function(s){ return s.vidIdx === layer.refIdx; });
+    if (seg && (elapsed < seg.start || elapsed >= seg.start + seg.dur)) return;
+
+    // IMPORTANT: do NOT set video.currentTime every render frame.
+    // Repeated seeking is what makes HTML video playback stutter.
+    // startVideoLayers() seeks once, calls play(), and the browser then advances decoded frames smoothly.
+    ctx.save();
+    ctx.globalAlpha = v.opacity ?? 1;
+    if (v.el.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+        ctx.drawImage(v.el, v.px-v.pw/2, v.py-v.ph/2, v.pw, v.ph);
+    }
     ctx.restore();
 }
 function drawTextLayerItem(layer, elapsed) {
@@ -1160,7 +1125,7 @@ async function addVideoLayer(file) {
     const video=document.createElement('video'); video.src=url; video.muted=true; video.preload='auto';
     await new Promise((res,rej)=>{ video.onloadedmetadata=res; video.onerror=rej; setTimeout(res,3000); });
     const aspect=(video.videoWidth/video.videoHeight)||16/9; const dur=video.duration||10;
-    videoLayers.push({el:video,name,url,aspect,audioEnabled:false,opacity:1,hidden:false,fileSize:file.size,_fingerprint:{name:file.name,size:file.size}});
+    videoLayers.push({el:video,name,url,aspect,audioEnabled:true,opacity:1,hidden:false,fileSize:file.size,_fingerprint:{name:file.name,size:file.size}});
     const lastEnd = videoSegments.length ? videoSegments[videoSegments.length-1].start+videoSegments[videoSegments.length-1].dur : 0;
     videoSegments.push({vidIdx:videoLayers.length-1,start:lastEnd,dur});
     renderVideoLayerList();
@@ -1513,11 +1478,13 @@ async function playPreview() {
     pvSrc=pvCtx.createBufferSource(); pvSrc.buffer=buf;
     pvSrc.connect(pvGainNode); pvGainNode.connect(pvAnalyser); pvAnalyser.connect(pvCtx.destination);
     pvOffset=Math.min(pvOffset,audioDuration-.1); pvSrc.start(0,pvOffset); pvStartAt=pvCtx.currentTime; pvPlaying=true;
+    // Keep video clips playing smoothly alongside audio preview.
+    if (typeof startVideoLayers === 'function') startVideoLayers(pvOffset);
     pvSrc.onended = () => { if (pvPlaying) { pvPlaying=false; pvOffset=0; updatePvUI(); if (tapCatchActive) stopTapCatch(); if (autoCapActive) stopAutoCaption(); document.getElementById('audioMeter').classList.remove('show'); } };
     updatePvUI(); tickPreview();
     document.getElementById('audioMeter').classList.add('show'); initAudioMeterBars();
 }
-function pausePreview() { pvOffset=Math.min(getPvTime(),audioDuration); try { pvSrc?.stop(); } catch(e){} pvPlaying=false; updatePvUI(); document.getElementById('audioMeter').classList.remove('show'); }
+function pausePreview() { pvOffset=Math.min(getPvTime(),audioDuration); try { pvSrc?.stop(); } catch(e){} if (typeof pauseVideoLayers === 'function') pauseVideoLayers(); pvPlaying=false; updatePvUI(); document.getElementById('audioMeter').classList.remove('show'); }
 function seekPreview(t) { const was=pvPlaying; if (pvPlaying) pausePreview(); pvOffset=Math.max(0,Math.min(audioDuration,t)); if (was) playPreview(); else updatePvUI(); TL.draw(pvOffset); drawIdle(); }
 function updatePvUI() {
     const t=getPvTime(), pct=audioDuration?(t/audioDuration)*100:0;
@@ -1748,6 +1715,26 @@ async function handleGenerate() {
     analyser=genAudioCtx.createAnalyser(); analyser.fftSize=2048; analyser.smoothingTimeConstant=.82;
     freqData=new Uint8Array(analyser.frequencyBinCount);
     const mDest=genAudioCtx.createMediaStreamDestination();
+    // Mix audio from video clips into the recorder stream. The GainNode keeps the clip audible
+    // during preview/export while also routing the same PCM signal to the MediaRecorder output.
+    videoLayers.forEach(function(v) {
+        if (!v || !v.el || !v.audioEnabled || v._audioGraphAttached) return;
+        try {
+            const source = genAudioCtx.createMediaElementSource(v.el);
+            const gain = genAudioCtx.createGain();
+            gain.gain.value = 1;
+            source.connect(gain);
+            gain.connect(mDest);
+            gain.connect(genAudioCtx.destination);
+            v._audioGraphAttached = true;
+            v._audioSource = source;
+            v._audioGain = gain;
+            // Once routed through AudioContext, the element itself must not be muted.
+            v.el.muted = false;
+        } catch (videoAudioError) {
+            console.warn('Could not attach video audio to export stream', videoAudioError);
+        }
+    });
 
     if (audioTracks.length && audioSegments.length) {
         audioSegments.forEach(seg=>{ const track=audioTracks[seg.trackIdx]; if (!track||track.muted) return;
@@ -1783,7 +1770,17 @@ async function handleGenerate() {
     const gb=document.getElementById('genBtn'); gb.textContent='Stop'; gb.classList.add('stop');
     showPauseUI(true);
 }
-function startVideoLayers(offset) { videoLayers.forEach(v=>{ if (!v.el) return; try{v.el.currentTime=offset;}catch(e){} v.el.muted=!v.audioEnabled; v.el.play().catch(()=>{}); }); }
+function startVideoLayers(offset) {
+    videoLayers.forEach(function(v, index) {
+        if (!v.el || v.hidden) return;
+        const seg = videoSegments.find(function(s){ return s.vidIdx === index; });
+        const clipOffset = seg ? Math.max(0, offset - seg.start) : offset;
+        try { v.el.currentTime = clipOffset; } catch (e) {}
+        v.el.muted = !v.audioEnabled;
+        v.el.playbackRate = 1;
+        v.el.play().catch(function(error){ console.warn('Video playback blocked', error); });
+    });
+}
 function pauseVideoLayers() { videoLayers.forEach(v=>v.el&&v.el.pause()); }
 function resumeVideoLayers() { videoLayers.forEach(v=>v.el&&v.el.play().catch(()=>{})); }
 function pickRecorderMime() {
@@ -1839,70 +1836,30 @@ drawIdle();
 
 
 
-/* ================ COMPLETE MOBILE SHELL CONTROLLER ================ */
-function __msPhone(){return window.matchMedia('(max-width:768px)').matches;}
-function __msCanvas(){return document.getElementById('msCanvas');}
-function __msSync(){
-  if(!__msPhone())return;
-  const mobile=document.getElementById('msGenerate'),desktop=document.getElementById('genBtn');
-  if(mobile&&desktop){mobile.disabled=desktop.disabled;mobile.textContent=desktop.textContent;mobile.classList.toggle('stop',desktop.classList.contains('stop'));}
-  const play=document.getElementById('msPlay');if(play)play.textContent=(typeof pvPlaying!=='undefined'&&pvPlaying)?'❚❚':'▶';
-  const plan=document.getElementById('msPlan');if(plan)plan.textContent=(typeof sub!=='undefined'&&sub.isActive)?'PRO':'TRIAL';
-  const time=document.getElementById('msTime');if(time&&typeof fmt==='function')time.textContent=fmt(typeof getPvTime==='function'?getPvTime():0)+' / '+fmt(typeof audioDuration==='number'?audioDuration:0);
-  const empty=document.getElementById('msEmpty');if(empty)empty.style.display=(typeof chars!=='undefined'&&(chars.length||videoLayers.length))?'none':'block';
-  __msDrawPreview();__msDrawAllTimeline();
+/* UI control for individual video sound. */
+const __bvRenderVideoListOriginal = renderVideoLayerList;
+renderVideoLayerList = function() {
+  const list = document.getElementById('videoLayerList');
+  if (!list) return;
+  list.innerHTML = videoLayers.map(function(v, i) {
+    const selected = selectedLayer && selectedLayer.type === 'video' && selectedLayer.refIdx === i;
+    const sound = v.audioEnabled ? '🔊' : '🔇';
+    return '<div class="track-item '+(selected?'selected ':'')+(v.hidden?'hidden-layer':'')+'" onclick="selectLayer({type:\'video\',refIdx:'+i+'})">' +
+      '<span style="flex:1;overflow:hidden;text-overflow:ellipsis">🎬 '+v.name+'</span>' +
+      '<button class="video-audio-toggle '+(v.audioEnabled?'':'muted')+'" onclick="event.stopPropagation();toggleVideoAudio('+i+')">'+sound+'</button>' +
+      '<button onclick="event.stopPropagation();videoLayers['+i+'].hidden=!videoLayers['+i+'].hidden;renderVideoLayerList();drawIdle()">'+(v.hidden?'🚫':'👁')+'</button>' +
+      '<button onclick="event.stopPropagation();removeVideoLayer('+i+')">✕</button></div>';
+  }).join('');
+};
+function toggleVideoAudio(i) {
+  const v = videoLayers[i];
+  if (!v) return;
+  v.audioEnabled = !v.audioEnabled;
+  if (v.el && !v._audioGraphAttached) v.el.muted = !v.audioEnabled;
+  if (v._audioGain) v._audioGain.gain.value = v.audioEnabled ? 1 : 0;
+  renderVideoLayerList();
+  toast(v.audioEnabled ? 'Video sound enabled' : 'Video sound muted');
 }
-function __msDrawPreview(){
-  const target=__msCanvas();if(!target||!__msPhone())return;
-  const holder=document.getElementById('msPreview');const rect=holder.getBoundingClientRect();const ratio=(typeof W==='number'&&typeof H==='number')?W/H:16/9;
-  let w=rect.width-12,h=w/ratio;if(h>rect.height-12){h=rect.height-12;w=h*ratio;}
-  target.width=Math.max(1,Math.floor(w));target.height=Math.max(1,Math.floor(h));
-  const c=target.getContext('2d');c.fillStyle='#000';c.fillRect(0,0,target.width,target.height);
-  try{c.drawImage(canvas,0,0,target.width,target.height);}catch(e){}
-}
-function __msDrawLane(id,items,color,labelFn){
-  const cv=document.getElementById(id);if(!cv||!__msPhone())return;const parent=cv.parentElement;const w=Math.max(1,parent.clientWidth);const h=27;cv.width=w;cv.height=h;cv.style.width=w+'px';cv.style.height=h+'px';const c=cv.getContext('2d');c.fillStyle='#0d0f16';c.fillRect(0,0,w,h);if(!audioDuration)return;
-  items.forEach((it,i)=>{const start=it.time!==undefined?it.time:it.start;const dur=it.endTime!==undefined?it.endTime-it.time:it.dur;const x=Math.max(0,start/audioDuration*w),bw=Math.max(6,dur/audioDuration*w);c.fillStyle=color+'bb';c.fillRect(x,3,bw,h-6);c.strokeStyle=color;c.strokeRect(x+.5,3.5,bw-1,h-7);if(bw>35){c.fillStyle='#fff';c.font='9px Inter';c.fillText(labelFn(it,i),x+5,17);}});
-  const t=typeof getPvTime==='function'?getPvTime():pvOffset||0;const px=t/audioDuration*w;c.strokeStyle='#f0525c';c.beginPath();c.moveTo(px,0);c.lineTo(px,h);c.stroke();
-}
-function __msDrawAllTimeline(){
-  if(!__msPhone())return;
-  __msDrawLane('msTlLyrics',typeof lyrics!=='undefined'?lyrics:[],'#6d5ef5',x=>x.text||'tap to type');
-  __msDrawLane('msTlText',typeof textSegments!=='undefined'?textSegments:[],'#a78bfa',(x,i)=>(textLayers[x.textIdx]?.content||'Text').slice(0,12));
-  __msDrawLane('msTlVideo',typeof videoSegments!=='undefined'?videoSegments:[],'#22d3ee',(x,i)=>(videoLayers[x.vidIdx]?.name||'Video').slice(0,12));
-  __msDrawLane('msTlImages',typeof imgSegments!=='undefined'?imgSegments:[],'#f2b544',(x,i)=>'Image '+(x.charIdx+1));
-  __msDrawLane('msTlAudio',typeof audioSegments!=='undefined'?audioSegments:[],'#6d5ef5',(x,i)=>(audioTracks[x.trackIdx]?.name||'Audio').slice(0,12));
-}
-function msFitTimeline(){__msDrawAllTimeline();}
-function msTogglePlay(){if(typeof togglePreview==='function')togglePreview();setTimeout(__msSync,50);}
-function msOpenSheet(title,html,button){
-  if(!__msPhone())return;document.getElementById('msSheetTitle').textContent=title;document.getElementById('msSheetBody').innerHTML=html;document.getElementById('msBackdrop').classList.add('show');document.getElementById('msSheet').classList.add('show');document.querySelectorAll('#msNav button').forEach(b=>b.classList.toggle('active',b===button));
-}
-function msCloseSheet(){document.getElementById('msBackdrop').classList.remove('show');document.getElementById('msSheet').classList.remove('show');}
-function msOpenUpload(btn){msOpenSheet('Upload media','<div class="ms-upload-choice"><button onclick="document.getElementById(\'audioIn\').click()"><span>🎵</span>Add Audio</button><button onclick="document.getElementById(\'videoIn\').click()"><span>🎬</span>Add Video</button><button onclick="document.getElementById(\'imgIn\').click()"><span>🖼️</span>Add Image</button><button onclick="document.getElementById(\'charIn\').click()"><span>🎭</span>Add Character</button></div><div class="ms-upload-list" id="msFiles"></div>',btn);msRenderFiles();}
-function msRenderFiles(){const el=document.getElementById('msFiles');if(!el)return;let out=[];(audioTracks||[]).forEach((x,i)=>out.push('<div class="ms-file"><i>🎵</i><b>'+x.name+'</b><small>'+fmt(x.buffer.duration)+'</small></div>'));(videoLayers||[]).forEach((x,i)=>out.push('<div class="ms-file"><i>🎬</i><b>'+x.name+'</b></div>'));(chars||[]).forEach((x,i)=>out.push('<div class="ms-file"><i>🖼️</i><b>'+x.name+'</b></div>'));el.innerHTML=out.join('')||'<div style="text-align:center;color:#777b8f;padding:25px;font:13px Inter">Choose audio, video, or image above.</div>';}
-function msOpenLyrics(btn){
-  const html='<div class="ms-lyric-time" id="msLyricTime">0:00 / 0:00</div><div class="ms-lyrics-inputrow"><input id="msLyricInput" placeholder="Type lyric line…"><button onclick="msAddLyric()">Add</button></div><div class="ms-lyric-tools"><button id="msTap" onclick="msToggleTap()">👆 Tap mode</button><button id="msCopy" onclick="msCopyLyric()" disabled>📋 Copy</button><button id="msPaste" onclick="msPasteLyric()" disabled>📥 Paste next</button></div><div class="ms-lyrics-list" id="msLyricsList"></div>';
-  msOpenSheet('Lyrics',html,btn);const input=document.getElementById('msLyricInput');input.onkeydown=e=>{if(e.key==='Enter')msAddLyric();};msRenderLyrics();msUpdateLyricsTime();
-}
-let __msSelected=-1,__msTap=false,__msTapTimer=null;
-function msNow(){return typeof getPvTime==='function'?getPvTime():(pvOffset||0);}
-function msUpdateLyricsTime(){const el=document.getElementById('msLyricTime');if(el)el.textContent=fmt(msNow())+' / '+fmt(audioDuration||0);}
-function msAddLyric(){if(!audioDuration){toast('Upload audio first');return;}const inp=document.getElementById('msLyricInput');const text=inp.value.trim();if(!text){inp.focus();return;}const t=msNow(),next=lyrics.find(l=>l.time>t+.05),end=Math.min(audioDuration,next?Math.min(next.time,t+4):t+4),item={time:t,endTime:end,text:text,ds:{beatCount:0,jumpAmt:0,spinAng:0,spinDir:1,phase:Math.random()*Math.PI*2}};lyrics.push(item);lyrics.sort((a,b)=>a.time-b.time);__msSelected=lyrics.indexOf(item);selectedLyricIdx=__msSelected;lastPasteRefIdx=__msSelected;inp.value='';renderLyrics();TL.draw(t);msRenderLyrics();inp.focus();}
-function msSelect(i){__msSelected=i;selectedLyricIdx=i;lastPasteRefIdx=i;if(lyrics[i])seekPreview(lyrics[i].time);msRenderLyrics();}
-function msChange(i,v){if(lyrics[i]){lyrics[i].text=v;renderLyrics();TL.draw(msNow());}}
-function msDelete(i){lyrics.splice(i,1);__msSelected=Math.min(i,lyrics.length-1);selectedLyricIdx=__msSelected;renderLyrics();TL.draw(msNow());msRenderLyrics();}
-function msNudge(i,kind,d){const l=lyrics[i];if(!l)return;d=Number(d);if(kind==='move'){const dur=l.endTime-l.time;l.time=Math.max(0,Math.min(audioDuration-dur,l.time+d));l.endTime=l.time+dur;}else{l.endTime=Math.max(l.time+.3,Math.min(audioDuration,l.endTime+d));}lyrics.sort((a,b)=>a.time-b.time);__msSelected=lyrics.indexOf(l);selectedLyricIdx=__msSelected;renderLyrics();TL.draw(msNow());msRenderLyrics();}
-function msCopyLyric(){if(__msSelected<0||!lyrics[__msSelected])return;copiedLyric={...lyrics[__msSelected]};lastPasteRefIdx=__msSelected;document.getElementById('msCopy').textContent='✓ Copied';document.getElementById('msPaste').disabled=false;}
-function msPasteLyric(){if(!copiedLyric)return;const ref=lyrics[__msSelected],dur=Math.max(.3,copiedLyric.endTime-copiedLyric.time),start=ref?Math.min(audioDuration-dur,ref.endTime+.15):msNow(),item={text:copiedLyric.text,time:start,endTime:start+dur,ds:{beatCount:0,jumpAmt:0,spinAng:0,spinDir:1,phase:Math.random()*Math.PI*2}};lyrics.push(item);lyrics.sort((a,b)=>a.time-b.time);__msSelected=lyrics.indexOf(item);selectedLyricIdx=__msSelected;lastPasteRefIdx=__msSelected;renderLyrics();TL.draw(msNow());msRenderLyrics();}
-function msToggleTap(){if(!audioDuration)return;if(__msTap){__msTap=false;clearInterval(__msTapTimer);document.getElementById('msTap').classList.remove('active');document.getElementById('msTap').textContent='👆 Tap mode';return;}__msTap=true;document.getElementById('msTap').classList.add('active');document.getElementById('msTap').textContent='⏹ Stop tap';if(!pvPlaying)playPreview();__msTapTimer=setInterval(msUpdateLyricsTime,100);}
-function msTapLine(){if(!__msTap)return;const t=msNow(),item={time:t,endTime:Math.min(audioDuration,t+3),text:'',isPlaceholder:true,ds:{beatCount:0,jumpAmt:0,spinAng:0,spinDir:1,phase:Math.random()*Math.PI*2}};lyrics.push(item);lyrics.sort((a,b)=>a.time-b.time);__msSelected=lyrics.indexOf(item);selectedLyricIdx=__msSelected;renderLyrics();TL.draw(t);msRenderLyrics();}
-function msRenderLyrics(){const el=document.getElementById('msLyricsList');if(!el)return;const cp=document.getElementById('msCopy'),ps=document.getElementById('msPaste');if(cp)cp.disabled=__msSelected<0;if(ps)ps.disabled=!copiedLyric;if(!lyrics.length){el.innerHTML='<div style="text-align:center;color:#777b8f;padding:28px 10px;font:13px Inter">Play your track, type a lyric, then tap Add.<br><br>Use Tap mode to mark lines in rhythm.</div>';return;}el.innerHTML=lyrics.map((l,i)=>{const t=(l.text||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');return '<div class="ms-lyric-item '+(i===__msSelected?'selected':'')+'" onclick="msSelect('+i+')"><div class="ms-li-main"><b>'+fmt(l.time)+'</b><input value="'+t+'" placeholder="Type lyric…" onclick="event.stopPropagation()" onchange="msChange('+i+',this.value)"><button onclick="event.stopPropagation();msDelete('+i+')">×</button></div><div class="ms-li-controls"><span>Move</span><button onclick="event.stopPropagation();msNudge('+i+',\'move\',-.5)">−</button><button onclick="event.stopPropagation();msNudge('+i+',\'move\',.5)">+</button><span>Length</span><button onclick="event.stopPropagation();msNudge('+i+',\'end\',-.5)">−</button><button onclick="event.stopPropagation();msNudge('+i+',\'end\',.5)">+</button><button class="copy" onclick="event.stopPropagation();__msSelected='+i+';msCopyLyric()">Copy</button><button class="paste" onclick="event.stopPropagation();__msSelected='+i+';msPasteLyric()">Paste</button></div></div>';}).join('');}
-document.addEventListener('pointerdown',function(e){if(!__msTap||!__msPhone())return;const sh=document.getElementById('msSheet');if(!sh||!sh.classList.contains('show')||e.target.closest('input,button'))return;if(sh.contains(e.target))msTapLine();});
-function msOpenLayers(btn){msOpenSheet('Layers','<div style="font:12px Inter;color:#a3a6b8;line-height:1.6">Use the desktop editor for detailed layer resize/order controls. On mobile, select your media in Upload, then preview the result above.</div>',btn);}
-function msOpenText(btn){msOpenSheet('Text & title','<button style="width:100%;padding:14px;border:1px solid #6d5ef5;border-radius:10px;background:rgba(109,94,245,.15);color:#c3baff;font:800 13px Inter" onclick="addTextLayer();msCloseSheet()">＋ Add Text / Title</button>',btn);}
-function msOpenStyle(btn){msOpenSheet('Style','<div style="font:12px Inter;color:#a3a6b8;line-height:1.7">Open this page on desktop for all scene, motion, and effect controls. Your chosen style will apply to mobile preview and export.</div>',btn);}
-setInterval(__msSync,150);
 
 </script>
 </body>

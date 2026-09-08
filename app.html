@@ -1195,16 +1195,18 @@ function addTextLayer() {
     selectLayer({type:'text', refIdx: textLayers.length-1});
     showPane('text', document.querySelector('[data-pane="text"]'));
     toast('Text layer added — drag it on the canvas, edit below');
+    setTimeout(()=>{ const inp=document.getElementById('txtContent'); if (inp) { inp.focus(); inp.select(); } }, 30);
 }
 function renderTextLayerList() {
     const el = document.getElementById('textLayerList'); if (!el) return;
     if (!textLayers.length) { el.innerHTML = '<div style="font-size:11px;color:var(--text-3);padding:8px 10px">No text yet — click "Add Text / Title" above.</div>'; return; }
     el.innerHTML = textLayers.map((t,i)=>{ const isSel = selectedLayer&&selectedLayer.type==='text'&&selectedLayer.refIdx===i;
-        return `<div class="text-layer-item ${isSel?'selected':''}" onclick="selectLayer({type:'text',refIdx:${i}})">${t.content||'(empty)'}</div>`; }).join('');
+        return `<div class="text-layer-item ${isSel?'selected':''}" onclick="selectLayer({type:'text',refIdx:${i}})">${(t.content && t.content.length) ? t.content : '(empty)'}</div>`; }).join('');
     const wrap = document.getElementById('textPropsWrap');
     if (selectedLayer && selectedLayer.type==='text') {
         wrap.style.display='block'; const t=textLayers[selectedLayer.refIdx];
-        document.getElementById('txtContent').value = t.content;
+        const contentInput = document.getElementById('txtContent');
+        if (document.activeElement !== contentInput) contentInput.value = t.content;
         document.getElementById('txtColor').value = t.color;
         document.getElementById('txtSize').value = t.size; document.getElementById('vTxtSize').textContent = t.size+'px';
         document.getElementById('txtBold').classList.toggle('active', t.bold);
@@ -1215,7 +1217,7 @@ function renderTextLayerList() {
 function applyTextProps() {
     if (!selectedLayer || selectedLayer.type!=='text') return;
     const t = textLayers[selectedLayer.refIdx]; if (!t) return;
-    t.content = document.getElementById('txtContent').value || 'Text';
+    t.content = document.getElementById('txtContent').value;
     t.color = document.getElementById('txtColor').value;
     t.size = parseInt(document.getElementById('txtSize').value);
     document.getElementById('vTxtSize').textContent = t.size+'px';
@@ -1757,11 +1759,19 @@ async function handleGenerate() {
     const mDest=genAudioCtx.createMediaStreamDestination();
 
     // Route each video's own soundtrack into the mix when the creator has enabled it
-    // for that clip (see the speaker toggle in the Video Clips list).
+    // for that clip (see the speaker toggle in the Video Clips list). We reuse the
+    // SAME AudioContext across every Generate (see bvHardStopAudio: it suspends
+    // rather than closes it), and disconnect/reconnect each video's node every
+    // time, because a <video> element can only ever have ONE MediaElementSourceNode
+    // created for it in its whole lifetime — creating a second one (e.g. after the
+    // context was closed and a new one created) throws and silently kills that
+    // video's audio for every future export.
     videoLayers.forEach(v => {
-        if (!v.audioEnabled || !v.el) return;
+        if (!v.el) return;
+        if (!v.audioEnabled) { if (v._audioNode) { try { v._audioNode.disconnect(); } catch(e){} } v.el.muted = true; return; }
         try {
             if (!v._audioNode) v._audioNode = genAudioCtx.createMediaElementSource(v.el);
+            else v._audioNode.disconnect();
             const g = genAudioCtx.createGain(); g.gain.value = 1;
             v._audioNode.connect(g); g.connect(mDest); g.connect(genAudioCtx.destination); g.connect(analyser);
             v.el.muted = false;
@@ -1831,27 +1841,31 @@ async function bvHardStopAudio() {
     });
     window.bvRenderSources = [];
 
-    // 3. Pause, mute, and rewind every uploaded video to stop embedded video audio.
+    // 3. Pause and mute every uploaded video to stop embedded video audio.
+    //    NOTE: we deliberately do NOT rewind currentTime to 0 here — that used
+    //    to run *before* the context suspend below, which was harmless, but
+    //    keeping it minimal avoids fighting the canvas redraw loop mid-stop.
     videoLayers.forEach(function(videoLayer) {
         if (!videoLayer || !videoLayer.el) return;
         try { videoLayer.el.pause(); } catch (e) {}
         try { videoLayer.el.muted = true; } catch (e) {}
-        try { videoLayer.el.currentTime = 0; } catch (e) {}
     });
 
-    // 4. Close the live generation graph. Closing is stronger than suspend:
-    // it permanently disconnects every active node in that graph.
+    // 4. Silence the shared generation graph by SUSPENDING it — not closing it.
+    //    Closing the AudioContext permanently invalidates every
+    //    MediaElementAudioSourceNode created from an uploaded <video>, and a
+    //    browser will never let you create a second source node for the same
+    //    <video> element even in a brand-new context. That was the root cause
+    //    of "video audio only works the first time": Generate -> Stop closed
+    //    the context, the next Generate got a fresh context, and every video's
+    //    audio silently failed to (re)connect. Suspending keeps the same
+    //    context — and all its node bindings — alive for the next Generate.
     try {
-        if (genAudioCtx && genAudioCtx.state !== 'closed') await genAudioCtx.close();
+        if (genAudioCtx && genAudioCtx.state === 'running') await genAudioCtx.suspend();
     } catch (e) {}
     genAudioCtx = null;
     analyser = null;
     freqData = null;
-
-    // 5. If preview has a distinct context, close it too.
-    try {
-        if (pvCtx && pvCtx !== sharedAudioCtx && pvCtx.state !== 'closed') await pvCtx.close();
-    } catch (e) {}
 }
 
 async function stopAll() {

@@ -322,11 +322,26 @@ a { color: var(--accent); text-decoration: none; } button { font-family: var(--f
     .left-toolbar, .right-panel { display: none !important; }
 }
 
+
+/* ORIGINAL LOOK, WINDOW-SAFE TIMELINE */
+@media (min-width:769px){
+ .preview-area{display:grid!important;grid-template-rows:minmax(120px,1fr) 185px 68px 32px!important;height:100%!important;min-height:0!important;overflow:hidden!important}
+ .canvas-wrap{grid-row:1!important;min-height:0!important;height:auto!important;overflow:hidden!important;padding:8px!important}
+ .canvas-wrap canvas{max-height:100%!important;max-width:100%!important;width:auto!important;height:auto!important}
+ .mt-area{grid-row:2!important;height:185px!important;min-height:185px!important;max-height:185px!important;overflow-y:auto!important}
+ .timeline-wrap{grid-row:3!important;height:68px!important;min-height:68px!important;max-height:68px!important}
+ .timeline-wrap .tl-scroll,.timeline-wrap #tlCanvas{height:68px!important}
+ .status-bar{grid-row:4!important;height:32px!important;min-height:32px!important}
+}
+@media (min-width:769px) and (max-height:760px){
+ .preview-area{grid-template-rows:minmax(80px,1fr) 150px 60px 30px!important}.mt-area{height:150px!important;min-height:150px!important;max-height:150px!important}.mt-row{height:26px!important}.timeline-wrap,.timeline-wrap .tl-scroll,.timeline-wrap #tlCanvas{height:60px!important;min-height:60px!important}.status-bar{height:30px!important;min-height:30px!important}
+}
+
 </style>
 </head>
 <body>
 
-<header class="topbar" id="topbar">
+<header class="topbar" id="topbar"><span id="buildTag" style="position:absolute;left:50%;transform:translateX(-50%);font:600 10px Inter,sans-serif;color:#94a3b8">AUDIO MIX + ORIGINAL TIMELINE</span>
     <span id="buildTag" style="position:absolute;left:50%;transform:translateX(-50%);font:600 10px Inter,sans-serif;color:#6c6f82;letter-spacing:.4px">BUILD 2026-09-08-1756</span>
     <div class="topbar-left">
         <div class="topbar-logo"><div class="mark">🎬</div>Beat<em>Viz</em></div>
@@ -1686,11 +1701,10 @@ async function handleGenerate() {
     const canGenerate = sub.isActive || (sub.trialActive && sub.trialDaysLeft > 0);
     if (!canGenerate) { showPaywall(); return; }
     if (isPlaying) { stopAll(); return; }
-    const hasAnyMedia = audioTracks.length > 0 || videoLayers.length > 0 || chars.length > 0;
-    if (!hasAnyMedia) { toast('Add audio, video, or an image first.'); return; }
+    if (!audioTracks.length && !videoLayers.length && !chars.length) { toast('Add audio, video, or an image first.'); return; }
     if (pvPlaying) pausePreview();
 
-    // Fresh render-only context. Preview has its own context, so stopping an export never breaks Preview sound.
+    // A completely fresh export graph on every render. It is independent from Preview audio.
     try { if (genAudioCtx && genAudioCtx.state !== 'closed') await genAudioCtx.close(); } catch (e) {}
     genAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
     await genAudioCtx.resume();
@@ -1700,92 +1714,89 @@ async function handleGenerate() {
     analyser.smoothingTimeConstant = 0.82;
     freqData = new Uint8Array(analyser.frequencyBinCount);
 
-    // One master mixer feeds BOTH the user's speakers and the MediaRecorder audio track.
-    const master = genAudioCtx.createGain();
-    master.gain.value = 1;
-    const recorderDestination = genAudioCtx.createMediaStreamDestination();
-    master.connect(analyser);
-    master.connect(recorderDestination);
-    master.connect(genAudioCtx.destination);
+    const masterGain = genAudioCtx.createGain();
+    masterGain.gain.value = 1;
+    const recordDestination = genAudioCtx.createMediaStreamDestination();
+    masterGain.connect(recordDestination);
+    masterGain.connect(analyser);
+    masterGain.connect(genAudioCtx.destination);
+
+    // Decide final duration before creating the recorder.
+    if (!audioDuration || !audioTracks.length) {
+        const longestVideo = videoSegments.reduce(function(max, seg) { return Math.max(max, seg.start + seg.dur); }, 0);
+        audioDuration = longestVideo || 10;
+    }
+
+    initParticles();
+    bassAvg = 0;
+    beatIntensity = 0;
+    lastBeat = 0;
+    applyExportResolution();
+    await new Promise(function(resolve) { setTimeout(resolve, 50); });
+
+    const canvasStream = canvas.captureStream(30);
+    const exportStream = new MediaStream();
+    canvasStream.getVideoTracks().forEach(function(track) { exportStream.addTrack(track); });
+    recordDestination.stream.getAudioTracks().forEach(function(track) { exportStream.addTrack(track); });
+
+    const picked = pickRecorderMime();
+    const bitrate = Q_BITRATE[exportQuality] || 6000000;
+    chunks = [];
+    recorder = new MediaRecorder(exportStream, { mimeType:picked.mime, videoBitsPerSecond:bitrate });
+    recorder.ondataavailable = function(event) { if (event.data.size > 0) chunks.push(event.data); };
+    recorder.onstop = finalize;
+
+    // Recorder begins before audio starts. This prevents loss of the beginning of music.
+    recorder.start(100);
+    isPlaying = true;
+    isPaused = false;
+    playStart = genAudioCtx.currentTime;
 
     window.bvRenderSources = [];
-    window.bvVideoAudioNodes = [];
+    window.bvVideoSources = [];
 
-    // Timeline duration: music track wins; otherwise calculate longest uploaded video.
-    if (!audioDuration || audioTracks.length === 0) {
-        const videoEnd = videoSegments.reduce((max, segment) => Math.max(max, segment.start + segment.dur), 0);
-        if (videoEnd > 0) audioDuration = videoEnd;
-        else if (chars.length > 0) audioDuration = 10;
-    }
+    // Mix uploaded audio tracks: each track reaches speakers AND the output file.
+    const musicSegments = audioSegments.length ? audioSegments : audioTracks.map(function(track, index) {
+        return { trackIdx:index, start:0, dur:track.buffer.duration };
+    });
+    musicSegments.forEach(function(segment) {
+        const track = audioTracks[segment.trackIdx];
+        if (!track || track.muted || !track.buffer) return;
+        const source = genAudioCtx.createBufferSource();
+        const gain = genAudioCtx.createGain();
+        source.buffer = track.buffer;
+        gain.gain.value = Number(track.volume ?? 1);
+        source.connect(gain);
+        gain.connect(masterGain);
+        window.bvRenderSources.push(source);
+        const at = Math.max(0, Number(segment.start) || 0);
+        const length = Math.max(0.05, Math.min(Number(segment.dur) || track.buffer.duration, track.buffer.duration));
+        try { source.start(genAudioCtx.currentTime + at, 0, length); } catch (e) { console.warn('Music source failed', e); }
+    });
 
-    // Mix every audio track using its actual timeline start/duration.
-    if (audioTracks.length > 0) {
-        const segments = audioSegments.length ? audioSegments : audioTracks.map((track, i) => ({trackIdx:i,start:0,dur:track.buffer.duration}));
-        segments.forEach(function(segment) {
-            const track = audioTracks[segment.trackIdx];
-            if (!track || track.muted || !track.buffer) return;
-            const source = genAudioCtx.createBufferSource();
-            const gain = genAudioCtx.createGain();
-            source.buffer = track.buffer;
-            gain.gain.value = Number(track.volume ?? 1);
-            source.connect(gain);
-            gain.connect(master);
-            window.bvRenderSources.push(source);
-            const when = Math.max(0, Number(segment.start) || 0);
-            const duration = Math.min(Number(segment.dur) || track.buffer.duration, track.buffer.duration);
-            try { source.start(genAudioCtx.currentTime + when, 0, duration); } catch (e) { console.warn('Audio track could not start', e); }
-        });
-    }
-
-    // Mix embedded video audio. The video element is routed through a MediaElementSource exactly once per render.
-    videoLayers.forEach(function(videoLayer, index) {
-        if (!videoLayer || !videoLayer.el || !videoLayer.audioEnabled || videoLayer.hidden) return;
+    // Mix embedded audio from video clips. createMediaElementSource sends it to masterGain/output file.
+    videoLayers.forEach(function(layer) {
+        if (!layer || !layer.el || layer.hidden || layer.audioEnabled === false) return;
         try {
-            const source = genAudioCtx.createMediaElementSource(videoLayer.el);
+            const source = genAudioCtx.createMediaElementSource(layer.el);
             const gain = genAudioCtx.createGain();
             gain.gain.value = 1;
             source.connect(gain);
-            gain.connect(master);
-            window.bvVideoAudioNodes.push({source:source,gain:gain});
-            // Audio now travels through the context, so element must remain unmuted.
-            videoLayer.el.muted = false;
-        } catch (e) {
-            console.warn('Could not mix video audio. This browser/video codec may not support it.', e);
-        }
+            gain.connect(masterGain);
+            window.bvVideoSources.push({ source:source, gain:gain });
+            layer.el.muted = false;
+        } catch (e) { console.warn('Embedded video audio unavailable', e); }
     });
 
-    initParticles();
-    bassAvg = 0; beatIntensity = 0; lastBeat = 0;
-    applyExportResolution();
-    await new Promise(function(resolve){ setTimeout(resolve, 60); });
-
-    const canvasStream = canvas.captureStream(30);
-    const outputStream = new MediaStream();
-    canvasStream.getVideoTracks().forEach(function(track){ outputStream.addTrack(track); });
-    recorderDestination.stream.getAudioTracks().forEach(function(track){ outputStream.addTrack(track); });
-
-    const picked = pickRecorderMime();
-    const bitrate = {hd:6000000,fhd:10000000,uhd:28000000}[exportQuality] || 6000000;
-    recordingIsMp4 = picked.isMp4;
-    chunks = [];
-    recorder = new MediaRecorder(outputStream, {mimeType:picked.mime, videoBitsPerSecond:bitrate});
-    recorder.ondataavailable = function(event){ if (event.data.size > 0) chunks.push(event.data); };
-    recorder.onstop = finalize;
-
-    playStart = genAudioCtx.currentTime;
     startVideoLayers(0);
-    recorder.start(250);
-    isPlaying = true;
-    isPaused = false;
     startLoop();
-
     document.getElementById('statusDot').className = 'dot rec';
     document.getElementById('statusTxt').textContent = 'Recording with audio';
     const gb = document.getElementById('genBtn');
     gb.textContent = 'Stop';
     gb.classList.add('stop');
     showPauseUI(true);
-} 
+}
 
 function startVideoLayers(offset) { videoLayers.forEach(v=>{ if (!v.el) return; try{v.el.currentTime=offset;}catch(e){} v.el.muted=!v.audioEnabled; v.el.play().catch(()=>{}); }); }
 function pauseVideoLayers() { videoLayers.forEach(v=>v.el&&v.el.pause()); }
@@ -1798,35 +1809,19 @@ function pickRecorderMime() {
     return {mime:'video/webm',isMp4:false};
 }
 async function bvHardStopAudio() {
-    // Stop audio track sources used by this export.
-    (window.bvRenderSources || []).forEach(function(source) {
-        try { source.stop(0); source.disconnect(); } catch (e) {}
-    });
+    (window.bvRenderSources || []).forEach(function(source) { try { source.stop(0); source.disconnect(); } catch (e) {} });
     window.bvRenderSources = [];
-
-    // Pause every video and cut its embedded audio.
-    videoLayers.forEach(function(layer) {
-        if (!layer || !layer.el) return;
-        try { layer.el.pause(); } catch (e) {}
-        try { layer.el.muted = true; } catch (e) {}
-        try { layer.el.currentTime = 0; } catch (e) {}
-    });
-
-    // Disconnect video audio nodes and close ONLY the render-specific context.
-    (window.bvVideoAudioNodes || []).forEach(function(node) {
-        try { node.source.disconnect(); node.gain.disconnect(); } catch (e) {}
-    });
-    window.bvVideoAudioNodes = [];
+    (window.bvVideoSources || []).forEach(function(node) { try { node.source.disconnect(); node.gain.disconnect(); } catch (e) {} });
+    window.bvVideoSources = [];
+    videoLayers.forEach(function(layer) { if (!layer || !layer.el) return; try { layer.el.pause(); layer.el.currentTime = 0; layer.el.muted = true; } catch (e) {} });
     try { if (genAudioCtx && genAudioCtx.state !== 'closed') await genAudioCtx.close(); } catch (e) {}
     genAudioCtx = null;
     analyser = null;
     freqData = null;
 }
-
 function stopAll() {
     isPlaying = false;
     isPaused = false;
-    // Start shutdown immediately; this kills playback without disturbing normal Preview context.
     bvHardStopAudio();
     try { if (recorder && recorder.state !== 'inactive') recorder.stop(); } catch (e) {}
     const meter = document.getElementById('audioMeter'); if (meter) meter.classList.remove('show');

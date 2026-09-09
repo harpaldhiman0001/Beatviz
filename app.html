@@ -2171,7 +2171,6 @@
         .guide-card kbd { display:inline-block; padding:1px 5px; border:1px solid var(--border-strong); border-radius:4px; background:var(--bg-app); color:#c3baff; font:700 10px Inter,sans-serif; }
         @media (max-width:768px) { .guide-btn { padding:7px 9px; font-size:10px; } .guide-modal { padding:10px; align-items:flex-end; } .guide-box { max-height:calc(100dvh - 20px); border-radius:18px 18px 12px 12px; } .guide-head { padding:15px; } .guide-intro { padding:12px 14px 2px; } .guide-grid { grid-template-columns:1fr; padding:12px 14px 18px; } }
 
-            #pasteNextBtn, #tlClipBanner { display:none !important; }
     </style>
 </head>
 <body>
@@ -3027,8 +3026,6 @@ async function startAudioFrom(offset = 0) {
             recordingIsMp4 = false;
         let selectedLyricIdx = -1;
         let copiedLyric = null;
-        let lyricClipboard = null;
-        let lyricPasteTarget = null;
         let lastPasteRefIdx = -1;
         let activeFX = new Set();
         let previewVolume = 1;
@@ -4379,25 +4376,7 @@ function fitImageIndexToFull(idx) {
             if (e.code === 'Space') { e.preventDefault();
                 togglePreview(); }
             if (e.key.toLowerCase() === 'l') { if (tapCatchActive) tapCatchHit(); }
-            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
-                if (selectedLyricIdx >= 0 && selectedLyricIdx < lyrics.length) {
-                    e.preventDefault(); lyricClipboard = { ...lyrics[selectedLyricIdx] }; copiedLyric = null;
-                    toast('Lyric copied — left-click a timeline point, then press Ctrl+V');
-                }
-                return;
-            }
-            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'v') {
-                e.preventDefault();
-                if (!lyricClipboard) { toast('Select a lyric and press Ctrl+C first'); return; }
-                if (lyricPasteTarget === null) { toast('Left-click an empty Lyrics timeline point first'); return; }
-                const duration = Math.max(.3, Number(lyricClipboard.endTime) - Number(lyricClipboard.time));
-                const start = Math.max(0, Math.min(audioDuration - duration, lyricPasteTarget));
-                const nextLyric = lyrics.find(lyric => Number(lyric.time) > start + .01);
-                const end = Math.max(start + .3, Math.min(audioDuration, nextLyric ? Number(nextLyric.time) : start + duration));
-                const pastedLyric = { text: lyricClipboard.text || '', time:+start.toFixed(2), endTime:+end.toFixed(2), ds:{beatCount:0,jumpAmt:0,spinAng:0,spinDir:1,phase:Math.random()*Math.PI*2} };
-                lyrics.push(pastedLyric); lyrics.sort((a,b)=>Number(a.time)-Number(b.time)); selectedLyricIdx=lyrics.indexOf(pastedLyric); lyricPasteTarget=null; pvOffset=start;
-                renderLyrics(); TL.draw(start); toast('Lyric pasted at ' + fmt(start)); return;
-            }
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'v' && copiedLyric) pasteNextInSequence();
             if (e.key === 'Delete' && selectedLayer) { if (selectedLayer.type === 'img') removeChar(selectedLayer
                     .refIdx); else if (selectedLayer.type === 'video') removeVideoLayer(selectedLayer.refIdx);
                 else if (selectedLayer.type === 'text') { textLayers.splice(selectedLayer.refIdx, 1);
@@ -4618,21 +4597,36 @@ function togglePreview() {
                 const { mx, my } = this.getXY(e, lane);
                 if (lane === 'lyrics') {
                     const h = this.hitLyric(mx);
-                    if (h) {
-                        selectedLyricIdx = h.idx;
-                        this.dragging = { lane, ...h, startX: mx, startScreenX: e.clientX, startScreenY: e.clientY,
-                            origStart: lyrics[h.idx].time, origEnd: lyrics[h.idx].endTime, moved: false };
-                        renderLyrics();
-                        return;
-                    }
+                    if (h) { selectedLyricIdx = h.idx;
+                        this.dragging = { lane, ...h, startX: mx, startScreenX: e.clientX, startScreenY: e
+                                .clientY, origStart: lyrics[h.idx].time, origEnd: lyrics[h.idx].endTime,
+                            moved: false };
+                        renderLyrics(); return; }
                     const t = this.x2t(mx);
-                    lyricPasteTarget = t;
-                    pvOffset = t;
-                    if (playbackState === 'paused') pausedAt = t;
-                    seekPreview(t);
-                    this.draw(t);
-                    if (lyricClipboard) toast('Paste position selected — press Ctrl+V to paste lyric');
-                    else if (playbackState === 'paused') toast('Resume point moved to ' + fmt(t));
+                    if (copiedLyric) { const dur = copiedLyric.endTime - copiedLyric.time;
+                        const newT = Math.max(0, Math.min(audioDuration - dur, t));
+                        lyrics.push({ text: copiedLyric.text, time: +newT.toFixed(2), endTime: +(newT + dur)
+                                .toFixed(2), ds: { beatCount: 0, jumpAmt: 0, spinAng: 0, spinDir: 1,
+                                phase: Math.random() * Math.PI * 2 } });
+                        lyrics.sort((a, b) => a.time - b.time);
+                        const ni = lyrics.findIndex(l => Math.abs(l.time - newT) < 0.1);
+                        selectedLyricIdx = ni;
+                        lastPasteRefIdx = ni;
+                        renderLyrics();
+                        this.draw(pvOffset);
+                        toast('Pasted at ' + fmt(newT));
+                        return; }
+                    const dur = 3;
+                    const nxt = lyrics.find(l => l.time > t + 0.05);
+                    const end = Math.min(audioDuration, nxt ? Math.min(nxt.time, t + dur) : t + dur);
+                    lyrics.push({ time: t, endTime: end, text: '', ds: { beatCount: 0, jumpAmt: 0, spinAng: 0,
+                            spinDir: 1, phase: Math.random() * Math.PI * 2 } });
+                    lyrics.sort((a, b) => a.time - b.time);
+                    const newIdx = lyrics.findIndex(l => Math.abs(l.time - t) < 0.1);
+                    selectedLyricIdx = newIdx;
+                    renderLyrics();
+                    this.draw(pvOffset);
+                    openInlineEditor(newIdx, e.clientX, e.clientY);
                     return;
                 }
                 if (lane === 'text') { const h = this.hitSeg(mx, textSegments); if (h) { this.dragging = { lane, ...h,
@@ -5304,18 +5298,89 @@ async function exportMP4() {
         function hideGuide() { document.getElementById('guideModal').classList.remove('show'); }
         document.getElementById('guideModal').addEventListener('click', function(e) { if (e.target === this) hideGuide(); });
 
-        // Final subscription UI rule: keep Guide visible, hide only Upgrade for Pro users.
-        (() => {
-            const oldUpdate = updateSubPill;
-            updateSubPill = function () {
-                oldUpdate();
-                const upgrade = document.querySelector('.topbar-cta');
-                if (upgrade) upgrade.style.display = sub && sub.isActive ? 'none' : '';
-            };
-            const upgrade = document.querySelector('.topbar-cta');
-            if (upgrade && sub && sub.isActive) upgrade.style.display = 'none';
-        })();
 
+        /* Lyric clip editor repair: preserve edge trimming, add hide/show, and keep empty clicks paste-only. */
+        (() => {
+            let lyricClipboardFixed = null;
+            let lyricPasteTargetFixed = null;
+            let lyricDragSnapshot = null;
+
+            function lyricSnapshot() { return JSON.stringify(lyrics); }
+            function refreshLyricsUI() { renderLyrics(); TL.draw(pvOffset); }
+            function pasteCopiedLyric() {
+                if (!lyricClipboardFixed) { toast('Select a lyric and press Ctrl+C first'); return; }
+                if (lyricPasteTargetFixed === null) { toast('Left-click an empty Lyrics timeline point first'); return; }
+                const duration = Math.max(.3, Number(lyricClipboardFixed.endTime) - Number(lyricClipboardFixed.time));
+                const start = Math.max(0, Math.min(audioDuration - duration, lyricPasteTargetFixed));
+                const next = lyrics.find(l => Number(l.time) > start + .01);
+                const end = Math.max(start + .3, Math.min(audioDuration, next ? Number(next.time) : start + duration));
+                const item = { text:lyricClipboardFixed.text || '', time:+start.toFixed(2), endTime:+end.toFixed(2), hidden:false,
+                    ds:{beatCount:0,jumpAmt:0,spinAng:0,spinDir:1,phase:Math.random()*Math.PI*2} };
+                lyrics.push(item); lyrics.sort((a,b)=>Number(a.time)-Number(b.time));
+                selectedLyricIdx=lyrics.indexOf(item); lyricPasteTargetFixed=null; pvOffset=start; refreshLyricsUI(); toast('Lyric pasted at '+fmt(start));
+            }
+
+            // Replace only the Lyrics mouse-down behavior. Clip body/edges retain normal drag and trim behavior.
+            const baseDown = TL.onDown.bind(TL);
+            TL.onDown = function(e,lane) {
+                if (lane !== 'lyrics') return baseDown(e,lane);
+                if (!audioDuration) { toast('Upload audio first to use the timeline'); return; }
+                closeInlineEditor();
+                const {mx}=this.getXY(e,lane), hit=this.hitLyric(mx);
+                if (hit) {
+                    selectedLyricIdx=hit.idx;
+                    lyricDragSnapshot=lyricSnapshot();
+                    this.dragging={lane,...hit,startX:mx,startScreenX:e.clientX,startScreenY:e.clientY,
+                        origStart:Number(lyrics[hit.idx].time),origEnd:Number(lyrics[hit.idx].endTime),moved:false};
+                    renderLyrics();
+                    return;
+                }
+                // Empty left click: position only. Never creates/pastes a lyric.
+                const t=this.x2t(mx);
+                lyricPasteTargetFixed=t; pvOffset=t;
+                if (playbackState==='paused') pausedAt=t;
+                seekPreview(t); this.draw(t);
+                toast(lyricClipboardFixed ? 'Paste position selected — press Ctrl+V to paste lyric' : 'Timeline position selected');
+            };
+
+            const baseUp=TL.onUp.bind(TL);
+            TL.onUp=function(e,lane) {
+                const wasLyricDrag=this.dragging && this.dragging.lane==='lyrics';
+                const wasEdge=wasLyricDrag && (this.dragging.handle==='left'||this.dragging.handle==='right');
+                baseUp(e,lane);
+                if(wasEdge) { renderLyrics(); this.draw(pvOffset); toast('Lyric duration updated'); }
+                lyricDragSnapshot=null;
+            };
+
+            // Hide/show selected lyric with H. Hidden clips stay on timeline but do not render in video.
+            const originalDrawLyricsOverlay = drawLyricsOverlay;
+            drawLyricsOverlay = function(currentTime, beat) {
+                const current = lyrics.filter(l => !l.hidden);
+                const all = lyrics;
+                // Preserve original function behavior by temporarily exposing only visible lyrics.
+                lyrics.splice(0, lyrics.length, ...current);
+                try { return originalDrawLyricsOverlay(currentTime, beat); }
+                finally { lyrics.splice(0, lyrics.length, ...all); }
+            };
+
+            document.addEventListener('keydown',e=>{
+                const typing=e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.isContentEditable;
+                if(typing) return;
+                const mod=e.ctrlKey||e.metaKey, key=e.key.toLowerCase();
+                if(mod&&key==='c'&&selectedLyricIdx>=0&&selectedLyricIdx<lyrics.length){
+                    e.preventDefault(); e.stopImmediatePropagation(); lyricClipboardFixed={...lyrics[selectedLyricIdx]};
+                    toast('Lyric copied — left-click a timeline point, then press Ctrl+V'); return;
+                }
+                if(mod&&key==='v'){e.preventDefault();e.stopImmediatePropagation();pasteCopiedLyric();return;}
+                if(key==='h'&&selectedLyricIdx>=0&&selectedLyricIdx<lyrics.length){
+                    e.preventDefault(); e.stopImmediatePropagation(); lyrics[selectedLyricIdx].hidden=!lyrics[selectedLyricIdx].hidden;
+                    refreshLyricsUI(); toast(lyrics[selectedLyricIdx].hidden?'Lyric hidden — press H to show':'Lyric visible'); return;
+                }
+                if((e.key==='Delete'||e.key==='Backspace')&&selectedLyricIdx>=0&&selectedLyricIdx<lyrics.length){
+                    e.preventDefault();e.stopImmediatePropagation();lyrics.splice(selectedLyricIdx,1);selectedLyricIdx=Math.min(selectedLyricIdx,lyrics.length-1);refreshLyricsUI();toast('Lyric deleted');
+                }
+            },true);
+        })();
         drawIdle();
     </script>
     <!-- Apply this patch to the end of beatviz.html, immediately before </body>. It adds lyric creation by right-click, paused-playhead seeking by left-click, and fixes effects rendering. -->

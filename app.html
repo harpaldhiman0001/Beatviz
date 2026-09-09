@@ -2151,71 +2151,6 @@
             .paywall .pw-box { max-height: calc(100dvh - 24px); overflow-y: auto; border-radius: 20px; }
         }
 
-    
-
-        /* Quick guide */
-        .guide-btn {
-            border: 1px solid rgba(103,232,249,.45);
-            background: rgba(6,182,212,.10);
-            color: #67e8f9;
-            border-radius: 9px;
-            padding: 8px 11px;
-            font: 800 11px Inter, sans-serif;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-        .guide-btn:hover { background: rgba(6,182,212,.20); }
-        .guide-modal {
-            position: fixed;
-            inset: 0;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            z-index: 500;
-            background: rgba(4,5,8,.76);
-            backdrop-filter: blur(9px);
-        }
-        .guide-modal.show { display: flex; }
-        .guide-box {
-            width: min(760px, 100%);
-            max-height: min(720px, calc(100dvh - 40px));
-            overflow: auto;
-            background: linear-gradient(160deg, var(--bg-panel), var(--bg-app));
-            border: 1px solid var(--border-strong);
-            border-radius: 18px;
-            box-shadow: 0 24px 80px rgba(0,0,0,.55);
-        }
-        .guide-head {
-            position: sticky;
-            top: 0;
-            z-index: 2;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            padding: 18px 20px;
-            border-bottom: 1px solid var(--border);
-            background: rgba(20,21,31,.96);
-            backdrop-filter: blur(10px);
-        }
-        .guide-head h2 { color: var(--text-1); font-size: 17px; }
-        .guide-close { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--border-strong); background: var(--bg-card); color: var(--text-2); cursor: pointer; font-size: 18px; }
-        .guide-intro { padding: 16px 20px 4px; color: var(--text-3); font-size: 12px; line-height: 1.55; }
-        .guide-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; padding: 16px 20px 20px; }
-        .guide-card { border: 1px solid var(--border); border-radius: 12px; padding: 13px; background: var(--bg-card); }
-        .guide-card h3 { color: var(--text-1); font-size: 12px; margin-bottom: 7px; }
-        .guide-card p { color: var(--text-3); font-size: 11px; line-height: 1.55; }
-        .guide-card kbd { display: inline-block; padding: 1px 5px; border: 1px solid var(--border-strong); border-radius: 4px; background: var(--bg-app); color: #c3baff; font: 700 10px Inter,sans-serif; }
-        @media (max-width:768px) {
-            .guide-btn { padding: 7px 9px; font-size: 10px; }
-            .guide-modal { padding: 10px; align-items: flex-end; }
-            .guide-box { max-height: calc(100dvh - 20px); border-radius: 18px 18px 12px 12px; }
-            .guide-head { padding: 15px; }
-            .guide-grid { grid-template-columns: 1fr; padding: 12px 14px 18px; }
-            .guide-intro { padding: 12px 14px 2px; }
-        }
-
     </style>
 </head>
 <body>
@@ -2229,7 +2164,6 @@
             <span class="topbar-badge trial" id="subBadge">Free Trial</span>
         </div>
         <div class="topbar-right">
-            <button class="guide-btn" type="button" onclick="showGuide()">? Guide</button>
             <div class="mode-switcher">
                 <button id="modeChar" class="active" onclick="setAppMode('character')">🎭 Character</button>
                 <button id="modePromo" onclick="setAppMode('promo')">📢 Promo</button>
@@ -2239,27 +2173,6 @@
             <button class="topbar-logout" onclick="doLogout()">Logout</button>
         </div>
     </header>
-
-    <div class="guide-modal" id="guideModal" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
-        <div class="guide-box">
-            <div class="guide-head"><h2 id="guideTitle">BeatViz Quick Guide</h2><button class="guide-close" type="button" onclick="hideGuide()" aria-label="Close guide">×</button></div>
-            <p class="guide-intro">Create your video in this order: upload media, arrange clips on the timeline, customize the look, then generate.</p>
-            <div class="guide-grid">
-                <article class="guide-card"><h3>1. Add audio</h3><p>Open <b>Upload</b>, choose your MP3, WAV, AAC, or FLAC track. The timeline turns on after audio loads.</p></article>
-                <article class="guide-card"><h3>2. Add video</h3><p>In <b>Upload</b>, choose video clips. They are placed on the Video timeline. Drag clips to move them and drag either edge to trim.</p></article>
-                <article class="guide-card"><h3>3. Overlap videos</h3><p>Drag a video clip left or right on the Video timeline so it overlaps another clip. Open <b>Layers</b> and use <b>To Front</b> or <b>To Back</b> to choose which video appears on top.</p></article>
-                <article class="guide-card"><h3>4. Add images</h3><p>In <b>Upload</b>, add a Character or Any Image. Select it in <b>Layers</b>, then drag it on the preview or change X, Y, Width, and Height.</p></article>
-                <article class="guide-card"><h3>5. Overlap images</h3><p>Move image clips so their timeline times overlap. In <b>Layers</b>, use <b>Bring Forward</b>, <b>Send Backward</b>, <b>To Front</b>, or <b>To Back</b> to set the visible order.</p></article>
-                <article class="guide-card"><h3>6. Add lyrics</h3><p><b>Right-click</b> empty space on the Lyrics timeline to add a lyric. Type the line in the editor. Left-click only sets the playhead; it does not add a lyric.</p></article>
-                <article class="guide-card"><h3>7. Edit lyric clips</h3><p>Right-click a lyric to select it. Press <kbd>Delete</kbd> to remove it. Press <kbd>Ctrl</kbd> + <kbd>C</kbd> to copy, left-click where you want it, then press <kbd>Ctrl</kbd> + <kbd>V</kbd> to paste.</p></article>
-                <article class="guide-card"><h3>8. Undo and redo</h3><p>Use <kbd>Ctrl</kbd> + <kbd>Z</kbd> to undo lyric add, delete, or paste. Use <kbd>Ctrl</kbd> + <kbd>Y</kbd>, or <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Z</kbd>, to redo.</p></article>
-                <article class="guide-card"><h3>9. Add effects</h3><p>Use the right-side <b>Effects</b> section to turn on Glow, Grain, or Vignette. On mobile, open the <b>Style</b> tab to choose visual styles and adjust the look.</p></article>
-                <article class="guide-card"><h3>10. Pause and resume</h3><p>Pause playback, left-click an empty point on the timeline to choose the next resume point, then press <b>Resume</b>.</p></article>
-                <article class="guide-card"><h3>11. Generate video</h3><p>When media is ready, click <b>Generate Video</b>. On mobile, the purple Generate button stays above the bottom navigation.</p></article>
-                <article class="guide-card"><h3>12. Mobile navigation</h3><p>Use the bottom app navigation: Upload, Layers, Text, Lyrics, Style, and Motion. Your selected panel opens above the preview.</p></article>
-            </div>
-        </div>
-    </div>
 
     <div class="audio-unlock-banner" id="audioUnlockBanner" onclick="unlockAudioNow()">🔊 Click here to enable sound</div>
 
@@ -5339,10 +5252,76 @@ async function exportMP4() {
                 if (window.innerWidth <= 768 && typeof TL !== 'undefined') TL.resize();
             });
         })();
-        function showGuide() { document.getElementById('guideModal').classList.add('show'); }
-        function hideGuide() { document.getElementById('guideModal').classList.remove('show'); }
-        document.getElementById('guideModal').addEventListener('click', function(e) { if (e.target === this) hideGuide(); });
 
+        /* Final lyric paste rule: Ctrl+C copies, left-click chooses a position, Ctrl+V pastes. */
+        (() => {
+            let lyricClipboard = null;
+            let lyricPasteTarget = null;
+            const oldOnDown = TL.onDown.bind(TL);
+
+            TL.onDown = function(e, lane) {
+                if (lane === 'lyrics' && audioDuration) {
+                    const { mx } = this.getXY(e, lane);
+                    const hit = this.hitLyric(mx);
+                    if (!hit) {
+                        // Left-click only chooses the target. It never adds or pastes a lyric.
+                        const t = this.x2t(mx);
+                        lyricPasteTarget = t;
+                        pvOffset = t;
+                        if (playbackState === 'paused') pausedAt = t;
+                        seekPreview(t);
+                        this.draw(t);
+                        if (lyricClipboard) toast('Paste position selected — press Ctrl+V to paste lyric');
+                        else if (playbackState === 'paused') toast('Resume point moved to ' + fmt(t));
+                        return;
+                    }
+                }
+                return oldOnDown(e, lane);
+            };
+
+            function pasteAtSelectedTimelinePoint() {
+                if (!lyricClipboard) { toast('Select a lyric and press Ctrl+C first'); return; }
+                if (lyricPasteTarget === null || lyricPasteTarget === undefined) {
+                    toast('Left-click an empty Lyrics timeline point before pasting');
+                    return;
+                }
+                const dur = Math.max(.3, Number(lyricClipboard.endTime) - Number(lyricClipboard.time));
+                const start = Math.max(0, Math.min(audioDuration - dur, lyricPasteTarget));
+                const next = lyrics.find(l => Number(l.time) > start + .01);
+                const end = Math.max(start + .3, Math.min(audioDuration, next ? Number(next.time) : start + dur));
+                const newLyric = {
+                    text: lyricClipboard.text || '',
+                    time: +start.toFixed(2),
+                    endTime: +end.toFixed(2),
+                    ds: { beatCount: 0, jumpAmt: 0, spinAng: 0, spinDir: 1, phase: Math.random() * Math.PI * 2 }
+                };
+                lyrics.push(newLyric);
+                lyrics.sort((a,b) => Number(a.time) - Number(b.time));
+                selectedLyricIdx = lyrics.indexOf(newLyric);
+                pvOffset = start;
+                lyricPasteTarget = null;
+                renderLyrics();
+                TL.draw(start);
+                toast('Lyric pasted at ' + fmt(start));
+            }
+
+            document.addEventListener('keydown', e => {
+                const typing = e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable;
+                if (typing || !(e.ctrlKey || e.metaKey)) return;
+                const key = e.key.toLowerCase();
+                if (key === 'c') {
+                    if (selectedLyricIdx < 0 || selectedLyricIdx >= lyrics.length) return;
+                    e.preventDefault(); e.stopImmediatePropagation();
+                    lyricClipboard = { ...lyrics[selectedLyricIdx] };
+                    copiedLyric = null;
+                    toast('Lyric copied — left-click a timeline point, then press Ctrl+V');
+                }
+                if (key === 'v') {
+                    e.preventDefault(); e.stopImmediatePropagation();
+                    pasteAtSelectedTimelinePoint();
+                }
+            }, true);
+        })();
         drawIdle();
     </script>
     <!-- Apply this patch to the end of beatviz.html, immediately before </body>. It adds lyric creation by right-click, paused-playhead seeking by left-click, and fixes effects rendering. -->

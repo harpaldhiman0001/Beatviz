@@ -2171,6 +2171,27 @@
         .guide-card kbd { display:inline-block; padding:1px 5px; border:1px solid var(--border-strong); border-radius:4px; background:var(--bg-app); color:#c3baff; font:700 10px Inter,sans-serif; }
         @media (max-width:768px) { .guide-btn { padding:7px 9px; font-size:10px; } .guide-modal { padding:10px; align-items:flex-end; } .guide-box { max-height:calc(100dvh - 20px); border-radius:18px 18px 12px 12px; } .guide-head { padding:15px; } .guide-intro { padding:12px 14px 2px; } .guide-grid { grid-template-columns:1fr; padding:12px 14px 18px; } }
 
+    
+        /* Supabase cloud projects */
+        .cloud-btn { border:1px solid rgba(103,232,249,.55); border-radius:var(--radius-sm); background:rgba(6,182,212,.10); color:#67e8f9; padding:9px 10px; font:700 10px Inter,sans-serif; cursor:pointer; }
+        .cloud-btn:hover { background:rgba(6,182,212,.2); }
+        .cloud-projects-modal { position:fixed; inset:0; z-index:700; display:none; align-items:center; justify-content:center; padding:20px; background:rgba(4,5,8,.8); backdrop-filter:blur(10px); }
+        .cloud-projects-modal.show { display:flex; }
+        .cloud-projects-box { width:min(760px,100%); max-height:calc(100dvh - 40px); overflow:auto; border:1px solid var(--border-strong); border-radius:18px; background:var(--bg-panel); box-shadow:0 24px 80px rgba(0,0,0,.6); }
+        .cloud-projects-head { position:sticky; top:0; z-index:2; display:flex; align-items:center; justify-content:space-between; gap:10px; padding:15px 16px; background:var(--bg-panel); border-bottom:1px solid var(--border); }
+        .cloud-projects-head h2 { color:var(--text-1); font-size:16px; }
+        .cloud-close { width:32px; height:32px; border:1px solid var(--border-strong); border-radius:50%; color:var(--text-2); background:var(--bg-card); font-size:18px; cursor:pointer; }
+        .cloud-project-list { display:grid; gap:10px; padding:14px; }
+        .cloud-project-card { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:13px; border:1px solid var(--border); border-radius:12px; background:var(--bg-card); }
+        .cloud-project-name { color:var(--text-1); font-weight:800; font-size:13px; }
+        .cloud-project-meta { color:var(--text-3); font-size:10px; margin-top:5px; }
+        .cloud-project-actions { display:flex; gap:6px; flex-shrink:0; }
+        .cloud-open-btn,.cloud-delete-btn { border:1px solid var(--border-strong); border-radius:8px; padding:7px 9px; background:var(--bg-elevated); color:var(--text-2); font:700 10px Inter,sans-serif; cursor:pointer; }
+        .cloud-open-btn { border-color:var(--accent); color:#c3baff; background:var(--accent-soft); }
+        .cloud-delete-btn { border-color:rgba(239,68,68,.5); color:#fca5a5; background:rgba(239,68,68,.08); }
+        .cloud-empty { padding:28px 14px; text-align:center; font-size:12px; color:var(--text-3); }
+        @media(max-width:768px) { .cloud-projects-modal{align-items:flex-end;padding:8px}.cloud-projects-box{max-height:calc(100dvh - 16px);border-radius:18px 18px 12px 12px}.cloud-project-card{align-items:flex-start;flex-direction:column}.cloud-project-actions{width:100%}.cloud-open-btn,.cloud-delete-btn{flex:1}.cloud-btn{padding:9px 8px;font-size:9px} }
+
     </style>
 </head>
 <body>
@@ -2216,6 +2237,10 @@
         </div>
     </div>
 
+    <div class="cloud-projects-modal" id="cloudProjectsModal" role="dialog" aria-modal="true" aria-labelledby="cloudProjectsTitle">
+        <div class="cloud-projects-box"><div class="cloud-projects-head"><h2 id="cloudProjectsTitle">My Cloud Projects</h2><button class="cloud-close" type="button" onclick="closeCloudProjects()">×</button></div><div class="cloud-project-list" id="cloudProjectsList"></div></div>
+    </div>
+
     <div class="audio-unlock-banner" id="audioUnlockBanner" onclick="unlockAudioNow()">🔊 Click here to enable sound</div>
 
     <div class="app-main" id="appMain">
@@ -2244,6 +2269,8 @@
                         <div class="sec-head">Project File <span class="sec-badge">saves to your computer</span></div>
                         <div class="project-io-row">
                             <button class="save-btn" onclick="saveProjectToFile()">💾 Save Project</button>
+                            <button class="cloud-btn" type="button" onclick="saveProjectToCloud()">☁ Save Cloud</button>
+                            <button class="cloud-btn" type="button" onclick="openCloudProjects()">📁 My Projects</button>
                             <button class="load-btn" onclick="document.getElementById('loadProjectIn').click()">📂 Load Project</button>
                             <input type="file" id="loadProjectIn" accept=".json,.beatviz" style="display:none" onchange="loadProjectFromFile(event)">
                         </div>
@@ -2579,8 +2606,17 @@
     </div>
 
     <div class="toast" id="toast"></div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script>
+
+        const SUPABASE_URL = 'https://gzagsueuedwwhbhifbbl.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd6YWdzdWV1ZWR3d2hiaGlmYmJsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg5NDUzNzMsImV4cCI6MjEwNDUyMTM3M30.72jA2glg0Z_4LkzNi71TBtyg4y8wwuSYYYnK-QQ1aYg';
+
+const supabase = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
+);
         const CONFIG = { SCRIPTURL: "https://script.google.com/macros/s/AKfycbxmlAuS2sftPJIuplMd5Scrv2PinK2D-IMVDM2CfxAsuJr2RzM7Yy-Jhh-Inoe5ptQzOQ/exec",
             RAZORPAYKEY: "rzp_live_TNjnMPpmLS7dJG" };
         const token = localStorage.getItem('bvtoken');
@@ -2964,6 +3000,83 @@ async function startAudioFrom(offset = 0) {
             updateQualityLabel();
             drawIdle();
         }
+
+        let activeCloudProjectId = null;
+
+async function saveProjectToCloud() {
+  const {
+    data: { user },
+    error: authError
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    alert('Please log in before saving a cloud project.');
+    return;
+  }
+
+  const projectPayload = {
+    lyrics,
+    textLayers,
+    videoSegments,
+    imgSegments,
+    audioSegments,
+    textSegments,
+
+    style,
+    lyricsStyle,
+    danceMode,
+    camShakeOn,
+
+    aspectRatio: currentAR,
+    exportQuality,
+
+    activeEffects: [...activeFX]
+  };
+
+  const projectName = prompt(
+    'Project name:',
+    document.title.includes('Untitled') ? 'Untitled project' : 'My BeatViz Project'
+  );
+
+  if (!projectName) return;
+
+  const projectRow = {
+    user_id: user.id,
+    name: projectName,
+    status: 'draft',
+    aspect_ratio: currentAR,
+    export_quality: exportQuality,
+    project_data: projectPayload
+  };
+
+  let response;
+
+  if (activeCloudProjectId) {
+    response = await supabase
+      .from('projects')
+      .update(projectRow)
+      .eq('id', activeCloudProjectId)
+      .select()
+      .single();
+  } else {
+    response = await supabase
+      .from('projects')
+      .insert(projectRow)
+      .select()
+      .single();
+  }
+
+  const { data, error } = response;
+
+  if (error) {
+    console.error(error);
+    alert('Could not save project: ' + error.message);
+    return;
+  }
+
+  activeCloudProjectId = data.id;
+  alert('Project saved to your cloud projects.');
+}
 
         function setQuality(q, btn) {
             if (q !== 'hd' && !sub.isActive) { toast('Full HD / Ultra HD are Pro features.');
@@ -5340,6 +5453,123 @@ async function exportMP4() {
                 }
             },true);
         })();
+
+        // ============================================================
+        // SUPABASE CLOUD PROJECTS
+        // Replace only these two values with Settings > API values.
+        // Use the browser-safe publishable / anon key. Never use service_role here.
+        // ============================================================
+        const SUPABASE_URL = 'PASTE_YOUR_SUPABASE_PROJECT_URL';
+        const SUPABASE_ANON_KEY = 'PASTE_YOUR_SUPABASE_ANON_OR_PUBLISHABLE_KEY';
+        const SUPABASE_BUCKET = 'beatviz-media';
+        let cloudSupabase = null;
+        let activeCloudProjectId = null;
+
+        function cloudConfigured() {
+            return SUPABASE_URL.startsWith('https://') &&
+                   !SUPABASE_URL.includes('PASTE_YOUR') &&
+                   !SUPABASE_ANON_KEY.includes('PASTE_YOUR');
+        }
+        function getCloudClient() {
+            if (!cloudConfigured()) {
+                toast('Add your Supabase URL and anon/publishable key first.');
+                return null;
+            }
+            if (!window.supabase) { toast('Supabase library did not load. Check your internet connection.'); return null; }
+            if (!cloudSupabase) cloudSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            return cloudSupabase;
+        }
+        async function cloudUser() {
+            const sb = getCloudClient();
+            if (!sb) return null;
+            const { data, error } = await sb.auth.getUser();
+            if (error || !data.user) {
+                toast('Please sign in through Supabase before using Cloud Projects.');
+                return null;
+            }
+            return data.user;
+        }
+        function cloudProjectState() {
+            return {
+                lyrics: JSON.parse(JSON.stringify(lyrics || [])),
+                textLayers: JSON.parse(JSON.stringify(textLayers || [])),
+                videoSegments: JSON.parse(JSON.stringify(videoSegments || [])),
+                imgSegments: JSON.parse(JSON.stringify(imgSegments || [])),
+                audioSegments: JSON.parse(JSON.stringify(audioSegments || [])),
+                textSegments: JSON.parse(JSON.stringify(textSegments || [])),
+                layerStack: JSON.parse(JSON.stringify(layerStack || [])),
+                style, lyricsStyle, danceMode, camShakeOn,
+                activeEffects: Array.from(activeFX || []),
+                currentAR, exportQuality
+            };
+        }
+        function safeCloudName(name) {
+            return String(name || 'file').toLowerCase().replace(/[^a-z0-9._-]/g, '-').replace(/-+/g, '-');
+        }
+        async function uploadCloudAsset(projectId, user, file, assetType, order) {
+            const sb = getCloudClient();
+            if (!file) return null;
+            const name = Date.now() + '-' + crypto.randomUUID() + '-' + safeCloudName(file.name);
+            const storagePath = user.id + '/projects/' + projectId + '/' + assetType + '/' + name;
+            const { error: uploadError } = await sb.storage.from(SUPABASE_BUCKET).upload(storagePath, file, { contentType:file.type, upsert:false });
+            if (uploadError) throw uploadError;
+            const { data, error } = await sb.from('project_assets').insert({ project_id:projectId, user_id:user.id, asset_type:assetType, file_name:file.name, storage_path:storagePath, mime_type:file.type, file_size:file.size, sort_order:order || 0 }).select().single();
+            if (error) { await sb.storage.from(SUPABASE_BUCKET).remove([storagePath]); throw error; }
+            return data;
+        }
+        async function saveProjectToCloud() {
+            const sb = getCloudClient(), user = await cloudUser();
+            if (!sb || !user) return;
+            const inputName = prompt('Cloud project name:', activeCloudProjectId ? 'BeatViz Project' : 'Untitled project');
+            if (!inputName) return;
+            const row = { user_id:user.id, name:inputName.trim(), status:'draft', aspect_ratio:currentAR, export_quality:exportQuality, project_data:cloudProjectState() };
+            let data, error;
+            if (activeCloudProjectId) ({data,error} = await sb.from('projects').update(row).eq('id',activeCloudProjectId).select().single());
+            else ({data,error} = await sb.from('projects').insert(row).select().single());
+            if (error) { console.error(error); toast('Cloud save failed: ' + error.message); return; }
+            activeCloudProjectId = data.id;
+            toast('Project saved to cloud');
+        }
+        async function openCloudProjects() {
+            const sb = getCloudClient(), user = await cloudUser();
+            if (!sb || !user) return;
+            document.getElementById('cloudProjectsModal').classList.add('show');
+            const list = document.getElementById('cloudProjectsList');
+            list.innerHTML='<div class="cloud-empty">Loading projects…</div>';
+            const {data,error} = await sb.from('projects').select('id,name,status,aspect_ratio,export_quality,updated_at,created_at').eq('user_id',user.id).is('deleted_at',null).order('updated_at',{ascending:false});
+            if(error){list.innerHTML='<div class="cloud-empty">Could not load projects: '+escapeHtml(error.message)+'</div>';return;}
+            if(!data.length){list.innerHTML='<div class="cloud-empty">No cloud projects yet. Build a project and press ☁ Save Cloud.</div>';return;}
+            list.innerHTML=data.map(p=>'<div class="cloud-project-card"><div><div class="cloud-project-name">'+escapeHtml(p.name)+'</div><div class="cloud-project-meta">'+escapeHtml(p.status)+' · '+escapeHtml(p.aspect_ratio)+' · Updated '+new Date(p.updated_at).toLocaleString()+'</div></div><div class="cloud-project-actions"><button class="cloud-open-btn" onclick="loadCloudProject(\''+p.id+'\')">Open</button><button class="cloud-delete-btn" onclick="deleteCloudProject(\''+p.id+'\')">Delete</button></div></div>').join('');
+        }
+        function closeCloudProjects(){document.getElementById('cloudProjectsModal').classList.remove('show');}
+        function escapeHtml(v){return String(v||'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
+        async function loadCloudProject(projectId) {
+            const sb=getCloudClient(), user=await cloudUser(); if(!sb||!user)return;
+            const {data,error}=await sb.from('projects').select('*').eq('id',projectId).eq('user_id',user.id).single();
+            if(error){toast('Could not open project: '+error.message);return;}
+            const p=data.project_data || {};
+            lyrics.splice(0,lyrics.length,...(p.lyrics||[]));
+            textLayers.splice(0,textLayers.length,...(p.textLayers||[]));
+            videoSegments.splice(0,videoSegments.length,...(p.videoSegments||[]));
+            imgSegments.splice(0,imgSegments.length,...(p.imgSegments||[]));
+            audioSegments.splice(0,audioSegments.length,...(p.audioSegments||[]));
+            textSegments.splice(0,textSegments.length,...(p.textSegments||[]));
+            layerStack.splice(0,layerStack.length,...(p.layerStack||[]));
+            style=p.style || 'none'; lyricsStyle=p.lyricsStyle || 'none'; danceMode=p.danceMode || 'none'; camShakeOn=!!p.camShakeOn;
+            activeFX.clear(); (p.activeEffects||[]).forEach(x=>activeFX.add(x));
+            if(p.currentAR) setAspectRatio(p.currentAR); if(p.exportQuality) setQuality(p.exportQuality);
+            activeCloudProjectId=data.id; selectedLyricIdx=-1; renderLyrics(); rebuildLayerStack(); drawIdle(); TL.draw(pvOffset); closeCloudProjects(); toast('Cloud project opened. Re-attach original media to preview/export.');
+        }
+        async function deleteCloudProject(projectId) {
+            if(!confirm('Delete this cloud project? Its editable timeline data will be removed.'))return;
+            const sb=getCloudClient(), user=await cloudUser();if(!sb||!user)return;
+            const {data:assets,error:assetError}=await sb.from('project_assets').select('storage_path').eq('project_id',projectId).eq('user_id',user.id);
+            if(assetError){toast('Could not read project assets: '+assetError.message);return;}
+            const paths=(assets||[]).map(a=>a.storage_path); if(paths.length){const {error}=await sb.storage.from(SUPABASE_BUCKET).remove(paths);if(error){toast('Could not delete media: '+error.message);return;}}
+            const {error}=await sb.from('projects').delete().eq('id',projectId).eq('user_id',user.id);if(error){toast('Could not delete project: '+error.message);return;}
+            if(activeCloudProjectId===projectId)activeCloudProjectId=null;toast('Cloud project deleted');openCloudProjects();
+        }
+        document.getElementById('cloudProjectsModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeCloudProjects();});
         drawIdle();
     </script>
     <!-- Apply this patch to the end of beatviz.html, immediately before </body>. It adds lyric creation by right-click, paused-playhead seeking by left-click, and fixes effects rendering. -->

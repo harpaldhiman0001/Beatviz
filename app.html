@@ -2152,7 +2152,24 @@
         }
 
     
-        .topbar-cta.pro-hidden { display: none !important; }
+
+        /* Quick Guide */
+        .guide-btn { border:1px solid rgba(103,232,249,.48); border-radius:9px; background:rgba(6,182,212,.10); color:#67e8f9; padding:8px 11px; font:800 11px Inter,sans-serif; cursor:pointer; white-space:nowrap; }
+        .guide-btn:hover { background:rgba(6,182,212,.20); }
+        .guide-modal { position:fixed; inset:0; display:none; z-index:600; align-items:center; justify-content:center; padding:20px; background:rgba(4,5,8,.78); backdrop-filter:blur(9px); }
+        .guide-modal.show { display:flex; }
+        .guide-box { width:min(760px,100%); max-height:min(720px,calc(100dvh - 40px)); overflow:auto; border:1px solid var(--border-strong); border-radius:18px; background:linear-gradient(160deg,var(--bg-panel),var(--bg-app)); box-shadow:0 24px 80px rgba(0,0,0,.56); }
+        .guide-head { position:sticky; top:0; z-index:1; display:flex; align-items:center; justify-content:space-between; padding:17px 20px; border-bottom:1px solid var(--border); background:rgba(20,21,31,.97); }
+        .guide-head h2 { color:var(--text-1); font-size:17px; }
+        .guide-close { width:32px; height:32px; border:1px solid var(--border-strong); border-radius:50%; background:var(--bg-card); color:var(--text-2); font-size:18px; cursor:pointer; }
+        .guide-intro { padding:15px 20px 2px; color:var(--text-3); font-size:12px; line-height:1.55; }
+        .guide-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; padding:15px 20px 20px; }
+        .guide-card { padding:13px; border:1px solid var(--border); border-radius:12px; background:var(--bg-card); }
+        .guide-card h3 { color:var(--text-1); font-size:12px; margin-bottom:7px; }
+        .guide-card p { color:var(--text-3); font-size:11px; line-height:1.55; }
+        .guide-card b { color:var(--text-2); }
+        .guide-card kbd { display:inline-block; padding:1px 5px; border:1px solid var(--border-strong); border-radius:4px; background:var(--bg-app); color:#c3baff; font:700 10px Inter,sans-serif; }
+        @media (max-width:768px) { .guide-btn { padding:7px 9px; font-size:10px; } .guide-modal { padding:10px; align-items:flex-end; } .guide-box { max-height:calc(100dvh - 20px); border-radius:18px 18px 12px 12px; } .guide-head { padding:15px; } .guide-intro { padding:12px 14px 2px; } .guide-grid { grid-template-columns:1fr; padding:12px 14px 18px; } }
 
     </style>
 </head>
@@ -2167,6 +2184,7 @@
             <span class="topbar-badge trial" id="subBadge">Free Trial</span>
         </div>
         <div class="topbar-right">
+            <button class="guide-btn" type="button" onclick="showGuide()">? Guide</button>
             <div class="mode-switcher">
                 <button id="modeChar" class="active" onclick="setAppMode('character')">🎭 Character</button>
                 <button id="modePromo" onclick="setAppMode('promo')">📢 Promo</button>
@@ -2176,6 +2194,27 @@
             <button class="topbar-logout" onclick="doLogout()">Logout</button>
         </div>
     </header>
+
+    <div class="guide-modal" id="guideModal" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
+        <div class="guide-box">
+            <div class="guide-head"><h2 id="guideTitle">BeatViz Quick Guide</h2><button class="guide-close" type="button" onclick="hideGuide()" aria-label="Close guide">×</button></div>
+            <p class="guide-intro">Use this short guide to build your video, arrange the timeline, and generate the final result.</p>
+            <div class="guide-grid">
+                <article class="guide-card"><h3>1. Upload media</h3><p>Open <b>Upload</b>. Add an audio track first, then add video clips, character images, or normal images.</p></article>
+                <article class="guide-card"><h3>2. Add video clips</h3><p>Choose video files in <b>Upload</b>. They appear on the Video timeline. Drag a clip to move it; drag an edge to trim it.</p></article>
+                <article class="guide-card"><h3>3. Overlap video</h3><p>Move video clips so their times overlap. Select a video in <b>Layers</b> and use <b>To Front</b> or <b>To Back</b> to control which one is visible.</p></article>
+                <article class="guide-card"><h3>4. Add and layer images</h3><p>Add Character or Any Image in <b>Upload</b>. Move or resize it in the preview. Use <b>Layers</b> to overlap images and set front/back order.</p></article>
+                <article class="guide-card"><h3>5. Add lyrics</h3><p>Only <b>right-click empty space</b> on the Lyrics timeline to add a lyric. Type the lyric in the editor that opens.</p></article>
+                <article class="guide-card"><h3>6. Copy and paste lyrics</h3><p>Right-click a lyric to select it. Press <kbd>Ctrl</kbd> + <kbd>C</kbd>. Left-click an empty Lyrics timeline position, then press <kbd>Ctrl</kbd> + <kbd>V</kbd> to paste. Left-click alone never pastes.</p></article>
+                <article class="guide-card"><h3>7. Delete and undo</h3><p>Right-click a lyric to select it, then press <kbd>Delete</kbd>. Use <kbd>Ctrl</kbd> + <kbd>Z</kbd> to undo and <kbd>Ctrl</kbd> + <kbd>Y</kbd> or <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Z</kbd> to redo.</p></article>
+                <article class="guide-card"><h3>8. Effects and style</h3><p>Use <b>Effects</b> for Glow, Grain, and Vignette. Use <b>Style</b> to choose scenes, lyric appearance, beat sensitivity, and character size.</p></article>
+                <article class="guide-card"><h3>9. Pause and resume</h3><p>Pause playback. Left-click an empty timeline point to choose the next playback position, then press <b>Resume</b>.</p></article>
+                <article class="guide-card"><h3>10. Auto-caption</h3><p>Use <b>Auto-Caption</b> to listen and capture lyric lines. Stop it when finished, review the lyrics, then generate the video once.</p></article>
+                <article class="guide-card"><h3>11. Generate and save</h3><p>Click <b>Generate Video</b> when ready. On mobile, the Generate button stays above the bottom navigation; use Saved Videos to preview current-session exports.</p></article>
+                <article class="guide-card"><h3>12. Mobile editing</h3><p>Use the bottom navigation for Upload, Layers, Text, Lyrics, Style, and Motion. Each tab opens the relevant touch-friendly editor panel.</p></article>
+            </div>
+        </div>
+    </div>
 
     <div class="audio-unlock-banner" id="audioUnlockBanner" onclick="unlockAudioNow()">🔊 Click here to enable sound</div>
 
@@ -2559,25 +2598,14 @@
 
         function updateSubPill() {
             const p = document.getElementById('subBadge');
-            const upgradeBtn = document.querySelector('.topbar-cta');
             if (!p) return;
-            if (sub.isActive) {
-                p.textContent = 'Pro';
-                p.className = 'topbar-badge pro';
-                if (upgradeBtn) upgradeBtn.classList.add('pro-hidden');
-            } else if (sub.trialActive && (sub.trialDaysLeft || 0) > 0) {
-                p.textContent = `Trial: ${sub.trialDaysLeft}d`;
-                p.className = 'topbar-badge ' + (sub.trialDaysLeft <= 2 ? 'expired' : 'trial');
-                if (upgradeBtn) upgradeBtn.classList.remove('pro-hidden');
-            } else {
-                p.textContent = 'Trial Expired';
-                p.className = 'topbar-badge expired';
-                if (upgradeBtn) upgradeBtn.classList.remove('pro-hidden');
-            }
+            if (sub.isActive) { p.textContent = 'Pro';
+                p.className = 'topbar-badge pro'; } else if (sub.trialActive && (sub.trialDaysLeft || 0) > 0) { p.textContent =
+                    `Trial: ${sub.trialDaysLeft}d`;
+                p.className = 'topbar-badge ' + (sub.trialDaysLeft <= 2 ? 'expired' : 'trial'); } else { p.textContent =
+                    'Trial Expired';
+                p.className = 'topbar-badge expired'; }
         }
-
-        // Hide Upgrade immediately for an already active Pro account; updateSubPill also keeps it in sync with the API.
-        if (sub && sub.isActive) document.querySelector('.topbar-cta')?.classList.add('pro-hidden');
 
         function doLogout() { localStorage.clear();
             location.href = 'auth.html'; }
@@ -5266,6 +5294,10 @@ async function exportMP4() {
                 if (window.innerWidth <= 768 && typeof TL !== 'undefined') TL.resize();
             });
         })();
+        function showGuide() { document.getElementById('guideModal').classList.add('show'); }
+        function hideGuide() { document.getElementById('guideModal').classList.remove('show'); }
+        document.getElementById('guideModal').addEventListener('click', function(e) { if (e.target === this) hideGuide(); });
+
         drawIdle();
     </script>
     <!-- Apply this patch to the end of beatviz.html, immediately before </body>. It adds lyric creation by right-click, paused-playhead seeking by left-click, and fixes effects rendering. -->

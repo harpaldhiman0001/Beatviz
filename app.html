@@ -5666,7 +5666,7 @@ async function exportMP4() {
         // Use the browser-safe publishable / anon key. Never use service_role here.
         // ============================================================
         const SUPABASE_BUCKET = 'beatviz-media';
-let activeCloudProjectId = null;
+
 
         function cloudConfigured() {
             return SUPABASE_URL.startsWith('https://') &&

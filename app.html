@@ -5461,7 +5461,7 @@ async function exportMP4() {
         // ============================================================
         const SUPABASE_BUCKET = 'beatviz-media';
         let cloudSupabase = null;
-        let activeCloudProjectId = null;
+
 
         function cloudConfigured() {
             return SUPABASE_URL.startsWith('https://') &&

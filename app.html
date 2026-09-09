@@ -4278,12 +4278,7 @@ function fitImageIndexToFull(idx) {
             }).join('');
         }
 
-        function copyLyric(i) { if (i < 0 || i >= lyrics.length) return;
-            copiedLyric = { ...lyrics[i] };
-            lastPasteRefIdx = i;
-            document.getElementById('tlClipBanner').classList.add('show');
-            updatePasteNextBtn();
-            toast('Copied "' + (lyrics[i].text || '(empty)').slice(0, 24) + '"'); }
+
 
         function clearClipboard() { copiedLyric = null;
             document.getElementById('tlClipBanner').classList.remove('show');
@@ -4292,42 +4287,6 @@ function fitImageIndexToFull(idx) {
 
         function updatePasteNextBtn() { const b = document.getElementById('pasteNextBtn'); if (b) b.disabled = !copiedLyric; }
 
-        function pasteNextInSequence() { if (!copiedLyric) { toast('Copy a lyric first (right-click it)'); return; } if (
-                lastPasteRefIdx < 0 || lastPasteRefIdx >= lyrics.length) { pasteAtPlayhead(); return; }
-            pasteAfterLyric(lastPasteRefIdx); }
-
-        function pasteAfterLyric(afterIdx) {
-            if (!copiedLyric) { toast('Nothing copied'); return; }
-            const refEnd = lyrics[afterIdx].endTime;
-            const dur = copiedLyric.endTime - copiedLyric.time;
-            const newStart = Math.min(audioDuration - dur, refEnd + 0.5);
-            lyrics.splice(afterIdx + 1, 0, { text: copiedLyric.text, time: +newStart.toFixed(2), endTime: +(newStart +
-                    dur).toFixed(2), ds: { beatCount: 0, jumpAmt: 0, spinAng: 0, spinDir: 1, phase: Math.random() *
-                    Math.PI * 2 } });
-            lyrics.sort((a, b) => a.time - b.time);
-            const newIdx = lyrics.findIndex(l => Math.abs(l.time - newStart) < 0.1);
-            selectedLyricIdx = newIdx;
-            lastPasteRefIdx = newIdx;
-            renderLyrics();
-            TL.draw(pvOffset);
-            toast('Pasted at ' + fmt(newStart));
-        }
-
-        function pasteAtPlayhead() {
-            if (!copiedLyric) { toast('Nothing copied'); return; }
-            const t = pvOffset || 0;
-            const dur = copiedLyric.endTime - copiedLyric.time;
-            const newStart = Math.max(0, Math.min(audioDuration - dur, t));
-            lyrics.push({ text: copiedLyric.text, time: +newStart.toFixed(2), endTime: +(newStart + dur).toFixed(2),
-                ds: { beatCount: 0, jumpAmt: 0, spinAng: 0, spinDir: 1, phase: Math.random() * Math.PI * 2 } });
-            lyrics.sort((a, b) => a.time - b.time);
-            const newIdx = lyrics.findIndex(l => Math.abs(l.time - newStart) < 0.1);
-            selectedLyricIdx = newIdx;
-            lastPasteRefIdx = newIdx;
-            renderLyrics();
-            TL.draw(pvOffset);
-            toast('Pasted at ' + fmt(newStart));
-        }
         let inlineEditIdx = -1;
 
         function openInlineEditor(idx, screenX, screenY) {

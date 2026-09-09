@@ -1979,6 +1979,178 @@
             background: var(--cyan);
             color: #04202a;
         }
+    
+
+        /* Mobile application shell */
+        .mobile-bottom-nav, .mobile-generate-bar { display: none; }
+
+        @media (max-width:768px) {
+            :root { --topbar-h: 54px; }
+            html, body { width: 100%; min-height: 100%; overflow-x: hidden; background: var(--bg-app); }
+            body { overscroll-behavior-y: none; }
+            .topbar {
+                height: calc(54px + env(safe-area-inset-top));
+                min-height: calc(54px + env(safe-area-inset-top));
+                padding: env(safe-area-inset-top) 12px 0;
+                position: sticky;
+            }
+            .topbar-logo { font-size: 16px; }
+            .topbar-divider, .topbar-badge, .topbar-username, .topbar-logout,
+            .topbar-cta, .mode-switcher, #buildTag, #buildTag2 { display: none !important; }
+            .topbar-left { min-width: 0; }
+            .topbar-right { margin-left: auto; }
+            .topbar-avatar { width: 30px; height: 30px; font-size: 12px; }
+
+            .app-main {
+                display: block !important;
+                height: auto !important;
+                min-height: calc(100dvh - 54px);
+                overflow: visible !important;
+                padding-bottom: calc(140px + env(safe-area-inset-bottom));
+            }
+            .left-toolbar, .right-panel { display: none !important; }
+            .sidebar {
+                display: flex !important;
+                width: 100%;
+                height: auto;
+                min-height: 0;
+                max-height: none;
+                overflow: visible;
+                border-right: 0;
+                border-bottom: 1px solid var(--border);
+                background: var(--bg-panel);
+            }
+            .sidebar-tabs {
+                display: flex;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                scrollbar-width: none;
+                padding: 7px 10px;
+                gap: 6px;
+                border-bottom: 1px solid var(--border);
+            }
+            .sidebar-tabs::-webkit-scrollbar { display: none; }
+            .sidebar-tab {
+                flex: 0 0 auto;
+                min-width: auto;
+                padding: 8px 11px;
+                border-radius: 9px;
+                font-size: 10px;
+                white-space: nowrap;
+            }
+            .sidebar-pane { display: none; padding-bottom: 12px; }
+            .sidebar-pane.active { display: block; }
+            .sidebar-pane .sec-head { padding-top: 12px; }
+            .drop-zone { margin: 8px 10px; min-height: 82px; }
+            .char-grid, #audioTrackList, #videoLayerList, #textLayerList, #lyricsList { max-height: none; }
+
+            .preview-area {
+                display: flex !important;
+                min-width: 0;
+                overflow: visible;
+                background: var(--bg-app);
+            }
+            .canvas-wrap {
+                flex: none;
+                width: 100%;
+                height: auto;
+                min-height: 230px;
+                aspect-ratio: 16 / 10;
+                padding: 8px;
+                overflow: hidden;
+            }
+            .canvas-wrap canvas { max-width: 100%; max-height: 100%; width: auto; height: auto; }
+            .canvas-empty { transform: scale(.88); }
+            .canvas-badge { top: 10px; right: 10px; font-size: 8px; }
+            .layer-hint { display: none !important; }
+
+            .timeline-wrap {
+                height: 208px !important;
+                min-height: 208px !important;
+                max-height: 208px !important;
+                border-top: 2px solid var(--accent);
+            }
+            .tl-topbar { height: 38px; min-height: 38px; padding: 5px 8px; gap: 5px; }
+            .tl-hint { display: none; }
+            .tl-actions { margin-left: 0; }
+            .tl-btn { padding: 6px 8px; font-size: 9px; }
+            .tl-zoom { margin-left: auto; }
+            .tl-tracks { height: 170px; overflow: auto; }
+            .tl-track-row { min-height: 34px; height: 34px; }
+            .tl-track-label { width: 62px; padding: 0 6px; font-size: 8px; }
+            .tl-track-canvas-wrap, .tl-tracks canvas { height: 34px !important; min-height: 34px !important; }
+            .status-bar { min-height: 36px; height: 36px; padding: 5px 10px; gap: 8px; }
+            .status-bar .progress-wrap { display: none; }
+            .status-text { font-size: 10px !important; }
+
+            .mobile-bottom-nav {
+                display: flex;
+                position: fixed;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                height: calc(60px + env(safe-area-inset-bottom));
+                padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+                z-index: 120;
+                background: rgba(15,16,24,.97);
+                backdrop-filter: blur(18px);
+                border-top: 1px solid var(--border-strong);
+                justify-content: space-around;
+                gap: 3px;
+            }
+            .mobile-nav-btn {
+                flex: 1;
+                min-width: 0;
+                border: 0;
+                border-radius: 10px;
+                background: transparent;
+                color: var(--text-3);
+                font: 700 9px Inter, sans-serif;
+                cursor: pointer;
+                touch-action: manipulation;
+            }
+            .mobile-nav-btn.active { color: #c3baff; background: var(--accent-soft); }
+            .mobile-nav-btn span { display: block; font-size: 17px; line-height: 19px; font-weight: 500; }
+
+            .mobile-generate-bar {
+                display: flex;
+                position: fixed;
+                z-index: 110;
+                left: 12px;
+                right: 12px;
+                bottom: calc(69px + env(safe-area-inset-bottom));
+                gap: 8px;
+                padding: 8px;
+                background: rgba(23,24,37,.96);
+                border: 1px solid var(--border-strong);
+                border-radius: 14px;
+                box-shadow: 0 12px 32px rgba(0,0,0,.42);
+            }
+            .mobile-generate-bar button { min-height: 42px; touch-action: manipulation; }
+            #mobileGenBtn {
+                flex: 1;
+                border: none;
+                border-radius: 10px;
+                background: linear-gradient(135deg, var(--accent), #8b7bff);
+                color: #fff;
+                font: 800 13px Inter, sans-serif;
+                cursor: pointer;
+            }
+            #mobileGenBtn:disabled { opacity: .4; cursor: not-allowed; }
+            #mobilePauseBtn {
+                display: none;
+                min-width: 88px;
+                border: 1px solid var(--gold);
+                border-radius: 10px;
+                background: var(--gold-soft);
+                color: var(--gold);
+                font: 800 12px Inter, sans-serif;
+                cursor: pointer;
+            }
+            .paywall { padding: 12px; align-items: flex-end; }
+            .paywall .pw-box { max-height: calc(100dvh - 24px); overflow-y: auto; border-radius: 20px; }
+        }
+
     </style>
 </head>
 <body>
@@ -2307,7 +2479,19 @@
         </aside>
     </div>
 
-    <div class="reattach-overlay" id="reattachOverlay">
+    <div class="mobile-generate-bar" id="mobileGenerateBar">
+            <button id="mobileGenBtn" type="button" onclick="handleGenerate()">Generate Video</button>
+            <button id="mobilePauseBtn" type="button" onclick="togglePause()">Pause</button>
+        </div>
+        <nav class="mobile-bottom-nav" aria-label="Mobile editor navigation">
+            <button class="mobile-nav-btn active" data-mobile-pane="upload" type="button"><span>↑</span>Upload</button>
+            <button class="mobile-nav-btn" data-mobile-pane="layers" type="button"><span>▱</span>Layers</button>
+            <button class="mobile-nav-btn" data-mobile-pane="text" type="button"><span>A</span>Text</button>
+            <button class="mobile-nav-btn" data-mobile-pane="lyrics" type="button"><span>♪</span>Lyrics</button>
+            <button class="mobile-nav-btn" data-mobile-pane="style" type="button"><span>✦</span>Style</button>
+            <button class="mobile-nav-btn" data-mobile-pane="motion" type="button"><span>↝</span>Motion</button>
+        </nav>
+        <div class="reattach-overlay" id="reattachOverlay">
         <div class="reattach-box">
             <h2>📎 Re-attach your media</h2>
             <p class="ra-sub">This project needs the original files to continue editing. They never left your computer, so pick each one from where you saved it.</p>
@@ -5032,6 +5216,42 @@ async function exportMP4() {
 
         setInterval(() => { if (audioDuration > 0) updateQbTime();
             checkAudioUnlockState(); }, 300);
+
+        // Mobile editor shell: make the same controls available as a touch-friendly app UI.
+        (() => {
+            const mobileGen = document.getElementById('mobileGenBtn');
+            const mobilePause = document.getElementById('mobilePauseBtn');
+            const desktopGen = document.getElementById('genBtn');
+            const desktopPause = document.getElementById('pauseBtn');
+
+            function syncMobileControls() {
+                if (!mobileGen || !desktopGen) return;
+                mobileGen.disabled = desktopGen.disabled;
+                mobileGen.textContent = desktopGen.textContent === 'Stop' ? 'Stop' : 'Generate Video';
+                const active = playbackState === 'playing' || playbackState === 'paused';
+                mobilePause.style.display = active ? 'block' : 'none';
+                mobilePause.textContent = playbackState === 'paused' ? 'Resume' : 'Pause';
+            }
+            const originalUI = updatePlaybackUI;
+            updatePlaybackUI = function () { originalUI(); syncMobileControls(); };
+            const watcher = new MutationObserver(syncMobileControls);
+            if (desktopGen) watcher.observe(desktopGen, { attributes: true, childList: true, subtree: true });
+            syncMobileControls();
+
+            document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const pane = btn.dataset.mobilePane;
+                    const desktopTab = document.querySelector('.sidebar-tab[data-pane="' + pane + '"]');
+                    showPane(pane, desktopTab);
+                    document.querySelectorAll('.mobile-nav-btn').forEach(b => b.classList.toggle('active', b === btn));
+                    document.querySelector('.sidebar')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
+            });
+
+            window.addEventListener('resize', () => {
+                if (window.innerWidth <= 768 && typeof TL !== 'undefined') TL.resize();
+            });
+        })();
         drawIdle();
     </script>
     <!-- Apply this patch to the end of beatviz.html, immediately before </body>. It adds lyric creation by right-click, paused-playhead seeking by left-click, and fixes effects rendering. -->

@@ -133,7 +133,7 @@ async function signInWithGoogle(source) {
   const { error } = await supabaseClient.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: 'https://beatviz.in/app.html'
+      redirectTo: 'https://beatviz.in/auth.html?google=1'
     }
   });
 
@@ -146,6 +146,56 @@ async function signInWithGoogle(source) {
       'Google sign-in failed: ' + error.message
     );
   }
+}
+
+  async function finishGoogleLogin() {
+  const params = new URLSearchParams(window.location.search);
+
+  if (params.get('google') !== '1') {
+    return;
+  }
+
+  document.getElementById('formLogin').style.display = 'block';
+  document.getElementById('formSignup').style.display = 'none';
+
+  showMsg(
+    'loginOk',
+    'Google sign-in successful. Setting up your BeatViz account…'
+  );
+
+  const { data, error } = await supabaseClient.auth.getSession();
+
+  if (error || !data.session || !data.session.access_token) {
+    showMsg(
+      'loginErr',
+      'Google session could not be completed. Please try again.'
+    );
+    return;
+  }
+
+  const result = await callAPI({
+    action: 'syncGoogleUser',
+    accessToken: data.session.access_token
+  });
+
+  if (!result || !result.success) {
+    showMsg(
+      'loginErr',
+      (result && result.error) ||
+      'Could not create your BeatViz Google account. Please try again.'
+    );
+    return;
+  }
+
+  saveSession(result);
+
+  window.history.replaceState(
+    {},
+    document.title,
+    window.location.pathname
+  );
+
+  window.location.replace('app.html');
 }
 
 async function doLogin() {
@@ -217,6 +267,9 @@ async function resendVerify() {
   resultEl.style.color = result && result.success ? '#2ecc8f' : '#f0525c';
   resultEl.style.display = 'block';
 }
+
+  finishGoogleLogin();
+
 
 // Email-password users use bvtoken. Google users use the Supabase session.
 // Do not redirect based on bvtoken alone until your app.html handles both sessions.

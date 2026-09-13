@@ -2583,12 +2583,12 @@
             <div class="pw-value-compare">
                 <div><div class="vc-label">Freelancer</div><div class="vc-amt">₹4,500/video</div></div>
                 <div style="color:var(--gold)">→</div>
-                <div><div class="vc-label">BeatViz Pro</div><div class="vc-amt final">₹849/mo</div></div>
+                <div><div class="vc-label">BeatViz Pro</div><div class="vc-amt final">₹199/mo</div></div>
             </div>
             <div class="pw-plan">
                 <div class="pw-pr">
                     <div><div style="font-size:13.5px;font-weight:700">Pro Monthly</div><div style="font-size:10px;color:var(--text-3)">Cancel anytime</div></div>
-                    <div style="text-align:right"><div class="pw-price">₹849</div><div style="font-size:10px;color:var(--text-3)">per month, incl. GST</div></div>
+                    <div style="text-align:right"><div class="pw-price">₹199</div><div style="font-size:10px;color:var(--text-3)">per month, incl. GST</div></div>
                 </div>
                 <div class="pw-feats">
                     <div class="pf"><div class="pf-ck">✓</div>Unlimited music videos</div>
@@ -2598,7 +2598,7 @@
                 </div>
             </div>
             <div class="pw-acts">
-                <button class="pw-btn" id="payBtn" onclick="initiatePayment()">Subscribe Now — ₹849/month</button>
+                <button class="pw-btn" id="payBtn" onclick="initiatePayment()">Subscribe Now — ₹199/month</button>
                 <p class="pw-note2">Secure payment via Razorpay · GST invoice sent automatically</p>
                 <button onclick="hidePaywall()" style="width:100%;padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:none;color:var(--text-3);cursor:pointer">Maybe later</button>
             </div>
@@ -2679,10 +2679,10 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
             btn.textContent = 'Creating order…';
             const or_ = await callAPI({ action: 'createOrder', token });
             if (!or_ || !or_.success) { btn.disabled = false;
-                btn.textContent = 'Subscribe Now — ₹849/month';
+                btn.textContent = 'Subscribe Now — ₹199/month';
                 toast((or_ && or_.error) || 'Cannot reach server.'); return; }
             btn.disabled = false;
-            btn.textContent = 'Subscribe Now — ₹849/month';
+            btn.textContent = 'Subscribe Now — ₹199/month';
             if (typeof Razorpay === 'undefined') { toast('Razorpay failed to load.'); return; }
             const options = { key: CONFIG.RAZORPAYKEY, amount: or_.amount, currency: 'INR', name: 'BeatViz',
                 order_id: or_.orderId, prefill: { name: user.name || '', email: user.email || '' }, theme: { color: '#6d5ef5' },

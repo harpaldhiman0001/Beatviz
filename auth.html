@@ -69,10 +69,21 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 const SCRIPTURL = 'https://script.google.com/macros/s/AKfycbxmlAuS2sftPJIuplMd5Scrv2PinK2D-IMVDM2CfxAsuJr2RzM7Yy-Jhh-Inoe5ptQzOQ/exec';
 const SUPABASE_URL = 'https://gzagsueuedwwhbhifbbl.supabase.co';
 
-// This is the browser-safe Supabase anon/publishable key already used by BeatViz.
-// Never replace it with a Supabase service_role key.
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdWIiLCJyZWYiOiJnemFnc3VldWVkd3doYmhpZmJibCIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzg4OTQ1MzczLCJleHAiOjIxMDQ1MjEzNzN9.72jA2glg0Z4LkzNi71TBtyg4y8wwuSYYYnK-QQ1aYg';
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const SUPABASE_ANON_KEY =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdWIiLCJyZWYiOiJnemFnc3VldWVkd3doYmhpZmJibCIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzg4OTQ1MzczLCJleHAiOjIxMDQ1MjEzNzN9.72jA2glg0Z4LkzNi71TBtyg4y8wwuSYYYnK-QQ1aYg';
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY,
+  {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+      flowType: 'implicit'
+    }
+  }
+);
 
 function switchTab(tab) {
   document.getElementById('verifyNotice').style.display = 'none';
@@ -148,7 +159,7 @@ async function signInWithGoogle(source) {
   }
 }
 
-  async function finishGoogleLogin() {
+async function finishGoogleLogin() {
   const params = new URLSearchParams(window.location.search);
 
   if (params.get('google') !== '1') {
@@ -163,32 +174,67 @@ async function signInWithGoogle(source) {
     'Google sign-in successful. Setting up your BeatViz account…'
   );
 
-  const { data, error } = await supabaseClient.auth.getSession();
+  let session = null;
+  let sessionError = null;
 
-  if (error || !data.session || !data.session.access_token) {
+  /*
+    Supabase may need a short moment to process the OAuth token
+    from the URL hash and persist the session in local storage.
+  */
+  for (let attempt = 0; attempt < 10; attempt++) {
+    const { data, error } = await supabaseClient.auth.getSession();
+
+    if (error) {
+      sessionError = error;
+    }
+
+    if (data && data.session && data.session.access_token) {
+      session = data.session;
+      break;
+    }
+
+    await new Promise(function(resolve) {
+      setTimeout(resolve, 300);
+    });
+  }
+
+  if (!session) {
+    console.error(
+      'Supabase session was not available after Google OAuth.',
+      sessionError
+    );
+
     showMsg(
       'loginErr',
       'Google session could not be completed. Please try again.'
     );
+
     return;
   }
 
   const result = await callAPI({
     action: 'syncGoogleUser',
-    accessToken: data.session.access_token
+    accessToken: session.access_token
   });
 
   if (!result || !result.success) {
+    console.error('BeatViz Google user sync failed:', result);
+
     showMsg(
       'loginErr',
       (result && result.error) ||
-      'Could not create your BeatViz Google account. Please try again.'
+      'Could not set up your BeatViz account after Google sign-in.'
     );
+
     return;
   }
 
   saveSession(result);
 
+  /*
+    Remove ?google=1 and the token hash from the visible address.
+    The Supabase session is already stored locally.
+  */
   window.history.replaceState(
     {},
     document.title,

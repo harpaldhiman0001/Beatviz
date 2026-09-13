@@ -123,21 +123,28 @@ async function callAPI(payload) {
 async function signInWithGoogle(source) {
   clearMsg('loginErr');
   clearMsg('signupErr');
+
   const loginButton = document.getElementById('googleLoginBtn');
   const signupButton = document.getElementById('googleSignupBtn');
+
   if (loginButton) loginButton.disabled = true;
   if (signupButton) signupButton.disabled = true;
 
-  const redirectTo = window.location.origin + '/app.html';
   const { error } = await supabaseClient.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: redirectTo }
+    options: {
+      redirectTo: 'https://beatviz.in/app.html'
+    }
   });
 
   if (error) {
     if (loginButton) loginButton.disabled = false;
     if (signupButton) signupButton.disabled = false;
-    showMsg(source === 'signup' ? 'signupErr' : 'loginErr', 'Google sign-in failed: ' + error.message);
+
+    showMsg(
+      source === 'signup' ? 'signupErr' : 'loginErr',
+      'Google sign-in failed: ' + error.message
+    );
   }
 }
 

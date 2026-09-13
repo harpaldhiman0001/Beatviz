@@ -2606,7 +2606,8 @@
     </div>
 
     <div class="toast" id="toast"></div>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script>
 
@@ -3950,13 +3951,12 @@ function loadChars(e) {
 
                 chars.push({
                     img,
+                    file: f,
                     url: ev.target.result,
                     name: f.name,
                     fileSize: f.size,
-                    fingerprint: {
-                        name: f.name,
-                        size: f.size
-                    },
+                    _fingerprint: { name: f.name, size: f.size },
+                    fingerprint: { name: f.name, size: f.size },
                     ds: {
                         beatCount: 0,
                         jumpAmt: 0,
@@ -4060,8 +4060,7 @@ function fitImageIndexToFull(idx) {
             if (isFirst) { audioBuffer = buf;
                 audioDuration = buf.duration;
                 document.getElementById('audioName').textContent = name; }
-            audioTracks.push({ buffer: buf, name, volume: 1, muted: false, fileSize: file.size, _fingerprint: { name: file
-                        .name, size: file.size } });
+            audioTracks.push({ file, buffer: buf, name, volume: 1, muted: false, fileSize: file.size, type: file.type, _fingerprint: { name: file.name, size: file.size } });
             renderAudioTrackList();
             checkReady();
             const lastEnd = audioSegments.length ? audioSegments[audioSegments.length - 1].start + audioSegments[
@@ -4125,8 +4124,7 @@ function fitImageIndexToFull(idx) {
                 setTimeout(res, 3000); });
             const aspect = (video.videoWidth / video.videoHeight) || 16 / 9;
             const dur = video.duration || 10;
-            videoLayers.push({ el: video, name, url, aspect, audioEnabled: false, opacity: 1, hidden: false, fileSize: file
-                    .size, _fingerprint: { name: file.name, size: file.size } });
+            videoLayers.push({ file, el: video, name, url, aspect, audioEnabled: false, opacity: 1, hidden: false, fileSize: file.size, type: file.type, _fingerprint: { name: file.name, size: file.size } });
             const lastEnd = videoSegments.length ? videoSegments[videoSegments.length - 1].start + videoSegments[
                 videoSegments.length - 1].dur : 0;
             videoSegments.push({ vidIdx: videoLayers.length - 1, start: lastEnd, dur });
@@ -4237,90 +4235,244 @@ function fitImageIndexToFull(idx) {
         }
 
         // ---------------------------- SAVE / LOAD ----------------------------
-        async function saveProjectToFile() {
-            if (!audioTracks.length && !videoLayers.length && !chars.length) { toast(
-                    'Add some audio, video, or images before saving'); return; }
-            const data = {
-                formatVersion: 1,
-                appName: 'BeatViz',
-                savedAt: new Date().toISOString(),
-                settings: { style: style_, lyricsStyle, danceMode, camShakeOn, aspectRatio: currentAR,
-                    exportQuality },
-                lyrics: lyrics.map(l => ({ time: l.time, endTime: l.endTime, text: l.text })),
-                textLayers: textLayers.map(t => ({ content: t.content, font: t.font, color: t.color, size: t.size,
-                    bold: t.bold, shadow: t.shadow, opacity: t.opacity, hidden: t.hidden, px: t.px, py: t.py,
-                    pw: t.pw, ph: t.ph })),
-                textSegments: textSegments.map(s => ({ textIdx: s.textIdx, start: s.start, dur: s.dur })),
-                images: chars.map(c => ({ fingerprint: c._fingerprint, px: c.px, py: c.py, pw: c.pw, ph: c.ph,
-                    opacity: c.opacity, hidden: c.hidden, userPlaced: c.userPlaced })),
-                imgSegments: imgSegments.map(s => ({ charIdx: s.charIdx, start: s.start, dur: s.dur })),
-                videos: videoLayers.map(v => ({ fingerprint: v._fingerprint, px: v.px, py: v.py, pw: v.pw, ph: v.ph,
-                    opacity: v.opacity, hidden: v.hidden, audioEnabled: v.audioEnabled })),
-                videoSegments: videoSegments.map(s => ({ vidIdx: s.vidIdx, start: s.start, dur: s.dur })),
-                audioTracks: audioTracks.map(t => ({ fingerprint: t._fingerprint, volume: t.volume, muted: t
-                        .muted })),
-                audioSegments: audioSegments.map(s => ({ trackIdx: s.trackIdx, start: s.start, dur: s.dur })),
-                audioDuration
-            };
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        /* ===== Self-contained BeatViz project files (.beatviz) =====
+           A .beatviz file is a ZIP containing project.json plus the original media.
+           New saved projects therefore reopen without asking the user to reselect media. */
+        function bvProjectSafeName(name) {
+            return String(name || 'media').replace(/[^a-zA-Z0-9._-]/g, '_');
+        }
+
+        function bvProjectDownload(blob, name) {
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            const stamp = new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-');
             a.href = url;
-            a.download = `beatviz-project-${stamp}.json`;
+            a.download = name;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
-            setTimeout(() => URL.revokeObjectURL(url), 2000);
-            toast('Project saved — choose where to keep it on your computer');
+            setTimeout(() => URL.revokeObjectURL(url), 5000);
+        }
+
+        function bvProjectBaseState() {
+            return {
+                formatVersion: 2,
+                appName: 'BeatViz',
+                savedAt: new Date().toISOString(),
+                settings: { style: style_, lyricsStyle, danceMode, camShakeOn, aspectRatio: currentAR, exportQuality },
+                lyrics: lyrics.map(l => ({ time: l.time, endTime: l.endTime, text: l.text, hidden: !!l.hidden })),
+                textLayers: textLayers.map(t => ({ content: t.content, font: t.font, color: t.color, size: t.size,
+                    bold: !!t.bold, shadow: t.shadow !== false, opacity: t.opacity ?? 1, hidden: !!t.hidden,
+                    px: t.px, py: t.py, pw: t.pw, ph: t.ph })),
+                textSegments: textSegments.map(x => ({ ...x })),
+                images: [], imgSegments: imgSegments.map(x => ({ ...x })),
+                videos: [], videoSegments: videoSegments.map(x => ({ ...x })),
+                audioTracks: [], audioSegments: audioSegments.map(x => ({ ...x })),
+                audioDuration
+            };
+        }
+
+        async function saveProjectToFile() {
+            if (!audioTracks.length && !videoLayers.length && !chars.length) {
+                toast('Add some audio, video, or images before saving');
+                return;
+            }
+            if (!window.JSZip) {
+                toast('Project-save library did not load. Check your internet connection and try again.');
+                return;
+            }
+
+            try {
+                const zip = new JSZip();
+                const media = zip.folder('media');
+                const data = bvProjectBaseState();
+
+                for (let i = 0; i < audioTracks.length; i++) {
+                    const track = audioTracks[i];
+                    if (!track.file) throw new Error(`The original audio file for “${track.name}” is unavailable. Please re-upload it, then save again.`);
+                    const path = `audio-${i}-${bvProjectSafeName(track.file.name)}`;
+                    media.file(path, track.file);
+                    data.audioTracks.push({ path: `media/${path}`, name: track.file.name, type: track.file.type,
+                        volume: track.volume ?? 1, muted: !!track.muted });
+                }
+
+                for (let i = 0; i < videoLayers.length; i++) {
+                    const video = videoLayers[i];
+                    if (!video.file) throw new Error(`The original video file for “${video.name}” is unavailable. Please re-upload it, then save again.`);
+                    const path = `video-${i}-${bvProjectSafeName(video.file.name)}`;
+                    media.file(path, video.file);
+                    data.videos.push({ path: `media/${path}`, name: video.file.name, type: video.file.type,
+                        px: video.px, py: video.py, pw: video.pw, ph: video.ph, opacity: video.opacity ?? 1,
+                        hidden: !!video.hidden, audioEnabled: !!video.audioEnabled });
+                }
+
+                for (let i = 0; i < chars.length; i++) {
+                    const image = chars[i];
+                    if (!image.file) throw new Error(`The original image file for “${image.name}” is unavailable. Please re-upload it, then save again.`);
+                    const path = `image-${i}-${bvProjectSafeName(image.file.name)}`;
+                    media.file(path, image.file);
+                    data.images.push({ path: `media/${path}`, name: image.file.name, type: image.file.type,
+                        px: image.px, py: image.py, pw: image.pw, ph: image.ph, opacity: image.opacity ?? 1,
+                        hidden: !!image.hidden, userPlaced: !!image.userPlaced });
+                }
+
+                zip.file('project.json', JSON.stringify(data, null, 2));
+                toast('Building self-contained project file…');
+                const blob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } });
+                const stamp = new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-');
+                bvProjectDownload(blob, `beatviz-project-${stamp}.beatviz`);
+                toast('Project saved with all audio, videos, and images.');
+            } catch (error) {
+                console.error(error);
+                toast(error.message || 'Could not save the project.');
+            }
         }
 
         let pendingProjectData = null;
         let reattachSlots = [];
 
-        function loadProjectFromFile(e) {
+        async function loadProjectFromFile(e) {
             const file = e.target.files[0];
             if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-                let data;
-                try { data = JSON.parse(ev.target.result); } catch (err) { toast('This file is not a valid BeatViz project');
-                    return; }
-                if (!data || data.appName !== 'BeatViz') { toast('This file is not a valid BeatViz project'); return; }
-                pendingProjectData = data;
-                openReattachFlow(data);
-            };
-            reader.readAsText(file);
-            e.target.value = '';
+            try {
+                const isEmbedded = file.name.toLowerCase().endsWith('.beatviz') || file.type === 'application/zip';
+                if (isEmbedded) await loadEmbeddedProject(file);
+                else await loadLegacyJsonProject(file);
+            } catch (error) {
+                console.error(error);
+                toast(error.message || 'Could not load this project file.');
+            } finally {
+                e.target.value = '';
+            }
+        }
+
+        async function loadLegacyJsonProject(file) {
+            const text = await file.text();
+            let data;
+            try { data = JSON.parse(text); } catch (error) { throw new Error('This file is not a valid BeatViz project.'); }
+            if (!data || data.appName !== 'BeatViz') throw new Error('This file is not a valid BeatViz project.');
+            pendingProjectData = data;
+            openReattachFlow(data);
+        }
+
+        function bvFileFromZip(zip, path, name, type) {
+            const entry = zip.file(path);
+            if (!entry) throw new Error(`Project is missing embedded media: ${name || path}`);
+            return entry.async('blob').then(blob => new File([blob], name || 'media', { type: type || blob.type || 'application/octet-stream' }));
+        }
+
+        async function addImageLayerFromFile(file) {
+            const dataUrl = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onerror = () => reject(new Error(`Could not read image: ${file.name}`));
+                reader.onload = () => resolve(reader.result);
+                reader.readAsDataURL(file);
+            });
+            const img = await new Promise((resolve, reject) => {
+                const image = new Image();
+                image.onload = () => resolve(image);
+                image.onerror = () => reject(new Error(`Could not decode image: ${file.name}`));
+                image.src = dataUrl;
+            });
+            chars.push({ img, url: dataUrl, file, name: file.name, fileSize: file.size,
+                _fingerprint: { name: file.name, size: file.size }, fingerprint: { name: file.name, size: file.size },
+                ds: { beatCount: 0, jumpAmt: 0, spinAng: 0, spinDir: 1, phase: Math.random() * Math.PI * 2 },
+                userPlaced: false, opacity: 1, hidden: false });
+        }
+
+        function resetProjectForLoad() {
+            stopAllAudio(true);
+            videoLayers.forEach(v => { try { v.el?.pause(); } catch (e) {} try { if (v.url) URL.revokeObjectURL(v.url); } catch (e) {} });
+            chars = []; videoLayers = []; audioTracks = []; textLayers = []; lyrics = [];
+            imgSegments = []; videoSegments = []; audioSegments = []; textSegments = [];
+            audioBuffer = null; audioDuration = 0; pvOffset = 0;
+            layerStack = []; selectedLayer = null;
+            selectLayer(null);
+        }
+
+        function restoreProjectEditorState(data) {
+            textLayers = (data.textLayers || []).map(t => ({ content: t.content, font: t.font || 'Inter', color: t.color || '#ffffff',
+                size: t.size || 48, bold: !!t.bold, shadow: t.shadow !== false, opacity: t.opacity ?? 1,
+                hidden: !!t.hidden, px: t.px, py: t.py, pw: t.pw, ph: t.ph }));
+            textSegments = (data.textSegments || []).map(x => ({ ...x }));
+            lyrics = (data.lyrics || []).map(l => ({ time: l.time, endTime: l.endTime, text: l.text, hidden: !!l.hidden,
+                ds: { beatCount: 0, jumpAmt: 0, spinAng: 0, spinDir: 1, phase: Math.random() * Math.PI * 2 } }));
+
+            if (data.settings) {
+                const settings = data.settings;
+                if (settings.style) pickStyle(settings.style, document.querySelector(`[data-style="${settings.style}"]`));
+                if (settings.lyricsStyle) pickLS(settings.lyricsStyle, document.querySelector(`[data-ls="${settings.lyricsStyle}"]`));
+                if (settings.danceMode) pickDance(settings.danceMode, document.querySelector(`[data-dm="${settings.danceMode}"]`));
+                if (settings.aspectRatio) setAspectRatio(settings.aspectRatio, document.querySelector(`[data-ar="${settings.aspectRatio}"]`));
+                if (settings.exportQuality) setQuality(settings.exportQuality, document.querySelector(`[data-q="${settings.exportQuality}"]`));
+            }
+            rebuildLayerStack();
+            renderAudioTrackList(); renderVideoLayerList(); renderCG(); renderTextLayerList(); renderLyrics();
+            checkReady();
+            if (audioDuration > 0) {
+                document.getElementById('timelineWrap').classList.remove('tl-disabled');
+                document.getElementById('qbInput').disabled = false;
+                document.getElementById('tapCatchBtn').disabled = false;
+                document.getElementById('autoCapBtn').disabled = false;
+                TL.resize();
+            }
+            TL.draw(pvOffset); drawIdle();
+        }
+
+        async function loadEmbeddedProject(file) {
+            if (!window.JSZip) throw new Error('Project-load library did not load. Check your internet connection and try again.');
+            toast('Opening project and restoring media…');
+            const zip = await JSZip.loadAsync(await file.arrayBuffer());
+            const projectEntry = zip.file('project.json');
+            if (!projectEntry) throw new Error('This .beatviz file has no project.json file.');
+            const data = JSON.parse(await projectEntry.async('text'));
+            if (!data || data.appName !== 'BeatViz' || Number(data.formatVersion) < 2) throw new Error('This is not a valid self-contained BeatViz project.');
+
+            resetProjectForLoad();
+            for (const track of data.audioTracks || []) {
+                const mediaFile = await bvFileFromZip(zip, track.path, track.name, track.type);
+                await addAudioTrack(mediaFile);
+                const current = audioTracks[audioTracks.length - 1];
+                current.volume = track.volume ?? 1; current.muted = !!track.muted;
+            }
+            audioSegments = (data.audioSegments || []).map(x => ({ ...x }));
+            if (data.audioDuration) audioDuration = data.audioDuration;
+
+            for (const layer of data.videos || []) {
+                const mediaFile = await bvFileFromZip(zip, layer.path, layer.name, layer.type);
+                await addVideoLayer(mediaFile);
+                Object.assign(videoLayers[videoLayers.length - 1], { px: layer.px, py: layer.py, pw: layer.pw, ph: layer.ph,
+                    opacity: layer.opacity ?? 1, hidden: !!layer.hidden, audioEnabled: !!layer.audioEnabled });
+            }
+            videoSegments = (data.videoSegments || []).map(x => ({ ...x }));
+
+            for (const layer of data.images || []) {
+                const mediaFile = await bvFileFromZip(zip, layer.path, layer.name, layer.type);
+                await addImageLayerFromFile(mediaFile);
+                Object.assign(chars[chars.length - 1], { px: layer.px, py: layer.py, pw: layer.pw, ph: layer.ph,
+                    opacity: layer.opacity ?? 1, hidden: !!layer.hidden, userPlaced: !!layer.userPlaced });
+            }
+            imgSegments = (data.imgSegments || []).map(x => ({ ...x }));
+            restoreProjectEditorState(data);
+            toast('Project loaded with all audio, videos, and images.');
         }
 
         function openReattachFlow(data) {
             reattachSlots = [];
-            (data.audioTracks || []).forEach((t, i) => reattachSlots.push({ kind: 'audio', idx: i, fingerprint: t
-                    .fingerprint, file: null }));
-            (data.videos || []).forEach((v, i) => reattachSlots.push({ kind: 'video', idx: i, fingerprint: v
-                    .fingerprint, file: null }));
-            (data.images || []).forEach((im, i) => reattachSlots.push({ kind: 'image', idx: i, fingerprint: im
-                    .fingerprint, file: null }));
+            (data.audioTracks || []).forEach((t, i) => reattachSlots.push({ kind: 'audio', idx: i, fingerprint: t.fingerprint, file: null }));
+            (data.videos || []).forEach((v, i) => reattachSlots.push({ kind: 'video', idx: i, fingerprint: v.fingerprint, file: null }));
+            (data.images || []).forEach((im, i) => reattachSlots.push({ kind: 'image', idx: i, fingerprint: im.fingerprint, file: null }));
             renderReattachList();
             document.getElementById('reattachOverlay').classList.add('show');
         }
 
         function renderReattachList() {
             const el = document.getElementById('reattachList');
-            if (!reattachSlots.length) { el.innerHTML =
-                    '<div style="font-size:12px;color:var(--text-3);padding:10px">No media files were used in this project — click Continue.</div>';
-            } else {
-                el.innerHTML = reattachSlots.map((slot, i) => {
-                    const icon = slot.kind === 'audio' ? '🎵' : slot.kind === 'video' ? '🎬' : '🖼';
-                    const matched = !!slot.file;
-                    return `<div class="ra-item ${matched?'matched':''}">
-                            <span class="ra-icon">${icon}</span>
-                            <div class="ra-info"><div class="ra-name">${slot.fingerprint?.name || 'Unknown file'}</div><div class="ra-status ${matched?'done':''}">${matched ? '✓ Attached' : 'Not attached yet'}</div></div>
-                            <button onclick="pickReattachFile(${i})">${matched?'Change':'Choose file'}</button>
-                        </div>`;
-                }).join('');
-            }
+            if (!reattachSlots.length) el.innerHTML = '<div style="font-size:12px;color:var(--text-3);padding:10px">No media files were used in this legacy project — click Continue.</div>';
+            else el.innerHTML = reattachSlots.map((slot, i) => {
+                const icon = slot.kind === 'audio' ? '🎵' : slot.kind === 'video' ? '🎬' : '🖼';
+                const matched = !!slot.file;
+                return `<div class="ra-item ${matched ? 'matched' : ''}"><span class="ra-icon">${icon}</span><div class="ra-info"><div class="ra-name">${slot.fingerprint?.name || 'Unknown file'}</div><div class="ra-status ${matched ? 'done' : ''}">${matched ? '✓ Attached' : 'Not attached yet'}</div></div><button onclick="pickReattachFile(${i})">${matched ? 'Change' : 'Choose file'}</button></div>`;
+            }).join('');
             updateReattachContinueBtn();
         }
 
@@ -4329,102 +4481,32 @@ function fitImageIndexToFull(idx) {
             inp.type = 'file';
             const slot = reattachSlots[slotIdx];
             inp.accept = slot.kind === 'audio' ? 'audio/*' : slot.kind === 'video' ? 'video/*' : 'image/*';
-            inp.onchange = (e) => { const f = e.target.files[0]; if (f) { reattachSlots[slotIdx].file = f;
-                    renderReattachList(); } };
+            inp.onchange = e => { const mediaFile = e.target.files[0]; if (mediaFile) { reattachSlots[slotIdx].file = mediaFile; renderReattachList(); } };
             inp.click();
         }
 
-        function updateReattachContinueBtn() { document.getElementById('raContinueBtn').disabled = !reattachSlots.every(s =>
-                !!s.file); }
-
-        function cancelProjectLoad() { pendingProjectData = null;
-            reattachSlots = [];
-            document.getElementById('reattachOverlay').classList.remove('show'); }
+        function updateReattachContinueBtn() { document.getElementById('raContinueBtn').disabled = !reattachSlots.every(slot => !!slot.file); }
+        function cancelProjectLoad() { pendingProjectData = null; reattachSlots = []; document.getElementById('reattachOverlay').classList.remove('show'); }
 
         async function finishProjectLoad() {
             const data = pendingProjectData;
             if (!data) return;
             document.getElementById('reattachOverlay').classList.remove('show');
-            toast('Loading project…');
-            chars = [];
-            videoLayers = [];
-            audioTracks = [];
-            textLayers = [];
-            lyrics = [];
-            imgSegments = [];
-            videoSegments = [];
-            audioSegments = [];
-            textSegments = [];
-            audioBuffer = null;
-            audioDuration = 0;
-            selectLayer(null);
-
-            const audioSlots = reattachSlots.filter(s => s.kind === 'audio');
-            for (const slot of audioSlots) { if (slot.file) await addAudioTrack(slot.file); }
-            (data.audioTracks || []).forEach((t, i) => { if (audioTracks[i]) { audioTracks[i].volume = t.volume ?? 1;
-                    audioTracks[i].muted = !!t.muted; } });
-            if (data.audioSegments && data.audioSegments.length) audioSegments = data.audioSegments.map(s => ({ ...s }));
+            toast('Loading legacy project…');
+            resetProjectForLoad();
+            for (const slot of reattachSlots.filter(x => x.kind === 'audio')) await addAudioTrack(slot.file);
+            (data.audioTracks || []).forEach((t, i) => { if (audioTracks[i]) { audioTracks[i].volume = t.volume ?? 1; audioTracks[i].muted = !!t.muted; } });
+            audioSegments = (data.audioSegments || []).map(x => ({ ...x }));
             if (data.audioDuration) audioDuration = data.audioDuration;
-            renderAudioTrackList();
-
-            const videoSlots = reattachSlots.filter(s => s.kind === 'video');
-            for (const slot of videoSlots) { if (slot.file) await addVideoLayer(slot.file); }
-            (data.videos || []).forEach((v, i) => { if (videoLayers[i]) Object.assign(videoLayers[i], { px: v.px,
-                    py: v.py, pw: v.pw, ph: v.ph, opacity: v.opacity ?? 1, hidden: !!v.hidden,
-                    audioEnabled: !!v.audioEnabled }); });
-            if (data.videoSegments && data.videoSegments.length) videoSegments = data.videoSegments.map(s => ({ ...s }));
-            renderVideoLayerList();
-
-            const imgSlots = reattachSlots.filter(s => s.kind === 'image');
-            for (const slot of imgSlots) {
-                if (!slot.file) continue;
-                await new Promise((resolve) => {
-                    const reader = new FileReader();
-                    reader.onload = ev => { const img = new Image();
-                        img.src = ev.target.result;
-                        img.onload = () => { chars.push({ img, url: ev.target.result, name: slot.file.name,
-                                ds: { beatCount: 0, jumpAmt: 0, spinAng: 0, spinDir: 1, phase: Math
-                                        .random() * Math.PI * 2 }, userPlaced: true, opacity: 1,
-                                hidden: false });
-                            resolve(); }; };
-                    reader.readAsDataURL(slot.file);
-                });
-            }
-            (data.images || []).forEach((im, i) => { if (chars[i]) Object.assign(chars[i], { px: im.px, py: im.py,
-                    pw: im.pw, ph: im.ph, opacity: im.opacity ?? 1, hidden: !!im.hidden,
-                    userPlaced: !!im.userPlaced }); });
-            if (data.imgSegments && data.imgSegments.length) imgSegments = data.imgSegments.map(s => ({ ...s }));
-            renderCG();
-
-            textLayers = (data.textLayers || []).map(t => ({ content: t.content, font: t.font || 'Inter', color: t
-                    .color || '#ffffff', size: t.size || 48, bold: !!t.bold, shadow: t.shadow !== false,
-                opacity: t.opacity ?? 1, hidden: !!t.hidden, px: t.px, py: t.py, pw: t.pw, ph: t.ph }));
-            textSegments = (data.textSegments || []).map(s => ({ ...s }));
-            renderTextLayerList();
-
-            lyrics = (data.lyrics || []).map(l => ({ time: l.time, endTime: l.endTime, text: l.text, ds: { beatCount: 0,
-                        jumpAmt: 0, spinAng: 0, spinDir: 1, phase: Math.random() * Math.PI * 2 } }));
-            renderLyrics();
-
-            if (data.settings) {
-                const s = data.settings;
-                if (s.style) pickStyle(s.style, document.querySelector(`[data-style="${s.style}"]`));
-                if (s.lyricsStyle) pickLS(s.lyricsStyle, document.querySelector(`[data-ls="${s.lyricsStyle}"]`));
-                if (s.danceMode) pickDance(s.danceMode, document.querySelector(`[data-dm="${s.danceMode}"]`));
-                if (s.aspectRatio) setAspectRatio(s.aspectRatio, document.querySelector(`[data-ar="${s.aspectRatio}"]`));
-                if (s.exportQuality) setQuality(s.exportQuality, document.querySelector(`[data-q="${s.exportQuality}"]`));
-            }
-            rebuildLayerStack();
-            checkReady();
-            if (audioDuration > 0) { document.getElementById('timelineWrap').classList.remove('tl-disabled');
-                document.getElementById('qbInput').disabled = false;
-                document.getElementById('tapCatchBtn').disabled = false;
-                document.getElementById('autoCapBtn').disabled = false;
-                TL.resize(); }
-            TL.draw(pvOffset);
-            pendingProjectData = null;
-            reattachSlots = [];
-            toast('Project loaded — you can keep editing');
+            for (const slot of reattachSlots.filter(x => x.kind === 'video')) await addVideoLayer(slot.file);
+            (data.videos || []).forEach((v, i) => { if (videoLayers[i]) Object.assign(videoLayers[i], { px:v.px, py:v.py, pw:v.pw, ph:v.ph, opacity:v.opacity ?? 1, hidden:!!v.hidden, audioEnabled:!!v.audioEnabled }); });
+            videoSegments = (data.videoSegments || []).map(x => ({ ...x }));
+            for (const slot of reattachSlots.filter(x => x.kind === 'image')) await addImageLayerFromFile(slot.file);
+            (data.images || []).forEach((im, i) => { if (chars[i]) Object.assign(chars[i], { px:im.px, py:im.py, pw:im.pw, ph:im.ph, opacity:im.opacity ?? 1, hidden:!!im.hidden, userPlaced:!!im.userPlaced }); });
+            imgSegments = (data.imgSegments || []).map(x => ({ ...x }));
+            restoreProjectEditorState(data);
+            pendingProjectData = null; reattachSlots = [];
+            toast('Legacy project loaded — future saves will include all media.');
         }
 
         function quickAddLyric() {

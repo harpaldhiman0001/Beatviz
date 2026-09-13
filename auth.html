@@ -70,7 +70,7 @@ const SCRIPTURL = 'https://script.google.com/macros/s/AKfycbxmlAuS2sftPJIuplMd5S
 const SUPABASE_URL = 'https://gzagsueuedwwhbhifbbl.supabase.co';
 
 const SUPABASE_ANON_KEY =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdWIiLCJyZWYiOiJnemFnc3VldWVkd3doYmhpZmJibCIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzg4OTQ1MzczLCJleHAiOjIxMDQ1MjEzNzN9.72jA2glg0Z4LkzNi71TBtyg4y8wwuSYYYnK-QQ1aYg';
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd6YWdzdWV1ZWR3d2hiaGlmYmJsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg5NDUzNzMsImV4cCI6MjEwNDUyMTM3M30.72jA2glg0Z_4LkzNi71TBtyg4y8wwuSYYYnK-QQ1aYg';
 
 const supabaseClient = window.supabase.createClient(
   SUPABASE_URL,
@@ -175,34 +175,57 @@ async function finishGoogleLogin() {
   );
 
   let session = null;
-  let sessionError = null;
 
   /*
-    Supabase may need a short moment to process the OAuth token
-    from the URL hash and persist the session in local storage.
+    First, try the normal Supabase persisted session.
   */
-  for (let attempt = 0; attempt < 10; attempt++) {
-    const { data, error } = await supabaseClient.auth.getSession();
+  const initial = await supabaseClient.auth.getSession();
 
-    if (error) {
-      sessionError = error;
-    }
-
-    if (data && data.session && data.session.access_token) {
-      session = data.session;
-      break;
-    }
-
-    await new Promise(function(resolve) {
-      setTimeout(resolve, 300);
-    });
+  if (initial.data && initial.data.session) {
+    session = initial.data.session;
   }
 
-  if (!session) {
-    console.error(
-      'Supabase session was not available after Google OAuth.',
-      sessionError
+  /*
+    If no persisted session exists yet, read the OAuth tokens from
+    the URL fragment and explicitly save them to Supabase storage.
+  */
+  if (!session && window.location.hash) {
+    const hashParams = new URLSearchParams(
+      window.location.hash.substring(1)
     );
+
+    const accessToken = hashParams.get('access_token');
+    const refreshToken = hashParams.get('refresh_token');
+
+    if (accessToken && refreshToken) {
+      const setResult = await supabaseClient.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken
+      });
+
+      if (setResult.data && setResult.data.session) {
+        session = setResult.data.session;
+      }
+    }
+  }
+
+  /*
+    One final retry after Supabase has processed the hash.
+  */
+  if (!session) {
+    await new Promise(function(resolve) {
+      setTimeout(resolve, 500);
+    });
+
+    const retry = await supabaseClient.auth.getSession();
+
+    if (retry.data && retry.data.session) {
+      session = retry.data.session;
+    }
+  }
+
+  if (!session || !session.access_token) {
+    console.error('No Supabase session after OAuth callback.');
 
     showMsg(
       'loginErr',
@@ -218,12 +241,12 @@ async function finishGoogleLogin() {
   });
 
   if (!result || !result.success) {
-    console.error('BeatViz Google user sync failed:', result);
+    console.error('BeatViz Google sync failed:', result);
 
     showMsg(
       'loginErr',
       (result && result.error) ||
-      'Could not set up your BeatViz account after Google sign-in.'
+      'Could not create your BeatViz account after Google sign-in.'
     );
 
     return;
@@ -232,8 +255,7 @@ async function finishGoogleLogin() {
   saveSession(result);
 
   /*
-    Remove ?google=1 and the token hash from the visible address.
-    The Supabase session is already stored locally.
+    Remove Google callback parameters and token fragment from URL.
   */
   window.history.replaceState(
     {},

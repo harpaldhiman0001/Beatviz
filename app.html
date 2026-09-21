@@ -2193,6 +2193,11 @@
         @media(max-width:768px) { .cloud-projects-modal{align-items:flex-end;padding:8px}.cloud-projects-box{max-height:calc(100dvh - 16px);border-radius:18px 18px 12px 12px}.cloud-project-card{align-items:flex-start;flex-direction:column}.cloud-project-actions{width:100%}.cloud-open-btn,.cloud-delete-btn{flex:1}.cloud-btn{padding:9px 8px;font-size:9px} }
 
     </style>
+
+<style id="beatviz-export-gate">
+.exp-btn.mp4 .export-lock{margin-left:4px;font-size:.8em;opacity:.84}
+.exp-btn.mp4{position:relative}
+</style>
 </head>
 <body>
 
@@ -2542,7 +2547,7 @@
                 <div id="bpmLine" style="font-size:10px;color:var(--text-3);text-align:center;min-height:16px"></div>
                 <button class="gen-btn" id="genBtn" onclick="handleGenerate()" disabled>Generate Video</button>
                 <button class="pause-btn" id="pauseBtn" onclick="togglePause()">⏸ Pause</button>
-                <div class="exp-row"><a class="exp-btn webm" id="dlWebm" download="beatviz.webm">⬇ WebM</a><button class="exp-btn mp4" id="dlMp4" onclick="exportMP4()">⬇ MP4</button></div>
+                <div class="exp-row"><a class="exp-btn webm" id="dlWebm" download="beatviz.webm">⬇ WebM</a><button class="exp-btn mp4" id="dlMp4" onclick="exportMP4(); return false;">⬇ MP4</button></div>
                 <div class="ready-label" id="readyLbl">✓ Ready to generate</div>
             </div>
         </aside>
@@ -5588,7 +5593,15 @@ function finalize() {
     }
 }
 
+function requireCreatorForExport() {
+    if (sub && sub.isActive) return true;
+    toast('MP4 export is available with BeatViz Creator.');
+    showPaywall();
+    return false;
+}
+
 async function exportMP4() {
+    if (!requireCreatorForExport()) return;
     if (!recordedBlob) { toast('Generate a video first!'); return; }
     if (recordedBlob.type === 'video/mp4') {
         const a = document.createElement('a');

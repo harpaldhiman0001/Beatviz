@@ -2194,9 +2194,8 @@
 
     </style>
 
-<style id="beatviz-export-gate">
-.exp-btn.mp4 .export-lock{margin-left:4px;font-size:.8em;opacity:.84}
-.exp-btn.mp4{position:relative}
+<style id="beatviz-export-locked-style">
+.exp-btn.mp4{position:relative}.exp-btn.mp4::after{content:'✦ Creator';font-size:8px;margin-left:5px;opacity:.85}
 </style>
 </head>
 <body>
@@ -2547,7 +2546,7 @@
                 <div id="bpmLine" style="font-size:10px;color:var(--text-3);text-align:center;min-height:16px"></div>
                 <button class="gen-btn" id="genBtn" onclick="handleGenerate()" disabled>Generate Video</button>
                 <button class="pause-btn" id="pauseBtn" onclick="togglePause()">⏸ Pause</button>
-                <div class="exp-row"><a class="exp-btn webm" id="dlWebm" download="beatviz.webm">⬇ WebM</a><button class="exp-btn mp4" id="dlMp4" onclick="exportMP4(); return false;">⬇ MP4</button></div>
+                <div class="exp-row"><a class="exp-btn webm" id="dlWebm" download="beatviz.webm">⬇ WebM</a><button class="exp-btn mp4" id="dlMp4" onclick="exportMP4()">⬇ MP4</button></div>
                 <div class="ready-label" id="readyLbl">✓ Ready to generate</div>
             </div>
         </aside>
@@ -5593,9 +5592,18 @@ function finalize() {
     }
 }
 
+function hasVerifiedCreatorPlan() {
+    return !!(sub && sub.isActive === true);
+}
+
 function requireCreatorForExport() {
-    if (sub && sub.isActive) return true;
-    toast('MP4 export is available with BeatViz Creator.');
+    if (hasVerifiedCreatorPlan()) return true;
+    const mp4 = document.getElementById('dlMp4');
+    if (mp4) {
+        mp4.removeAttribute('href');
+        mp4.removeAttribute('download');
+    }
+    toast('MP4 export requires an active BeatViz Creator plan.');
     showPaywall();
     return false;
 }
@@ -5871,7 +5879,35 @@ async function exportMP4() {
         document.getElementById('cloudProjectsModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeCloudProjects();});
         drawIdle();
     </script>
-    <!-- Apply this patch to the end of beatviz.html, immediately before </body>. It adds lyric creation by right-click, paused-playhead seeking by left-click, and fixes effects rendering. -->
+    <!-- Apply this patch to the end of beatviz.html, immediately before 
+<script id="beatviz-mp4-hard-lock">
+(function () {
+  function paid() { return !!(window.sub && window.sub.isActive === true); }
+  function block(event) {
+    if (paid()) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    const link = document.getElementById('dlMp4');
+    if (link) { link.removeAttribute('href'); link.removeAttribute('download'); }
+    if (typeof window.toast === 'function') window.toast('MP4 export requires an active BeatViz Creator plan.');
+    if (typeof window.showPaywall === 'function') window.showPaywall();
+  }
+  document.addEventListener('click', function (event) {
+    const link = event.target.closest && event.target.closest('#dlMp4');
+    if (link) block(event);
+  }, true);
+  window.addEventListener('DOMContentLoaded', function () {
+    const link = document.getElementById('dlMp4');
+    if (!link) return;
+    link.addEventListener('click', block, true);
+    const clean = function () { if (!paid()) { link.removeAttribute('href'); link.removeAttribute('download'); } };
+    clean();
+    new MutationObserver(clean).observe(link, {attributes:true, attributeFilter:['href','download']});
+  });
+}());
+</script>
+
+</body>. It adds lyric creation by right-click, paused-playhead seeking by left-click, and fixes effects rendering. -->
 <script>
 (() => {
   const oldOnDown = TL.onDown.bind(TL);

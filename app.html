@@ -2210,7 +2210,7 @@
                 <button id="modeChar" class="active" onclick="setAppMode('character')">🎭 Character</button>
                 <button id="modePromo" onclick="setAppMode('promo')">📢 Promo</button>
             </div>
-            <button class="topbar-cta" onclick="showPaywall()">⚡ Upgrade to Pro</button>
+            <button class="topbar-cta" onclick="showPaywall()">⚡ Create without limits</button>
             <div class="topbar-user"><div class="topbar-avatar" id="userAvatar">?</div><span class="topbar-username" id="userName">User</span></div>
             <button class="topbar-logout" onclick="doLogout()">Logout</button>
         </div>
@@ -2577,17 +2577,17 @@
             <button class="pw-close" onclick="hidePaywall()">✕</button>
             <div class="pw-head">
                 <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=140&h=140&fit=crop&auto=format" alt="">
-                <div class="pw-title">Upgrade to Pro</div>
-                <div class="pw-sub">You've used your free trial. Join creators making studio-quality videos every release.</div>
+                <div class="pw-title">Create without limits</div>
+                <div class="pw-sub">Unlock BeatViz Creator and turn every release into polished lyric videos, music visualizers, Reels and Shorts.</div>
             </div>
             <div class="pw-value-compare">
                 <div><div class="vc-label">Freelancer</div><div class="vc-amt">₹4,500/video</div></div>
                 <div style="color:var(--gold)">→</div>
-                <div><div class="vc-label">BeatViz Pro</div><div class="vc-amt final">₹199/mo</div></div>
+                <div><div class="vc-label">BeatViz Creator</div><div class="vc-amt final">₹199/mo</div></div>
             </div>
             <div class="pw-plan">
                 <div class="pw-pr">
-                    <div><div style="font-size:13.5px;font-weight:700">Pro Monthly</div><div style="font-size:10px;color:var(--text-3)">Cancel anytime</div></div>
+                    <div><div style="font-size:13.5px;font-weight:700">Creator Monthly</div><div style="font-size:10px;color:var(--text-3)">Cancel anytime</div></div>
                     <div style="text-align:right"><div class="pw-price">₹199</div><div style="font-size:10px;color:var(--text-3)">per month, incl. GST</div></div>
                 </div>
                 <div class="pw-feats">
@@ -2598,7 +2598,7 @@
                 </div>
             </div>
             <div class="pw-acts">
-                <button class="pw-btn" id="payBtn" onclick="initiatePayment()">Subscribe Now — ₹199/month</button>
+                <button class="pw-btn" id="payBtn" onclick="initiatePayment()">Get BeatViz Creator — ₹199/month</button>
                 <p class="pw-note2">Secure payment via Razorpay · GST invoice sent automatically</p>
                 <button onclick="hidePaywall()" style="width:100%;padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:none;color:var(--text-3);cursor:pointer">Maybe later</button>
             </div>
@@ -2620,7 +2620,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
             RAZORPAYKEY: "rzp_live_TNjnMPpmLS7dJG" };
         const token = localStorage.getItem('bvtoken');
         const user = JSON.parse(localStorage.getItem('bvuser') || '{}');
-        let sub = JSON.parse(localStorage.getItem('bvsub') || '{"isActive":false,"trialActive":true,"trialDaysLeft":7,"trialUsed":false}');
+        let sub = JSON.parse(localStorage.getItem('bvsub') || '{"isActive":false,"expiresAt":null}');
 
         if (!token) { location.href = 'auth.html'; } else {
             document.getElementById('userName').textContent = user.name || user.email || 'User';
@@ -2634,12 +2634,13 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
         function updateSubPill() {
             const p = document.getElementById('subBadge');
             if (!p) return;
-            if (sub.isActive) { p.textContent = 'Pro';
-                p.className = 'topbar-badge pro'; } else if (sub.trialActive && (sub.trialDaysLeft || 0) > 0) { p.textContent =
-                    `Trial: ${sub.trialDaysLeft}d`;
-                p.className = 'topbar-badge ' + (sub.trialDaysLeft <= 2 ? 'expired' : 'trial'); } else { p.textContent =
-                    'Trial Expired';
-                p.className = 'topbar-badge expired'; }
+            if (sub.isActive) {
+                p.textContent = 'BeatViz Creator';
+                p.className = 'topbar-badge pro';
+            } else {
+                p.textContent = 'Creator plan required';
+                p.className = 'topbar-badge expired';
+            }
         }
 
         async function getCurrentUser() {
@@ -2680,10 +2681,10 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
             btn.textContent = 'Creating order…';
             const or_ = await callAPI({ action: 'createOrder', token });
             if (!or_ || !or_.success) { btn.disabled = false;
-                btn.textContent = 'Subscribe Now — ₹199/month';
+                btn.textContent = 'Get BeatViz Creator — ₹199/month';
                 toast((or_ && or_.error) || 'Cannot reach server.'); return; }
             btn.disabled = false;
-            btn.textContent = 'Subscribe Now — ₹199/month';
+            btn.textContent = 'Get BeatViz Creator — ₹199/month';
             if (typeof Razorpay === 'undefined') { toast('Razorpay failed to load.'); return; }
             const options = { key: CONFIG.RAZORPAYKEY, amount: or_.amount, currency: 'INR', name: 'BeatViz',
                 order_id: or_.orderId, prefill: { name: user.name || '', email: user.email || '' }, theme: { color: '#6d5ef5' },
@@ -3045,7 +3046,7 @@ async function saveProjectToCloud() {
 
   const projectName = prompt(
     'Project name:',
-    document.title.includes('Untitled') ? 'Untitled project' : 'My BeatViz Project'
+    document.title.includes('Untitled') ? 'Untitled project' : 'My BeatViz Creatorject'
   );
 
   if (!projectName) return;
@@ -5805,7 +5806,7 @@ async function exportMP4() {
         async function saveProjectToCloud() {
             const sb = getCloudClient(), user = await cloudUser();
             if (!sb || !user) return;
-            const inputName = prompt('Cloud project name:', activeCloudProjectId ? 'BeatViz Project' : 'Untitled project');
+            const inputName = prompt('Cloud project name:', activeCloudProjectId ? 'BeatViz Creatorject' : 'Untitled project');
             if (!inputName) return;
             const row = { user_id:user.id, name:inputName.trim(), status:'draft', aspect_ratio:currentAR, export_quality:exportQuality, project_data:cloudProjectState() };
             let data, error;

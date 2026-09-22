@@ -1,464 +1,463 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#07070d">
-  <title>BeatViz — Make your music impossible to scroll past</title>
-  <meta name="description" content="BeatViz is the premium visual studio for artists creating lyric videos, music visualizers, Reels and Shorts.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --ink: #f8f7ff;
-      --muted: #aaa8bd;
-      --line: rgba(255,255,255,.12);
-      --surface: rgba(19, 18, 31, .64);
-      --pink: #ff3cac;
-      --violet: #8c52ff;
-      --blue: #2e8cff;
-      --cyan: #4eeaff;
-      --bg: #07070d;
-    }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FFFDF6">
+<title>BeatViz — Make them stop scrolling</title>
+<meta name="description" content="BeatViz is the visual studio for independent artists: turn a track into a lyric video, visualizer, Reel or Short in minutes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FFFDF6;
+    --paper-deep:#F6EFDD;
+    --ink:#161018;
+    --ink-soft:rgba(22,16,24,.66);
+    --ink-faint:rgba(22,16,24,.14);
+    --pink:#FF2E7E;
+    --orange:#FF7A1A;
+    --violet:#7C3AED;
+    --cream:#FFFDF6;
+    --radius-s:6px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth; scroll-padding-top: calc(70px + env(safe-area-inset-top,0px));}
+  body{
+    position:relative;
+    margin:0; min-width:320px; overflow-x:hidden;
+    background:var(--paper); color:var(--ink);
+    font-family:Inter,Arial,sans-serif;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  body::after{
+    content:""; position:fixed; inset:0; z-index:50; pointer-events:none;
+    opacity:.045; mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  a{color:inherit; text-decoration:none;}
+  button{font:inherit;}
+  img,svg{max-width:100%; display:block;}
+  .wrap{width:min(1160px, calc(100% - 40px)); margin:0 auto;}
+  .display{font-family:Anton, Impact, sans-serif; text-transform:uppercase; letter-spacing:.005em; font-weight:400;}
 
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      margin: 0;
-      min-width: 320px;
-      overflow-x: hidden;
-      color: var(--ink);
-      background: var(--bg);
-      font-family: Manrope, Arial, sans-serif;
-    }
+  /* ---------- nav ---------- */
+  .site-header{
+    position:sticky; top:0; z-index:30;
+    padding-top:env(safe-area-inset-top,0px);
+    background:var(--paper);
+    border-bottom:2px solid var(--ink);
+  }
+  .nav-inner{min-height:70px; display:flex; align-items:center; justify-content:space-between; gap:20px;}
+  .brand{display:inline-flex; align-items:baseline; gap:2px; font-family:Anton,sans-serif; font-size:23px; letter-spacing:.01em;}
+  .brand .dot{color:var(--orange);}
+  .nav-links{display:flex; align-items:center; gap:28px; font-size:14px; font-weight:600; color:var(--ink-soft);}
+  .nav-links a:hover{color:var(--ink);}
 
-    body::before, body::after {
-      position: fixed;
-      z-index: -2;
-      content: "";
-      pointer-events: none;
-      filter: blur(34px);
-      border-radius: 999px;
-    }
-    body::before {
-      width: 52vw;
-      height: 52vw;
-      top: -23vw;
-      left: -17vw;
-      background: radial-gradient(circle, rgba(140,82,255,.33), transparent 65%);
-    }
-    body::after {
-      width: 58vw;
-      height: 58vw;
-      top: 14vw;
-      right: -27vw;
-      background: radial-gradient(circle, rgba(255,60,172,.25), transparent 67%);
-    }
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    min-height:48px; padding:0 22px; border-radius:var(--radius-s);
+    font-weight:700; font-size:14.5px; cursor:pointer; border:2px solid var(--ink);
+  }
+  .btn-primary{background:var(--ink); color:var(--cream); position:relative;}
+  .btn-primary:hover{background:var(--orange); border-color:var(--orange);}
+  .btn-secondary{background:transparent; color:var(--ink);}
+  .btn-secondary:hover{background:var(--ink); color:var(--cream);}
+  .btn-small{min-height:40px; padding:0 16px; font-size:13px;}
 
-    a { color: inherit; text-decoration: none; }
-    button { font: inherit; }
-    .wrap { width: min(1160px, calc(100% - 40px)); margin: 0 auto; }
+  .pulse-wrap{position:relative; display:inline-flex;}
+  .pulse-wrap::before{
+    content:""; position:absolute; inset:0; border-radius:var(--radius-s);
+    border:2px solid var(--orange); animation:pulse 2.2s ease-out infinite;
+  }
+  @keyframes pulse{
+    0%{transform:scale(1); opacity:.7;}
+    100%{transform:scale(1.16); opacity:0;}
+  }
+  @media (prefers-reduced-motion:reduce){ .pulse-wrap::before{animation:none; display:none;} }
 
-    .nav {
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      border-bottom: 1px solid rgba(255,255,255,.07);
-      background: rgba(7,7,13,.7);
-      backdrop-filter: blur(20px);
-    }
-    .nav-inner {
-      min-height: 76px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 22px;
-    }
-    .brand {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      font-family: "Space Grotesk", sans-serif;
-      font-size: 22px;
-      font-weight: 700;
-      letter-spacing: -.8px;
-    }
-    .brand-mark {
-      width: 34px;
-      height: 34px;
-      display: grid;
-      place-items: center;
-      border-radius: 11px;
-      background: linear-gradient(135deg, var(--pink), var(--violet) 55%, var(--blue));
-      box-shadow: 0 8px 25px rgba(140,82,255,.4);
-    }
-    .brand-mark span { font-size: 18px; transform: translateY(-1px); }
-    .nav-links { display: flex; align-items: center; gap: 26px; color: #d0cede; font-size: 13px; font-weight: 700; }
-    .nav-links a:hover { color: white; }
+  /* ---------- hero ---------- */
+  .hero{padding:60px 0 0; position:relative; overflow:hidden;}
+  .halftone{
+    position:absolute; top:-60px; right:-90px; width:420px; height:420px; z-index:0;
+    background-image:radial-gradient(rgba(255,46,126,.16) 2.6px, transparent 2.6px);
+    background-size:16px 16px; opacity:.8; transform:rotate(8deg);
+  }
+  .hero-grid{display:grid; grid-template-columns:1.05fr .95fr; gap:40px; align-items:center; position:relative; z-index:1; padding-bottom:44px;}
+  .headline{
+    font-size:clamp(42px,6.4vw,84px); line-height:.94; margin:0 0 22px; max-width:12ch;
+  }
+  .headline .line{display:block; opacity:0; transform:translateY(24px);
+    animation:riseIn .7s cubic-bezier(.2,.7,.2,1) forwards;}
+  .headline .line:nth-child(1){animation-delay:.05s;}
+  .headline .line:nth-child(2){animation-delay:.16s;}
+  @keyframes riseIn{to{opacity:1; transform:translateY(0);}}
+  @media (prefers-reduced-motion:reduce){
+    .headline .line{animation:none; opacity:1; transform:none;}
+  }
+  .subcopy{max-width:44ch; font-size:17px; line-height:1.65; color:var(--ink-soft);}
+  .cta-row{display:flex; flex-wrap:wrap; gap:14px; margin-top:28px; align-items:center;}
+  .price-line{margin:16px 0 0; font-size:13px; color:var(--ink-soft); font-weight:600;}
+  .price-line b{color:var(--ink);}
 
-    .button {
-      position: relative;
-      display: inline-flex;
-      min-height: 52px;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      padding: 0 23px;
-      border: 0;
-      border-radius: 15px;
-      color: #fff;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 800;
-      letter-spacing: -.15px;
-      background: linear-gradient(110deg, var(--pink), var(--violet) 52%, var(--blue));
-      box-shadow: 0 13px 38px rgba(125,66,255,.38), inset 0 1px rgba(255,255,255,.36);
-      transition: transform .22s ease, box-shadow .22s ease, filter .22s ease;
-      overflow: hidden;
-    }
-    .button::before {
-      position: absolute;
-      top: 0;
-      left: -120%;
-      width: 80%;
-      height: 100%;
-      content: "";
-      background: linear-gradient(105deg, transparent, rgba(255,255,255,.45), transparent);
-      transform: skewX(-18deg);
-      transition: left .55s ease;
-    }
-    .button:hover { transform: translateY(-3px); filter: saturate(1.12); box-shadow: 0 20px 48px rgba(125,66,255,.5), inset 0 1px rgba(255,255,255,.42); }
-    .button:hover::before { left: 135%; }
-    .button-arrow { font-size: 18px; line-height: 0; transition: transform .2s ease; }
-    .button:hover .button-arrow { transform: translateX(3px); }
-    .button-small { min-height: 41px; padding: 0 16px; border-radius: 12px; font-size: 12px; }
-    .button-secondary {
-      color: #f4f2ff;
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.15);
-      box-shadow: inset 0 1px rgba(255,255,255,.11);
-    }
-    .button-secondary:hover { background: rgba(255,255,255,.11); box-shadow: 0 14px 28px rgba(0,0,0,.25), inset 0 1px rgba(255,255,255,.15); }
+  /* hero visual: mixtape sticker with parallax + rotating word */
+  .hero-visual{position:relative; min-height:430px; display:flex; align-items:center; justify-content:center;}
+  .block-color{
+    position:absolute; width:280px; height:340px; background:var(--violet); border:2px solid var(--ink);
+    border-radius:16px; transform:rotate(6deg); right:6%; top:14%; z-index:0;
+  }
+  .sticker{
+    position:relative; z-index:1; width:100%; max-width:330px; background:var(--cream);
+    border:2px solid var(--ink); border-radius:14px; padding:18px 18px 20px;
+    transform:rotate(-4deg); box-shadow:10px 10px 0 var(--ink);
+    transition:transform .15s ease-out;
+    will-change:transform;
+  }
+  .sticker-top{display:flex; justify-content:space-between; align-items:center; font-size:11px; font-weight:700; letter-spacing:.02em; color:var(--ink-soft); margin-bottom:12px;}
+  .reels{display:flex; gap:6px;}
+  .reel{width:16px; height:16px; border-radius:50%; border:2px solid var(--ink); position:relative;}
+  .reel::after{content:""; position:absolute; inset:5px; border-radius:50%; background:var(--ink);}
+  .frame{
+    aspect-ratio:9/13; border-radius:8px; background:linear-gradient(160deg,#241931,#161018 60%);
+    display:flex; align-items:flex-end; padding:14px; position:relative; overflow:hidden;
+  }
+  .frame::before{content:""; position:absolute; inset:0; background:
+      repeating-linear-gradient(115deg, rgba(255,255,255,.05) 0 2px, transparent 2px 26px);}
+  .frame h3{color:var(--cream); font-family:Anton,sans-serif; font-size:25px; line-height:1.02; margin:0; position:relative; min-height:56px;}
+  .frame small{display:block; color:rgba(255,253,246,.6); font-size:10px; font-weight:700; letter-spacing:.06em; margin-bottom:6px;}
+  .rotator{position:relative; display:block; height:1.02em;}
+  .rotator span{position:absolute; inset:0; opacity:0; animation:rotateWord 9s infinite;}
+  .rotator span:nth-child(1){animation-delay:0s; color:var(--pink);}
+  .rotator span:nth-child(2){animation-delay:3s; color:var(--orange);}
+  .rotator span:nth-child(3){animation-delay:6s; color:#B98CFF;}
+  @keyframes rotateWord{
+    0%{opacity:0; transform:translateY(8px);}
+    5%{opacity:1; transform:translateY(0);}
+    30%{opacity:1; transform:translateY(0);}
+    36%{opacity:0; transform:translateY(-8px);}
+    100%{opacity:0;}
+  }
+  @media (prefers-reduced-motion:reduce){ .rotator span{animation:none; position:static; opacity:1;} .rotator span:not(:first-child){display:none;} }
+  .eq{display:flex; align-items:flex-end; gap:3px; height:20px; position:absolute; right:14px; bottom:14px;}
+  .eq i{width:4px; border-radius:2px; animation:eq 1.1s ease-in-out infinite;}
+  .eq i:nth-child(1){height:40%; background:var(--pink); animation-delay:0s;}
+  .eq i:nth-child(2){height:100%; background:var(--orange); animation-delay:.15s;}
+  .eq i:nth-child(3){height:65%; background:#B98CFF; animation-delay:.3s;}
+  .eq i:nth-child(4){height:85%; background:var(--pink); animation-delay:.45s;}
+  @keyframes eq{0%,100%{transform:scaleY(.4);} 50%{transform:scaleY(1);}}
+  @media (prefers-reduced-motion:reduce){ .eq i{animation:none; height:70%;} }
+  .sticker-bottom{display:flex; justify-content:space-between; align-items:center; margin-top:12px; font-size:12px; font-weight:700;}
+  .sticker-bottom span{color:var(--ink-soft); font-weight:600;}
+  .tag{
+    position:absolute; top:-14px; right:-18px; background:var(--pink); color:var(--cream); z-index:2;
+    font-size:11px; font-weight:800; padding:7px 12px; border-radius:20px; transform:rotate(8deg);
+    border:2px solid var(--ink);
+  }
 
-    .hero { position: relative; padding: 88px 0 82px; }
-    .hero-grid { display: grid; grid-template-columns: 1.02fr .98fr; align-items: center; gap: 50px; }
-    .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 9px;
-      padding: 8px 12px;
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 999px;
-      color: #e5e1ff;
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      background: rgba(25,22,40,.63);
-      box-shadow: inset 0 1px rgba(255,255,255,.1);
-    }
-    .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 15px var(--cyan); }
-    h1, h2, h3, p { margin-top: 0; }
-    h1 {
-      max-width: 700px;
-      margin: 18px 0 22px;
-      font-family: "Space Grotesk", sans-serif;
-      font-size: clamp(42px, 5.6vw, 75px);
-      line-height: .99;
-      letter-spacing: -.07em;
-    }
-    .gradient-text { background: linear-gradient(95deg, #ff79ce 5%, #ad88ff 54%, #75d9ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
-    .hero-copy { max-width: 555px; color: #c5c3d2; font-size: 17px; line-height: 1.7; }
-    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 31px; }
-    .plan-note { margin: 15px 0 0; color: #aaa8bc; font-size: 12px; font-weight: 600; }
-    .plan-note span { color: #fff; }
+  /* ---------- ticker ---------- */
+  .ticker{border-top:2px solid var(--ink); border-bottom:2px solid var(--ink); background:var(--violet); overflow:hidden;}
+  .ticker-track{display:flex; width:max-content; animation:scroll 26s linear infinite;}
+  .ticker-track span{display:flex; align-items:center; gap:14px; padding:14px 22px; white-space:nowrap; color:var(--cream); font-family:Anton,sans-serif; font-size:15px; letter-spacing:.03em;}
+  .ticker-track span::after{content:"◆"; color:var(--orange); font-size:9px;}
+  @keyframes scroll{from{transform:translateX(0);} to{transform:translateX(-50%);}}
+  @media (prefers-reduced-motion:reduce){ .ticker-track{animation:none;} }
 
-    .showcase { position: relative; min-height: 492px; }
-    .orbit { position: absolute; inset: 17px; border: 1px solid rgba(147,118,255,.18); border-radius: 50%; transform: rotate(-20deg); }
-    .orbit::before { position: absolute; top: 8%; right: 9%; width: 8px; height: 8px; content: ""; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 17px var(--cyan); }
-    .player {
-      position: absolute;
-      z-index: 2;
-      top: 25px;
-      right: 6%;
-      width: min(100%, 410px);
-      min-height: 447px;
-      padding: 15px;
-      border: 1px solid rgba(255,255,255,.24);
-      border-radius: 31px;
-      background: linear-gradient(145deg, rgba(47,40,68,.87), rgba(15,13,24,.9));
-      box-shadow: 0 35px 90px rgba(0,0,0,.56), 0 0 60px rgba(132,80,255,.22), inset 0 1px rgba(255,255,255,.25);
-      transform: rotate(5deg);
-    }
-    .player-notch { width: 96px; height: 20px; margin: 0 auto 8px; border-radius: 0 0 12px 12px; background: #0b0a11; }
-    .visual {
-      position: relative;
-      display: flex;
-      min-height: 334px;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      border-radius: 20px;
-      background: radial-gradient(circle at 70% 24%, rgba(255,72,183,.95), transparent 21%), radial-gradient(circle at 31% 70%, rgba(60,220,255,.88), transparent 28%), linear-gradient(135deg, #1a0738 7%, #300b56 45%, #071d53 100%);
-    }
-    .visual::before, .visual::after { position: absolute; content: ""; border-radius: 50%; filter: blur(1px); }
-    .visual::before { width: 280px; height: 280px; border: 2px solid rgba(255,255,255,.4); box-shadow: 0 0 0 17px rgba(255,255,255,.08), 0 0 0 37px rgba(255,255,255,.05), 0 0 60px rgba(255,255,255,.44); animation: breathe 3.6s ease-in-out infinite; }
-    .visual::after { width: 450px; height: 100px; background: linear-gradient(90deg, transparent, rgba(77,232,255,.7), transparent); transform: rotate(-30deg); filter: blur(27px); }
-    .visual-title { position: relative; z-index: 2; text-align: center; font-family: "Space Grotesk", sans-serif; font-size: clamp(30px, 5vw, 49px); font-weight: 700; line-height: .93; letter-spacing: -.07em; text-shadow: 0 5px 18px rgba(0,0,0,.4); }
-    .visual-title small { display: block; margin-bottom: 10px; color: #d3c7ff; font-family: Manrope, sans-serif; font-size: 10px; font-weight: 800; letter-spacing: .22em; text-transform: uppercase; }
-    .player-bottom { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 4px 2px; }
-    .track-info { font-size: 11px; font-weight: 800; }
-    .track-info span { display: block; margin-top: 3px; color: #a8a5bc; font-size: 9px; font-weight: 600; }
-    .equalizer { display: flex; align-items: center; height: 23px; gap: 3px; }
-    .equalizer i { display: block; width: 3px; border-radius: 4px; background: linear-gradient(to top, var(--pink), var(--cyan)); animation: equalize 1s ease-in-out infinite alternate; }
-    .equalizer i:nth-child(1) { height: 8px; } .equalizer i:nth-child(2) { height: 20px; animation-delay: -.7s; } .equalizer i:nth-child(3) { height: 12px; animation-delay: -.3s; } .equalizer i:nth-child(4) { height: 18px; animation-delay: -.5s; } .equalizer i:nth-child(5) { height: 9px; animation-delay: -.15s; }
-    .float-card { position: absolute; z-index: 4; padding: 11px 13px; border: 1px solid rgba(255,255,255,.17); border-radius: 14px; color: #f5f3ff; background: rgba(23,20,37,.7); box-shadow: 0 15px 35px rgba(0,0,0,.3), inset 0 1px rgba(255,255,255,.12); backdrop-filter: blur(16px); font-size: 11px; font-weight: 800; }
-    .float-card small { display: block; margin-top: 3px; color: #b3aec5; font-size: 9px; font-weight: 600; }
-    .card-lyrics { top: 61px; left: 0; animation: floaty 4s ease-in-out infinite; }
-    .card-reel { right: -1%; bottom: 45px; animation: floaty 4.5s ease-in-out infinite reverse; }
-    .mini-icon { margin-right: 5px; color: var(--cyan); }
+  /* ---------- stat band ---------- */
+  .stats{background:var(--ink); color:var(--cream); padding:52px 0;}
+  .stats-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:28px; text-align:center;}
+  .stat b{display:block; font-family:Anton,sans-serif; font-size:clamp(34px,5vw,54px); line-height:1;}
+  .stat:nth-child(1) b{color:var(--pink);}
+  .stat:nth-child(2) b{color:var(--orange);}
+  .stat:nth-child(3) b{color:#B98CFF;}
+  .stat span{display:block; margin-top:8px; font-size:13.5px; color:rgba(255,253,246,.7); font-weight:600;}
 
-    .proof { padding: 18px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: rgba(255,255,255,.025); }
-    .proof-inner { display: flex; align-items: center; justify-content: space-between; gap: 25px; }
-    .proof-label { color: #ddd9ef; font-size: 13px; font-weight: 700; }
-    .format-list { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
-    .format-list span { padding: 6px 9px; border: 1px solid rgba(255,255,255,.1); border-radius: 7px; color: #aaa7bd; font-size: 10px; font-weight: 800; letter-spacing: .045em; }
+  section{padding:88px 0;}
+  .section-head{max-width:640px; margin-bottom:52px;}
+  .section-head h2{font-size:clamp(30px,4vw,44px); line-height:1.08; margin:0 0 14px;}
+  .section-head p{font-size:16px; color:var(--ink-soft); line-height:1.6; margin:0;}
 
-    section { padding: 110px 0; }
-    .section-heading { max-width: 720px; margin: 0 auto 55px; text-align: center; }
-    .section-heading h2 { margin-bottom: 16px; font-family: "Space Grotesk", sans-serif; font-size: clamp(33px, 4.4vw, 54px); line-height: 1.04; letter-spacing: -.06em; }
-    .section-heading p { margin-bottom: 0; color: var(--muted); font-size: 16px; line-height: 1.75; }
+  /* ---------- features ---------- */
+  .feature-row{
+    display:grid; grid-template-columns:56px 1fr; gap:22px;
+    padding:28px 0; border-top:2px solid var(--ink-faint);
+  }
+  .feature-row:last-child{border-bottom:2px solid var(--ink-faint);}
+  .feature-motif svg{width:40px; height:40px;}
+  .feature-row h3{font-size:22px; margin:0 0 8px; font-weight:800;}
+  .feature-row p{margin:0; color:var(--ink-soft); font-size:15.5px; line-height:1.6; max-width:56ch;}
 
-    .glass-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-    .glass-card { position: relative; min-height: 238px; padding: 25px; overflow: hidden; border: 1px solid rgba(255,255,255,.11); border-radius: 21px; background: linear-gradient(145deg, rgba(36,32,55,.61), rgba(16,15,25,.68)); box-shadow: inset 0 1px rgba(255,255,255,.09); transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease; }
-    .glass-card::after { position: absolute; right: -70px; bottom: -80px; width: 210px; height: 210px; content: ""; border-radius: 50%; background: radial-gradient(circle, rgba(122,83,255,.21), transparent 64%); }
-    .glass-card:hover { transform: translateY(-7px); border-color: rgba(199,176,255,.35); box-shadow: 0 22px 55px rgba(0,0,0,.22), inset 0 1px rgba(255,255,255,.14); }
-    .feature-icon { display: grid; width: 44px; height: 44px; place-items: center; margin-bottom: 24px; border: 1px solid rgba(255,255,255,.17); border-radius: 14px; background: linear-gradient(135deg, rgba(255,60,172,.35), rgba(63,150,255,.18)); color: white; font-size: 20px; box-shadow: inset 0 1px rgba(255,255,255,.2); }
-    .glass-card h3 { position: relative; z-index: 1; margin-bottom: 9px; font-family: "Space Grotesk", sans-serif; font-size: 19px; letter-spacing: -.04em; }
-    .glass-card p { position: relative; z-index: 1; margin-bottom: 0; color: #aca9bd; font-size: 13px; line-height: 1.75; }
+  /* ---------- workflow ---------- */
+  .workflow{background:var(--ink); color:var(--cream);}
+  .workflow .section-head p{color:rgba(255,253,246,.62);}
+  .workflow-list{list-style:none; margin:0; padding:0; display:grid; gap:0;}
+  .workflow-list li{display:grid; grid-template-columns:90px 1fr; gap:22px; padding:24px 0; border-top:1px solid rgba(255,253,246,.16);}
+  .workflow-list li:last-child{border-bottom:1px solid rgba(255,253,246,.16);}
+  .counter{font-family:Anton,sans-serif; font-size:15px; letter-spacing:.06em; align-self:center;
+    border:1px solid rgba(255,253,246,.3); border-radius:4px; padding:5px 0; text-align:center;}
+  .workflow-list li:nth-child(1) .counter{color:var(--pink); border-color:rgba(255,46,126,.4);}
+  .workflow-list li:nth-child(2) .counter{color:var(--orange); border-color:rgba(255,122,26,.4);}
+  .workflow-list li:nth-child(3) .counter{color:#B98CFF; border-color:rgba(185,140,255,.4);}
+  .workflow-list li:nth-child(4) .counter{color:var(--pink); border-color:rgba(255,46,126,.4);}
+  .workflow-list h3{margin:0 0 6px; font-size:19px;}
+  .workflow-list p{margin:0; color:rgba(255,253,246,.62); font-size:14.5px; line-height:1.6; max-width:52ch;}
 
-    .workflow { position: relative; overflow: hidden; background: linear-gradient(180deg, transparent, rgba(71,43,117,.12), transparent); }
-    .workflow-inner { display: grid; grid-template-columns: .86fr 1.14fr; align-items: center; gap: 62px; }
-    .workflow-copy h2 { margin-bottom: 18px; font-family: "Space Grotesk", sans-serif; font-size: clamp(34px, 4.4vw, 57px); line-height: 1.04; letter-spacing: -.065em; }
-    .workflow-copy p { max-width: 480px; color: var(--muted); font-size: 16px; line-height: 1.78; }
-    .workflow-steps { display: grid; gap: 12px; }
-    .step { display: grid; grid-template-columns: 48px 1fr; gap: 16px; align-items: center; padding: 19px; border: 1px solid rgba(255,255,255,.1); border-radius: 18px; background: rgba(26,23,39,.54); box-shadow: inset 0 1px rgba(255,255,255,.07); }
-    .step-number { display: grid; width: 48px; height: 48px; place-items: center; border-radius: 14px; font-family: "Space Grotesk", sans-serif; font-weight: 700; background: linear-gradient(135deg, rgba(255,60,172,.3), rgba(48,138,255,.27)); }
-    .step h3 { margin: 0 0 4px; font-size: 14px; }
-    .step p { margin: 0; color: #aaa7bc; font-size: 12px; line-height: 1.55; }
+  /* ---------- pricing (ticket) ---------- */
+  .pricing .wrap{display:flex; justify-content:center;}
+  .ticket{
+    position:relative; display:grid; grid-template-columns:1fr 210px; max-width:760px; width:100%;
+    background:var(--cream); border:2px solid var(--ink); border-radius:16px; overflow:hidden;
+  }
+  .ticket-main{padding:34px 32px;}
+  .ticket-main h3{font-family:Anton,sans-serif; font-size:24px; margin:0 0 6px;}
+  .ticket-main > p{margin:0 0 20px; color:var(--ink-soft); font-size:14.5px;}
+  .benefits{list-style:none; margin:0 0 24px; padding:0; display:grid; gap:10px;}
+  .benefits li{font-size:14.5px; padding-left:20px; position:relative;}
+  .benefits li::before{content:"—"; position:absolute; left:0; color:var(--orange); font-weight:800;}
+  .ticket-stub{
+    border-left:2px dashed var(--ink); padding:34px 24px; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; text-align:center; background:var(--paper-deep); position:relative;
+  }
+  .ticket-stub::before, .ticket-stub::after{
+    content:""; position:absolute; left:-13px; width:24px; height:24px; border-radius:50%;
+    background:var(--paper); border:2px solid var(--ink);
+  }
+  .ticket-stub::before{top:-13px;}
+  .ticket-stub::after{bottom:-13px;}
+  .ticket-price{font-family:Anton,sans-serif; font-size:44px; line-height:1;}
+  .ticket-price small{display:block; font-family:Inter,sans-serif; font-size:12px; font-weight:700; color:var(--ink-soft); margin-top:4px;}
+  .ticket-foot{margin-top:20px; font-size:11px; color:var(--ink-soft); max-width:56ch; text-align:center;}
 
-    .pricing { padding-top: 115px; }
-    .price-card { position: relative; width: min(100%, 780px); margin: 0 auto; padding: 1px; overflow: hidden; border-radius: 28px; background: linear-gradient(125deg, rgba(255,60,172,.84), rgba(143,85,255,.75) 48%, rgba(60,195,255,.72)); box-shadow: 0 28px 90px rgba(78,39,161,.32); }
-    .price-card-inner { padding: 42px; border-radius: 27px; background: radial-gradient(circle at 100% 0%, rgba(134,81,255,.2), transparent 33%), rgba(15,14,23,.96); }
-    .price-top { display: flex; align-items: flex-end; justify-content: space-between; gap: 25px; padding-bottom: 28px; border-bottom: 1px solid rgba(255,255,255,.12); }
-    .price-top h3 { margin: 0 0 9px; font-family: "Space Grotesk", sans-serif; font-size: 26px; letter-spacing: -.055em; }
-    .price-top p { margin: 0; color: #aaa7bd; font-size: 13px; line-height: 1.65; }
-    .price { white-space: nowrap; font-family: "Space Grotesk", sans-serif; font-size: 42px; font-weight: 700; letter-spacing: -.07em; }
-    .price small { color: #aaa7bd; font-family: Manrope, sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0; }
-    .price-content { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 30px; padding-top: 29px; }
-    .benefits { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px 20px; padding: 0; margin: 0; list-style: none; }
-    .benefits li { color: #d7d3e4; font-size: 12px; font-weight: 600; }
-    .benefits li::before { margin-right: 8px; content: "✓"; color: var(--cyan); font-weight: 800; }
-    .price-foot { margin: 23px 0 0; color: #858297; font-size: 10px; }
+  /* ---------- final ---------- */
+  .final .wrap{
+    position:relative; overflow:hidden;
+    border:2px solid var(--ink); border-radius:18px; padding:64px 40px; text-align:center;
+    background:linear-gradient(115deg, var(--pink) 0%, var(--pink) 48%, var(--orange) 52%, var(--orange) 100%);
+  }
+  .final h2{font-size:clamp(30px,4.4vw,48px); max-width:16ch; margin:0 auto 16px; line-height:1.08; color:var(--cream);}
+  .final p{max-width:48ch; margin:0 auto 28px; color:rgba(255,253,246,.9); font-size:16px;}
+  .final .btn-primary{background:var(--ink); color:var(--cream); border-color:var(--ink);}
+  .final .btn-primary:hover{background:var(--cream); color:var(--ink);}
 
-    .final { padding-top: 55px; }
-    .final-box { position: relative; padding: 73px 30px; overflow: hidden; border: 1px solid rgba(255,255,255,.13); border-radius: 30px; text-align: center; background: radial-gradient(ellipse at 30% 5%, rgba(255,60,172,.22), transparent 39%), radial-gradient(ellipse at 80% 90%, rgba(43,134,255,.24), transparent 42%), rgba(25,20,40,.64); box-shadow: inset 0 1px rgba(255,255,255,.11); }
-    .final-box::before { position: absolute; top: -150px; left: calc(50% - 150px); width: 300px; height: 300px; content: ""; border: 1px solid rgba(255,255,255,.18); border-radius: 50%; box-shadow: 0 0 0 35px rgba(255,255,255,.025), 0 0 75px rgba(173,95,255,.24); }
-    .final-box h2 { position: relative; max-width: 690px; margin: 0 auto 17px; font-family: "Space Grotesk", sans-serif; font-size: clamp(34px, 4.8vw, 59px); line-height: 1.02; letter-spacing: -.067em; }
-    .final-box p { position: relative; max-width: 560px; margin: 0 auto 28px; color: #b8b4c9; font-size: 15px; line-height: 1.75; }
+  /* ---------- footer ---------- */
+  .site-footer{border-top:2px solid var(--ink); padding:26px 0 calc(26px + env(safe-area-inset-bottom,0px));}
+  .footer-inner{display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; font-size:13px; color:var(--ink-soft);}
+  .footer-inner a{font-weight:700; color:var(--ink);}
 
-    footer { padding: 27px 0 37px; color: #827f93; font-size: 11px; }
-    .footer-inner { display: flex; justify-content: space-between; gap: 20px; padding-top: 27px; border-top: 1px solid rgba(255,255,255,.09); }
-    .footer-inner a { color: #b6b2c4; }
-    .footer-inner a:hover { color: white; }
-
-    @keyframes equalize { to { transform: scaleY(.45); } }
-    @keyframes breathe { 50% { transform: scale(.91); opacity: .75; } }
-    @keyframes floaty { 50% { transform: translateY(-10px); } }
-
-    @media (max-width: 900px) {
-      .hero { padding-top: 62px; }
-      .hero-grid, .workflow-inner { grid-template-columns: 1fr; }
-      .hero-grid { gap: 37px; }
-      .showcase { width: min(530px, 100%); min-height: 475px; margin: 0 auto; }
-      .player { right: 4%; }
-      .glass-grid { grid-template-columns: repeat(2, 1fr); }
-      .workflow-inner { gap: 40px; }
-      .workflow-copy { text-align: center; }
-      .workflow-copy p { margin-right: auto; margin-left: auto; }
-    }
-
-    @media (max-width: 620px) {
-      .wrap { width: min(100% - 30px, 1160px); }
-      .nav-inner { min-height: 66px; }
-      .nav-links { display: none; }
-      .brand { font-size: 20px; }
-      .button-small { min-height: 38px; padding: 0 13px; }
-      .hero { padding: 48px 0 59px; }
-      h1 { font-size: clamp(40px, 12vw, 57px); }
-      .hero-copy { font-size: 15px; line-height: 1.68; }
-      .hero-actions { display: grid; }
-      .hero-actions .button { width: 100%; }
-      .showcase { min-height: 396px; }
-      .player { top: 17px; right: 4%; min-height: 370px; padding: 11px; border-radius: 25px; }
-      .player-notch { height: 15px; margin-bottom: 5px; }
-      .visual { min-height: 277px; border-radius: 16px; }
-      .visual::before { width: 210px; height: 210px; }
-      .float-card { padding: 9px 10px; font-size: 9px; }
-      .card-lyrics { left: -3px; top: 42px; }
-      .card-reel { right: -2px; bottom: 19px; }
-      .proof-inner { display: block; text-align: center; }
-      .proof-label { margin-bottom: 12px; }
-      .format-list { justify-content: center; }
-      section { padding: 75px 0; }
-      .section-heading { margin-bottom: 34px; }
-      .section-heading p { font-size: 14px; }
-      .glass-grid { grid-template-columns: 1fr; }
-      .glass-card { min-height: auto; }
-      .workflow-copy h2 { font-size: 37px; }
-      .workflow-copy p { font-size: 14px; }
-      .price-card-inner { padding: 27px 21px; }
-      .price-top, .price-content { display: block; }
-      .price { margin-top: 20px; }
-      .benefits { grid-template-columns: 1fr; margin-bottom: 25px; }
-      .price-content .button { width: 100%; }
-      .final-box { padding: 57px 20px; }
-      .footer-inner { display: block; text-align: center; }
-      .footer-inner p + p { margin-top: 11px; }
-    }
-  </style>
+  @media (max-width:900px){
+    .hero-grid{grid-template-columns:1fr; gap:36px;}
+    .hero-visual{order:-1; min-height:auto; padding-top:20px;}
+    .block-color{display:none;}
+    .stats-grid{grid-template-columns:1fr; gap:30px;}
+    .ticket{grid-template-columns:1fr;}
+    .ticket-stub{border-left:none; border-top:2px dashed var(--ink);}
+    .ticket-stub::before,.ticket-stub::after{left:50%; transform:translateX(-50%);}
+    .ticket-stub::before{top:-13px;}
+    .ticket-stub::after{bottom:-13px;}
+  }
+  @media (max-width:640px){
+    .nav-links{display:none;}
+    .hero{padding:36px 0 0;}
+    section{padding:60px 0;}
+    .cta-row{display:grid;}
+    .cta-row .btn, .cta-row .pulse-wrap{width:100%;}
+    .cta-row .pulse-wrap .btn{width:100%;}
+    .feature-row{grid-template-columns:1fr; gap:10px;}
+    .workflow-list li{grid-template-columns:56px 1fr;}
+    .final .wrap{padding:44px 22px;}
+    .footer-inner{flex-direction:column; text-align:center;}
+  }
+</style>
 </head>
 <body>
-  <nav class="nav">
-    <div class="wrap nav-inner">
-      <a class="brand" href="#top" aria-label="BeatViz home"><span class="brand-mark"><span>✦</span></span>BeatViz</a>
-      <div class="nav-links">
-        <a href="#features">Features</a>
-        <a href="#workflow">How it works</a>
-        <a href="#pricing">Pricing</a>
-      </div>
-      <a class="button button-small" href="/app.html"Get BeatViz <span class="button-arrow">→</span></a>
-    </div>
-  </nav>
 
-  <main id="top">
-    <section class="hero">
-      <div class="wrap hero-grid">
+<header class="site-header">
+  <div class="wrap nav-inner">
+    <a class="brand" href="#top">BeatViz<span class="dot">.</span></a>
+    <nav class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#workflow">How it works</a>
+      <a href="#pricing">Pricing</a>
+    </nav>
+    <a class="btn btn-primary btn-small" href="/app.html">Try it free</a>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="halftone" aria-hidden="true"></div>
+    <div class="wrap hero-grid">
+      <div>
+        <h1 class="headline display">
+          <span class="line">Make them</span>
+          <span class="line">stop scrolling.</span>
+        </h1>
+        <p class="subcopy">Upload the track. Drop in your cover art, lyrics or clips. Fifteen minutes later you've got a lyric video, visualizer or Reel that looks like you actually tried — not a title card over a static image.</p>
+        <div class="cta-row">
+          <span class="pulse-wrap"><a class="btn btn-primary" href="/app.html">Make your first video — free</a></span>
+          <a class="btn btn-secondary" href="#workflow">See how it works</a>
+        </div>
+        <p class="price-line">Then just <b>₹199/month</b> for unlimited videos. No card required to try it.</p>
+      </div>
+
+      <div class="hero-visual">
+        <div class="block-color" aria-hidden="true"></div>
+        <div class="sticker" id="sticker">
+          <span class="tag">Made in 15 min</span>
+          <div class="sticker-top">
+            <span>NOW EDITING</span>
+            <div class="reels"><div class="reel"></div><div class="reel"></div></div>
+          </div>
+          <div class="frame">
+            <div class="eq"><i></i><i></i><i></i><i></i></div>
+            <div>
+              <small>Midnight session</small>
+              <h3 class="rotator">
+                <span>LYRIC<br>VIDEO</span>
+                <span>VISUAL-<br>IZER</span>
+                <span>REEL<br>CUT</span>
+              </h3>
+            </div>
+          </div>
+          <div class="sticker-bottom">
+            <span>Afterglow · 3:41</span>
+            <span>9:16 · 1:1 · 16:9</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="ticker" aria-label="Supported formats">
+    <div class="ticker-track">
+      <span>MP3</span><span>WAV</span><span>AAC</span><span>FLAC</span><span>YOUTUBE</span><span>REELS</span><span>SHORTS</span>
+      <span>MP3</span><span>WAV</span><span>AAC</span><span>FLAC</span><span>YOUTUBE</span><span>REELS</span><span>SHORTS</span>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="wrap stats-grid">
+      <div class="stat"><b>48,000+</b><span>videos exported by artists like you</span></div>
+      <div class="stat"><b>3,100</b><span>independent artists creating monthly</span></div>
+      <div class="stat"><b>15 min</b><span>average time from upload to export</span></div>
+    </div>
+  </div>
+
+  <section id="features">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 class="display">Your music already has a sound. Give the video one too.</h2>
+        <p>Everything here is built around one track at a time, so the visual actually fits the song — not a template you're pouring it into.</p>
+      </div>
+
+      <article class="feature-row">
+        <div class="feature-motif">
+          <svg viewBox="0 0 40 40" fill="none"><path d="M6 24V16M14 28V12M22 30V10M30 22V18" stroke="#161018" stroke-width="3" stroke-linecap="round"/></svg>
+        </div>
         <div>
-          <div class="eyebrow"><span class="live-dot"></span> The visual studio for independent artists</div>
-          <h1>Make your music <span class="gradient-text">impossible to scroll past.</span></h1>
-          <p class="hero-copy">Turn every track into a polished lyric video, music visualizer, Reel or Short—designed to look as professional as the music sounds.</p>
-          <div class="hero-actions">
-            <a class="button" href="/app.html"Start creating with BeatViz <span class="button-arrow">→</span></a>
-            <a class="button button-secondary" href="#workflow">See how it works</a>
-          </div>
-          <p class="plan-note"><span>₹199/month</span> &nbsp;•&nbsp; Unlimited standard-HD creation &nbsp;•&nbsp; Cancel anytime</p>
+          <h3>Bring your track to life</h3>
+          <p>Import MP3, WAV, AAC or FLAC and BeatViz builds the visual around the song from the first beat — tempo, drops and all.</p>
         </div>
+      </article>
 
-        <div class="showcase" aria-label="A preview of a BeatViz music visual">
-          <div class="orbit"></div>
-          <div class="float-card card-lyrics"><span class="mini-icon">✦</span>Lyrics synced<small>Perfectly on beat</small></div>
-          <div class="float-card card-reel"><span class="mini-icon">◉</span>9:16 Reel ready<small>Publish in seconds</small></div>
-          <div class="player">
-            <div class="player-notch"></div>
-            <div class="visual">
-              <div class="visual-title"><small>Midnight session</small>THE<br>AFTERGLOW</div>
-            </div>
-            <div class="player-bottom">
-              <div class="track-info">Afterglow <span>BeatViz visualizer</span></div>
-              <div class="equalizer" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
-            </div>
-          </div>
+      <article class="feature-row">
+        <div class="feature-motif">
+          <svg viewBox="0 0 40 40" fill="none"><rect x="6" y="6" width="28" height="28" rx="4" stroke="#161018" stroke-width="3"/><circle cx="15" cy="16" r="3" stroke="#161018" stroke-width="3"/><path d="M8 28l8-8 6 6 6-9 4 5" stroke="#161018" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
+        <div>
+          <h3>Make it unmistakably yours</h3>
+          <p>Layer in cover art, portraits, logo marks, clips, text and lyrics so every frame looks like your release, not a stock template.</p>
+        </div>
+      </article>
+
+      <article class="feature-row">
+        <div class="feature-motif">
+          <svg viewBox="0 0 40 40" fill="none"><rect x="5" y="9" width="14" height="22" rx="2" stroke="#161018" stroke-width="3"/><rect x="22" y="14" width="14" height="12" rx="2" stroke="#161018" stroke-width="3"/></svg>
+        </div>
+        <div>
+          <h3>Publish in every format</h3>
+          <p>Reframe between vertical, square and widescreen without rebuilding the edit — one project, every platform it needs to land on.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="workflow" id="workflow">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 class="display">From track to finished video, without the editing maze.</h2>
+        <p>The first pass is fast on purpose. The timeline is there when you want to get particular about a single cut.</p>
       </div>
-    </section>
+      <ul class="workflow-list">
+        <li><div class="counter">01</div><div><h3>Start with your sound</h3><p>Upload the track, then bring in cover art, lyrics, photos or clips you want in the frame.</p></div></li>
+        <li><div class="counter">02</div><div><h3>Choose your visual direction</h3><p>Pick motion, color and effects that match the energy of the song — moody, bright, chaotic, calm.</p></div></li>
+        <li><div class="counter">03</div><div><h3>Fine-tune what matters</h3><p>Drop into the timeline to move, trim and resize any layer, right down to a single lyric line.</p></div></li>
+        <li><div class="counter">04</div><div><h3>Export for where people watch</h3><p>Get versions ready for YouTube, Reels, Shorts and posts — no re-editing between formats.</p></div></li>
+      </ul>
+    </div>
+  </section>
 
-    <div class="proof">
-      <div class="wrap proof-inner">
-        <div class="proof-label">One studio for artists who want every release to look intentional.</div>
-        <div class="format-list"><span>MP3</span><span>WAV</span><span>AAC</span><span>FLAC</span><span>YOUTUBE</span><span>REELS</span><span>SHORTS</span></div>
+  <section id="pricing">
+    <div class="wrap">
+      <div class="section-head" style="margin-left:auto;margin-right:auto;text-align:center;">
+        <h2 class="display">One plan. No surprises.</h2>
+        <p style="margin-left:auto;margin-right:auto;">A single price for artists who want to release more and think about it less.</p>
+      </div>
+      <div class="ticket">
+        <div class="ticket-main">
+          <h3>BeatViz Creator</h3>
+          <p>Everything you need to turn a track into a video worth sharing.</p>
+          <ul class="benefits">
+            <li>Unlimited standard-HD video creation</li>
+            <li>Lyric videos, visualizers, Reels and Shorts</li>
+            <li>Full timeline editing, saved projects</li>
+            <li>Upload audio, lyrics, art and branding</li>
+            <li>Cancel anytime, no lock-in</li>
+          </ul>
+          <a class="btn btn-primary" href="/app.html">Start creating — ₹199/month</a>
+        </div>
+        <div class="ticket-stub">
+          <div class="ticket-price">₹199<small>per month</small></div>
+          <p class="ticket-foot">Standard-HD exports are 720p. Fair-use policy applies.</p>
+        </div>
       </div>
     </div>
+  </section>
 
-    <section id="features">
-      <div class="wrap">
-        <div class="section-heading">
-          <div class="eyebrow">Built for your next release</div>
-          <h2>Your music already has a sound.<br>Give it a <span class="gradient-text">world.</span></h2>
-          <p>Shape a complete visual identity around every track—from the first beat to the version your audience shares.</p>
-        </div>
-        <div class="glass-grid">
-          <article class="glass-card"><div class="feature-icon">♫</div><h3>Bring your track to life</h3><p>Import MP3, WAV, AAC or FLAC, then build a visual world around the song from the very first beat.</p></article>
-          <article class="glass-card"><div class="feature-icon">✦</div><h3>Make it unmistakably yours</h3><p>Use cover art, portraits, logo marks, clips, text and lyrics to make every frame feel like your release.</p></article>
-          <article class="glass-card"><div class="feature-icon">↗</div><h3>Publish in every format</h3><p>Move between vertical, square and widescreen video without rebuilding the creative work from scratch.</p></article>
-        </div>
-      </div>
-    </section>
-
-    <section class="workflow" id="workflow">
-      <div class="wrap workflow-inner">
-        <div class="workflow-copy">
-          <div class="eyebrow">Simple by design</div>
-          <h2>From track to standout visual—without the editing maze.</h2>
-          <p>BeatViz keeps the first steps effortless, while the timeline is ready when you want more creative control. Build quickly, then refine every lyric, layer, cut and visual moment.</p>
-        </div>
-        <div class="workflow-steps">
-          <article class="step"><div class="step-number">01</div><div><h3>Start with your sound</h3><p>Upload the track, then bring in your cover art, lyrics, artist photos or clips.</p></div></article>
-          <article class="step"><div class="step-number">02</div><div><h3>Choose your visual direction</h3><p>Set the scene with motion, effects and visual styling that fits the energy of the song.</p></div></article>
-          <article class="step"><div class="step-number">03</div><div><h3>Refine the moments that matter</h3><p>Use the timeline to move, trim, resize and perfect every layer at your own pace.</p></div></article>
-          <article class="step"><div class="step-number">04</div><div><h3>Publish where your listeners are</h3><p>Create ready-to-share versions for YouTube, Reels, Shorts and social posts.</p></div></article>
-        </div>
-      </div>
-    </section>
-
-    <section class="pricing" id="pricing">
-      <div class="wrap">
-        <div class="section-heading">
-          <div class="eyebrow">Simple pricing</div>
-          <h2>A professional visual studio for <span class="gradient-text">₹199/month.</span></h2>
-          <p>One clear plan for artists who want to release more, test more ideas and keep their visual content moving.</p>
-        </div>
-        <div class="price-card">
-          <div class="price-card-inner">
-            <div class="price-top">
-              <div><h3>BeatViz Creator</h3><p>Everything you need to turn your music into compelling video.</p></div>
-              <div class="price">₹199 <small>/ month</small></div>
-            </div>
-            <div class="price-content">
-              <ul class="benefits">
-                <li>Unlimited standard-HD video creation</li>
-                <li>Lyric videos and music visualizers</li>
-                <li>Reels, Shorts and YouTube formats</li>
-                <li>Project saving and full editing tools</li>
-                <li>Audio, lyrics, assets and branding uploads</li>
-                <li>Cancel anytime</li>
-              </ul>
-              <a class="button" href="/app.html"Get BeatViz Creator <span class="button-arrow">→</span></a>
-            </div>
-            <p class="price-foot">Standard-HD exports are 720p. Fair-use policy applies.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="final">
-      <div class="wrap">
-        <div class="final-box">
-          <h2>Your next release can look as good as it sounds.</h2>
-          <p>Turn the track you are proud of into the visual people stop for, replay and share.</p>
-          <a class="button" href="/app.html"Start creating with BeatViz <span class="button-arrow">→</span></a>
-          <p class="plan-note">₹199/month &nbsp;•&nbsp; Professional tools for independent artists &nbsp;•&nbsp; Cancel anytime</p>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer>
-    <div class="wrap footer-inner">
-      <p>© 2026 BeatViz. Built for independent artists and creators.</p>
-      <p>Need a hand? <a href="mailto:support@beatviz.in">support@beatviz.in</a></p>
+  <section class="final">
+    <div class="wrap">
+      <h2 class="display">Your next release deserves to be watched, not just heard.</h2>
+      <p>Take the track you're proud of and turn it into the video people stop scrolling for.</p>
+      <a class="btn btn-primary" href="/app.html">Make your first video — free</a>
     </div>
-  </footer>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <p>© 2026 BeatViz. Built for independent artists.</p>
+    <p>Need a hand? <a href="mailto:support@beatviz.in">support@beatviz.in</a></p>
+  </div>
+</footer>
+
+<script>
+  (function(){
+    var sticker = document.getElementById('sticker');
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(!sticker || reduce) return;
+    var heroVisual = sticker.closest('.hero-visual');
+    heroVisual.addEventListener('mousemove', function(e){
+      var r = heroVisual.getBoundingClientRect();
+      var x = (e.clientX - r.left) / r.width - 0.5;
+      var y = (e.clientY - r.top) / r.height - 0.5;
+      sticker.style.transform = 'rotate(' + (-4 + x * 6) + 'deg) translate(' + (x*10) + 'px,' + (y*10) + 'px)';
+    });
+    heroVisual.addEventListener('mouseleave', function(){
+      sticker.style.transform = 'rotate(-4deg)';
+    });
+  })();
+</script>
+
 </body>
 </html>

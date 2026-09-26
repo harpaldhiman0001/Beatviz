@@ -5560,7 +5560,23 @@ function finalize() {
     webmBtn.style.display = '';
     mp4Btn.style.display = '';
 
-    if (recordingIsMp4) {
+    if (!sub.isActive) {
+        // Trial / non-paying users never see a working MP4 download button —
+        // show an upgrade prompt instead, regardless of the recording format.
+        if (!recordingIsMp4) {
+            webmBtn.href = url;
+            webmBtn.download = 'beatviz-' + exportQuality + '.webm';
+            webmBtn.classList.add('show');
+        } else {
+            webmBtn.classList.remove('show');
+        }
+        mp4Btn.classList.add('show');
+        mp4Btn.textContent = '⚡ Upgrade to export MP4';
+        mp4Btn.onclick = () => {
+            toast('MP4 export requires an active BeatViz Creator plan.');
+            showPaywall();
+        };
+    } else if (recordingIsMp4) {
         webmBtn.classList.remove('show');
         mp4Btn.classList.add('show');
         mp4Btn.textContent = '⬇ MP4 ' + Q_LABEL[exportQuality];
